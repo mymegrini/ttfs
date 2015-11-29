@@ -19,14 +19,14 @@ bin/$(LIB): obj/$(LIBO)
 obj/$(LIBO): lib/$(LIBC)
 	$(CC) -fpic -c -o $@ $<
 
-bin/$(EXEC): obj/$(OBJECTS) $(LIB)
+bin/$(EXEC): obj/$(OBJECTS) bin/$(LIB)
 	$(CC) -Lbin -ltfs -o $@ $<
 
-obj/%.o: %.c $(HEADERS)
+obj/%.o: src/%.c src/$(HEADERS)
 	$(CC) $(CFLAGS) -c -Isrc -Ilib -o $@ $<
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f obj/$(OBJECTS)
 
 mrproper: clean
-	rm -f $(EXEC) $(LIB)
+	rm -f bin/$(EXEC) bin/$(LIB)
