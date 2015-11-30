@@ -13,8 +13,11 @@ all: bin/$(EXEC)
 
 lib: bin/$(LIB)
 
+obj/ll.o: lib/ll.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 bin/$(LIB): obj/$(LIBO)
-	gcc -shared -o $@ $<
+	$(CC) $(CFLAGS) -shared -o $@ $<
 
 obj/$(LIBO): lib/$(LIBC)
 	$(CC) -fpic -c -o $@ $<
