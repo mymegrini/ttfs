@@ -1,0 +1,11 @@
+Tiny Toy File System project folder description
+
+bin: contains executables (contains .gitignore)
+doc: contains documentation
+dsk: contains TTFS disks (contains .gitignore)
+lib: contains library source files
+obj: contains compiler-generated object files (contains .gitignore)
+src: contains source files
+
+Makefile: make command instruction tree
+setup.sh: adds './bin' folder to PATH environment variable
