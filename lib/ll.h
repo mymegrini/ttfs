@@ -2,8 +2,8 @@
 #include "error.h"
 
 #define B_SIZE 1024    /***< block size */
-#define DD_MAX 50      /***< maximum open disk */
-
+#define DD_MAX 50      /***< maximum number of open disk */
+#define D_PARTMAX 3    /***< maximum number of partitions in a disk */
 
 /**
  * A structure to represent blocks
