@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include "error.h"
 
-#define FD_MAX 750
-#define B_SIZE 1024
+#define B_SIZE 1024    /***< block size */
+#define DD_MAX 50      /***< maximum open disk */
+
 
 /**
  * A structure to represent blocks
@@ -15,6 +16,18 @@ typedef struct{
  * A structure to represent an index of the DISK_ID array
  */
 typedef int disk_id;
+
+/**
+ * A structure containing informations about an opened disk
+ */
+typedef struct disk_ent =
+  {
+    char *name;      /**< name of the disk */
+    int fd;          /**< file descriptor */
+    uint32_t size;   /**< size of the disl */
+  } disk_ent;
+
+extern disk_ent __o_disk[DD_MAX];    /**< opened disks. disk_id refer to an index in this array */
 
 /**
  * @brief This function associates an id number to a disk
