@@ -14,7 +14,7 @@ typedef struct disk_ent =
 
   } disk_ent;
 
-extern disk_ent __o_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
+static disk_ent __o_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
 
 
 /**
