@@ -1,3 +1,5 @@
+#ifndef LL_H
+#define LL_H
 #include <stdint.h>
 #include "error.h"
 
@@ -9,7 +11,7 @@
  * A structure to represent blocks
  */
 typedef struct{
-  char val[B_SIZE]; /**< the block contents */
+  char data[B_SIZE]; /**< the block contents */
 } block;
 
 /**
@@ -56,3 +58,5 @@ error sync_disk(disk_id id);
  * @return Returns an error if encountered
  */
 error stop_disk(disk_id id);
+
+#endif

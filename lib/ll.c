@@ -2,22 +2,21 @@
 #include "error.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/types>
-#include <unistd.h>
+
+char _error[ERR_STRLEN+1];
 
 /**                                                                                                                                            
  * A structure containing informations about an opened disk                                                                                    
  */
-typedef struct disk_ent =
-  {
-    char *name;      /**< name of the disk */
-    int fd;          /**< file descriptor */
-    uint32_t size;   /**< size of the disk */
-    uint8_t npart;   /**< number of partitions */
-    uint32_t part[D_PARTMAX]    /**< index of partitions, null at the creation. */
-  } disk_ent;
+typedef struct {
+  char *name;      /**< name of the disk */
+  int fd;          /**< file descriptor */
+  uint32_t size;   /**< size of the disk */
+  uint8_t npart;   /**< number of partitions */
+  uint32_t part[D_PARTMAX];    /**< index of partitions, null at the creation. */
+}disk_ent;
 
-extern disk_ent __o_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
+static disk_ent *_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
 
 /**
  * Physical reading of a block.
@@ -35,18 +34,19 @@ extern disk_ent __o_disk[DD_MAX];    /**< opened disks. A disk_id refers to an i
  */
 error read_physical_block(disk_id id,block b,uint32_t num){
 
-  if ( id >= DD_MAX || __o_disk[id] == NULL ) {
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    snprintf(_error, ERR_STRLEN, "disk_id %d unavailable", id);
     // error message
-    return D_UNAVAILABLE
-  } else if ( num < b.size ) {
+    return D_UNAVAILABLE;
+  } else if ( num < _disk[id]->size ) {
     // error message
     return B_OUT_OF_DISK;
   } else {
-    if ( lseek(__o_disk[id].fd, B_SIZE*num, SEEK_SET) == -1 ) {
+    if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
       // error message
       return D_SEEK_ERR;
     }
-    if ( read(__o_disk[id], b, B_SIZE) == -1 ) {
+    if ( read(_disk[id]->fd, &b, B_SIZE) == -1 ) {
       // error message
       return D_READ_ERR;
     }
@@ -64,18 +64,18 @@ error read_physical_block(disk_id id,block b,uint32_t num){
  */
 error write_physical_block(disk_id id,block b,uint32_t num){
 
-  if ( id >= DD_MAX || __o_disk[id] == NULL ) {
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
     // error message
-    return D_UNAVAILABLE
-  } else if ( num < b.size ) {
+    return D_UNAVAILABLE;
+  } else if ( num > _disk[id]->size ) {
     // error message
     return B_OUT_OF_DISK;
   } else {
-    if ( lseek(__o_disk[id].fd, B_SIZE*num, SEEK_SET) == -1 ) {
+    if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
       // error message
       return D_SEEK_ERR;
     }
-    if ( write(__o_disk[id], b, B_SIZE) == -1 ) {
+    if ( write(_disk[id]->fd, &b,  B_SIZE) == -1 ) {
       // error message
       return D_WRITE_ERR;
     }
