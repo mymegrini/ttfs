@@ -13,7 +13,7 @@ typedef int  error;
 /**
  * A variable to hold an error message
  */
-extern char _error[ERR_STRLEN+1];
+extern char *_error;
 
 #define D_UNAVAILABLE 1    /**< disk_id unavailable */
 #define B_OUT_OF_DISK 2    /**< Access impossible: block number out of the disk */
