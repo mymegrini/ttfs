@@ -1,5 +1,5 @@
 #ifndef ERROR_H
-#define ERROR_H
+#define ERROR_H 1
 
 #define ERR_STRLEN 80
 
@@ -10,12 +10,17 @@
  */
 typedef int  error;
 
-/**
- * A variable to hold an error message
- */
-extern char *_error;
 
-#define D_UNAVAILABLE 1    /**< disk_id unavailable */
+/**
+ * Contain the last error
+ */
+extern int errnum;
+
+
+
+extern void printerror(char *s);
+	    
+#define D_WRONGID 1    /**< Wrong disk_id  */
 #define B_OUT_OF_DISK 2    /**< Access impossible: block number out of the disk */
 #define D_SEEK_ERR 3    /**< Error while seeking to a block */
 #define D_READ_ERR 4    /**< Error while reading a block */
