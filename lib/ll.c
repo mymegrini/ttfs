@@ -101,7 +101,7 @@ error start_disk(char *name,disk_id *id){
   int i = 0;
   while((i<DD_MAX)||(_disk[i]!=NULL))
     i++;
-  if(i==DD_MAX) {
+  if(i == DD_MAX) {
     // error message
     return OD_FULL;
   }
@@ -117,16 +117,16 @@ error start_disk(char *name,disk_id *id){
   _disk[i]=(disk_ent *)(malloc(sizeof(disk_ent *)));
   _disk[i]->name=name;
   _disk[i]->fd=new_fd;
-  uint_32 val_size;
+  uint32_t val_size;
   _readint(b_read,0,&val_size) //fonction de Nicolas
   _disk[i]->size = val_size;
-  uint_32 val_npart;
+  uint32_t val_npart;
   _readint(b_read,4,&val_npart);
   _disk[i]->npart = val_npart;
   int j = 0;
   for(j=0;j<val_npart;j++){
     int pos = j*4+8;
-    uint_32 val_tmp;
+    uint32_t val_tmp;
     _readint(b_read,pos,&val_tmp);
     _disk[i]->part[j] = val_tmp;
   }
