@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-char *_error = (char *)malloc(sizeof(char)*(ERR_STRLEN+1));
-
 /**                                                                                                                                            
  * A structure containing informations about an opened disk                                                                                    
  */
@@ -20,8 +18,11 @@ typedef struct {
 
 static disk_ent *_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
 
+
+
+
 /**
- * Physical reading of a block.
+ * Physical reading of a block in a disk.
  * Lowest level to read a block, 
  * are directly accessed
  *
@@ -29,22 +30,17 @@ static disk_ent *_disk[DD_MAX];    /**< opened disks. A disk_id refers to an ind
  * \param b the block to store the reading
  * \param num the number of the block
  * \return error 
- * \see D_UNAVAILABLE
+ * \see D_WRONGID
  * \see B_OUT_OF_DISK
  * \see D_SEEK_ERR
  * \see D_READ_ERR
  */
 error read_physical_block(disk_id id,block b,uint32_t num){
 
-  if ( id >= DD_MAX || _disk[id] == NULL ) {
-    snprintf(_error, ERR_STRLEN, "disk_id %d unavailable\n", id);
-    // error message
-    return D_UNAVAILABLE;
-  }
   // In the case of reading the block 0,
   // check if the disk is a new empty file
   // if not, return D_NEWDISK
-  else if ( num == 0 ) {
+  if ( num == 0 ) {
     int r = read(_disk[id]->fd, &b, B_SIZE);
     if ( r == -1 ) {
       // error message
@@ -69,18 +65,22 @@ error read_physical_block(disk_id id,block b,uint32_t num){
 }
 
 /**
- * 
- * 
- * 
- * 
- * 
+ * Physical writing of a block in a disk.
+ * Lowest level to read a block, 
+ * are directly accessed
+ *
+ * \param id the id of the disk 
+ * \param b the block to store the reading
+ * \param num the number of the block
+ * \return error 
+ * \see D_WRONGID
+ * \see B_OUT_OF_DISK
+ * \see D_SEEK_ERR
+ * \see D_READ_ERR
  */
 error write_physical_block(disk_id id,block b,uint32_t num){
 
-  if ( id >= DD_MAX || _disk[id] == NULL ) {
-    // error message
-    return D_UNAVAILABLE;
-  } else if ( num > _disk[id]->size ) {
+  if ( num > _disk[id]->size ) {
     // error message
     return B_OUT_OF_DISK;
   } else {
@@ -96,6 +96,7 @@ error write_physical_block(disk_id id,block b,uint32_t num){
   
   return EXIT_SUCCESS;
 }
+
 
 /**
  * Starting a disk
@@ -124,7 +125,8 @@ error start_disk(char *name,disk_id *id){
   if(err_read != EXIT_SUCCESS)
     return err_read;
   _disk[i]=(disk_ent *)(malloc(sizeof(disk_ent *)));
-  _disk[i]->name=name;
+  _disk[i]->name=(char *)(malloc(sizeof(char)*strlen(name)));
+  strcpy(_disk[i]->name, name);    // better to copy the string, if not name could change...
   _disk[i]->fd=new_fd;
   uint32_t val_size;
   _readint(b_read,0,&val_size); //fonction de Nicolas
@@ -143,48 +145,81 @@ error start_disk(char *name,disk_id *id){
 
   return EXIT_SUCCESS;
 }
- 
+
+
 /**
+ * @brief Read a block from disk.
+ *        Use a cache memory to read.
  * 
- * 
- * 
- * 
- * 
+ * @param id 
+ * @param b 
+ * @param num 
+ * @return error could be D_WRONGID or EXIT_SUCCESS
+ * @see D_WRONGID
  */
 error read_block(disk_id id,block b,uint32_t num){
-  return EXIT_SUCCESS;
+
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    // error message
+    return D_WRONGID;;
+  }
+  return read_physical_block(id, b, num);
 }
- 
+
+
+
 /**
+ * @brief Write a block to a disk.
+ *        Use a cache memory to write.e
  * 
- * 
- * 
- * 
- * 
+ * @param id 
+ * @param b 
+ * @param num 
+ * @return error could be D_WRONGID or EXIT_SUCCESS
+ * @see D_WRONGID
  */
 error write_block(disk_id id,block b,uint32_t num){
-  return EXIT_SUCCESS;
+
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    // error message
+    return D_WRONGID;
+  }
+
+  return write_physical_block(id, b, num);
 }
 
 /**
+ * @brief Syncronize the disk.
+ *        Do all operations in the cache.
  * 
- * 
- * 
+ * @param id 
+ * @return error
  */
 error sync_disk(disk_id id){
   return EXIT_SUCCESS;
 }
 
+
 /**
+ * @brief Free an opened disk.
  * 
- * 
- * 
+ * @param id 
+ * @return error is D_WRONGID when ID is wrong, if not EXIT_SUCCESS
+ * @see D_WRONGID
  */
 error stop_disk(disk_id id){
 
-  if ( id > DD_MAX )
-    return 
-  return EXIT_SUCCESS;
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    // error message
+    return D_WRONGID;
+  }
+
+  error e = sync_disk(id);
+  if ( e != EXIT_SUCCESS )   // mmh... should we realy stop the disk in that case ?
+    return e;
+  
+  free(_disk[id]);
+  return EXIT_SUCCESS;;
 }
 
 
