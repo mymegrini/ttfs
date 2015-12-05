@@ -12,7 +12,7 @@ typedef struct {
   char *name;      /**< name of the disk */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
-  uint8_t npart;   /**< number of partitions */
+  uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX];    /**< index of partitions, null at the creation. */
 } disk_ent;
 
@@ -117,7 +117,19 @@ error start_disk(char *name,disk_id *id){
   _disk[i]=(disk_ent *)(malloc(sizeof(disk_ent *)));
   _disk[i]->name=name;
   _disk[i]->fd=new_fd;
-
+  uint_32 val_size;
+  _readint(b_read,0,&val_size) //fonction de Nicolas
+  _disk[i]->size = val_size;
+  uint_32 val_npart;
+  _readint(b_read,4,&val_npart);
+  _disk[i]->npart = val_npart;
+  int j = 0;
+  for(j=0;j<val_npart;j++){
+    int pos = j*4+8;
+    uint_32 val_tmp;
+    _readint(b_read,pos,&val_tmp);
+    _disk[i]->part[j] = val_tmp;
+  }
   *id = i;
 
   return EXIT_SUCCESS;
