@@ -15,4 +15,6 @@ extern char error[81];
 #define D_SEEK_ERR 3    /**< Error while seeking to a block */
 #define D_READ_ERR 4    /**< Error while reading a block */
 #define D_READ_ERR 5    /**< Error while writing a block */
-
+#define OD_FULL 6      /**< Array _disk full */ 
+#define D_OPEN_ERR 7   /**< Error while opening a disk */
+#define D_NEWDISK 8    /**< If a disk is created */

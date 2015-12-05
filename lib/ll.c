@@ -85,12 +85,37 @@ error write_physical_block(disk_id id,block b,uint32_t num){
 }
 
 /**
- * 
- * 
- * 
- * 
+ * Starting a disk
+ * Attribute a dynamic id to this disk
+ * Readding the block zero for starting disk
+ *
+ * \param name the name of the disk 
+ * \param id the dynamic id attribute to the disk at start
+ * \return error 
  */
 error start_disk(char *name,disk_id *id){
+  int i = 0;
+  while((i<DD_MAX)||(_disk[i]!=NULL))
+    i++;
+  if(i==DD_MAX) {
+    // error message
+    return OD_FULL;
+  }
+  int new_fd = open(name,O_CREAT|S_IRUSR|S_IWUSR);
+  if(new_fd == -1){
+    // error message
+    return D_OPEN_ERR;
+  }
+  block b_read;
+  error err_read = read_physical_block(i,b_read,0);
+  if(err_read != EXIT_SUCCESS)
+    return err_read;
+  _disk[i]=(disk_ent *)(malloc(sizeof(disk_ent *)));
+  _disk[i]->name=name;
+  _disk[i]->fd=new_fd;
+
+  *id = i;
+
   return EXIT_SUCCESS;
 }
  
@@ -133,3 +158,5 @@ error sync_disk(disk_id id){
 error stop_disk(disk_id id){
   return EXIT_SUCCESS;
 }
+
+
