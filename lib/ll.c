@@ -2,8 +2,10 @@
 #include "error.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
-char _error[ERR_STRLEN+1];
+char *_error = (char *)malloc(sizeof(char)*(ERR_STRLEN+1));
 
 /**                                                                                                                                            
  * A structure containing informations about an opened disk                                                                                    
@@ -118,7 +120,7 @@ error start_disk(char *name,disk_id *id){
   _disk[i]->name=name;
   _disk[i]->fd=new_fd;
   uint32_t val_size;
-  _readint(b_read,0,&val_size) //fonction de Nicolas
+  _readint(b_read,0,&val_size); //fonction de Nicolas
   _disk[i]->size = val_size;
   uint32_t val_npart;
   _readint(b_read,4,&val_npart);
