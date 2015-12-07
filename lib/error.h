@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #ifndef ERROR_H
 #define ERROR_H 1
 
@@ -8,13 +10,13 @@
 /**
  * A structure to represent an error id
  */
-typedef int  error;
+typedef uint8_t error;
 
 
 /**
  * Contains the last error
  */
-extern int errnum;
+extern error errnum;
 
 
 /**
