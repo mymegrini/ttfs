@@ -1,35 +1,35 @@
 CC = gcc
-CFLAGS = -Wall --pedantic
+CFLAGS = -Wall --pedantic -O3
 VPATH = src:obj
-EXEC = tfs_create tfs_partition tfs_format # tfs_cp tfs_mv tfs_rm tfs_cat tfs_mkdir ...
-LIB = libtfs.so
-LIBO = libtfs.o
-LIBC = tfs.c
-HEADERS = $(wildcard $*.h)
-OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
-
+EXEC = tfs_create # tfs_partition tfs_format tfs_cp tfs_mv tfs_rm tfs_cat tfs_mkdir ...
+LIB = lib/ll.o lib/libtfs.so
+HEADERS = $(wildcard lib/*.h) $(wildcard src/*.h)
+OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c))
 
 all: bin/$(EXEC)
 
-lib: bin/$(LIB)
+lib: $(LIB)
+
+path:	# changes PATH variable for more pleasant command calls
+	sh setup.h
 
 obj/ll.o: lib/ll.c
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -c -Ilib -o $@ $<
 
-bin/$(LIB): obj/$(LIBO)
+lib/libtfs.so: lib/libtfs.o
 	$(CC) $(CFLAGS) -shared -o $@ $<
 
-obj/$(LIBO): lib/$(LIBC)
+lib/libtfs.o: lib/tfs.c
 	$(CC) -fpic -c -o $@ $<
 
-bin/$(EXEC): obj/$(OBJECTS) bin/$(LIB)
-	$(CC) -Lbin -ltfs -o $@ $<
+bin/%: obj/%.o 
+	$(CC) -Llib -ltfs -o $@ $<
 
-obj/%.o: src/%.c src/$(HEADERS)
-	$(CC) $(CFLAGS) -c -Isrc -Ilib -o $@ $<
+obj/%.o: src/%.c lib/ll.h lib/libtfs.so
+	$(CC) $(CFLAGS) -c -Ilib -lll -o $@ $<
 
 clean:
-	rm -f obj/$(OBJECTS)
+	rm -f $(OBJECTS) lib/ll.o lib/libtfs.o
 
 mrproper: clean
-	rm -f bin/$(EXEC) bin/$(LIB)
+	rm -f $(patsubst %, bin/%, $(EXEC)) $(LIB)

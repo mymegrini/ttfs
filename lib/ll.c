@@ -4,19 +4,20 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <string.h>
 
-/**                                                                                                                                            
- * A structure containing informations about an opened disk                                                                                    
+/**
+ * A structure containing informations about an opened disk                                                        
  */
 typedef struct {
-  char *name;      /**< name of the disk */
+  char name[D_NAME_MAXLEN+1];      /**< name of the disk */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX];    /**< index of partitions, null at the creation. */
 } disk_ent;
 
-static disk_ent *_disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
+static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
 
 
 
@@ -97,6 +98,42 @@ error write_physical_block(disk_id id,block b,uint32_t num){
   return EXIT_SUCCESS;
 }
 
+/**
+ * Reads an integer in little-endian from a block
+ * at a specified index
+ *
+ * \param value pointer where read integer is stored 
+ * \param b the block from which integer is read
+ * \param idx index of integer in block
+ * \return void
+ */
+void _readint(uint32_t* value, block b, uint8_t idx){
+  *value = b.data[idx*4]
+    +256*(b.data[idx*4+1]
+	  +256*(b.data[idx*4+2]
+		+256*b.data[idx*4+3]
+		)
+	  );
+}
+
+/**
+ * Writes an integer in little-endian to a block
+ * at a specified index
+ *
+ * \param value of integer to be written 
+ * \param b the block to which integer is written
+ * \param idx index of integer in block
+ * \return void
+ */
+void _writeint(uint32_t value, block b, uint8_t idx){
+  b.data[idx*4] = value % 256;
+  value = value / 256;
+  b.data[idx*4+1] = value % 256;
+  value = value / 256;
+  b.data[idx*4+2] = value % 256;
+  value = value / 256;
+  b.data[idx*4+3] = value % 256;
+}
 
 /**
  * Starting a disk
@@ -109,53 +146,43 @@ error write_physical_block(disk_id id,block b,uint32_t num){
  */
 error start_disk(char *name,disk_id *id){
   int i = 0;
-  while((i<DD_MAX)||(_disk[i]!=NULL))
+  while((i<DD_MAX)&&(_disk[i]!=NULL))
     i++;
   if(i == DD_MAX) {
-    // error message
+    errnum = OD_FULL;
     return OD_FULL;
   }
-  int new_fd = open(name,O_CREAT|S_IRUSR|S_IWUSR);
+  int new_fd = open(name,O_RDWR|O_CREAT,S_IRUSR|S_IWUSR);
   if(new_fd == -1){
-    // error message
-    return D_OPEN_ERR;
   }
+  disk_ent dent;
   block b_read;
   error err_read = read_physical_block(i,b_read,0);
+  
   if(err_read != EXIT_SUCCESS)
     return err_read;
-  _disk[i]=(disk_ent *)(malloc(sizeof(disk_ent *)));
-  _disk[i]->name=(char *)(malloc(sizeof(char)*strlen(name)));
-  strcpy(_disk[i]->name, name);    // better to copy the string, if not name could change...
-  _disk[i]->fd=new_fd;
-  uint32_t val_size;
-  _readint(b_read,0,&val_size); //fonction de Nicolas
-  _disk[i]->size = val_size;
-  uint32_t val_npart;
-  _readint(b_read,4,&val_npart);
-  _disk[i]->npart = val_npart;
+  
+  strncpy(dent.name, name, D_NAME_MAXLEN+1);
+  dent.fd=new_fd;
+  _readint(&dent.size,b_read,0);
+  _readint(&dent.npart,b_read,1);
+  
   int j = 0;
-  for(j=0;j<val_npart;j++){
-    int pos = j*4+8;
-    uint32_t val_tmp;
-    _readint(b_read,pos,&val_tmp);
-    _disk[i]->part[j] = val_tmp;
+  for(j=0;j<dent.npart && j<D_PARTMAX;j++){
+    _readint(dent.part+j, b_read, 2+j);
   }
-  *id = i;
+  
+  _disk[i]=&dent;
 
   return EXIT_SUCCESS;
 }
 
 
 /**
- * @brief Read a block from disk.
- *        Use a cache memory to read.
+ * Read a block from disk.
+ * Use a cache memory to read.
  * 
- * @param id 
- * @param b 
- * @param num 
- * @return error could be D_WRONGID or EXIT_SUCCESS
- * @see D_WRONGID
+ * 
  */
 error read_block(disk_id id,block b,uint32_t num){
 
@@ -169,14 +196,11 @@ error read_block(disk_id id,block b,uint32_t num){
 
 
 /**
- * @brief Write a block to a disk.
- *        Use a cache memory to write.e
+ * Write a block to a disk.
+ * Use a cache memory to write.e
  * 
- * @param id 
- * @param b 
- * @param num 
- * @return error could be D_WRONGID or EXIT_SUCCESS
- * @see D_WRONGID
+ * 
+ * 
  */
 error write_block(disk_id id,block b,uint32_t num){
 
@@ -189,11 +213,11 @@ error write_block(disk_id id,block b,uint32_t num){
 }
 
 /**
- * @brief Syncronize the disk.
- *        Do all operations in the cache.
+ * Syncronize the disk.
+ * Flush  the cache.
  * 
- * @param id 
- * @return error
+ * 
+ * 
  */
 error sync_disk(disk_id id){
   return EXIT_SUCCESS;
@@ -201,11 +225,11 @@ error sync_disk(disk_id id){
 
 
 /**
- * @brief Free an opened disk.
+ * Closes an opened disk.
+ * Frees all associated memory
  * 
- * @param id 
- * @return error is D_WRONGID when ID is wrong, if not EXIT_SUCCESS
- * @see D_WRONGID
+ * 
+ * 
  */
 error stop_disk(disk_id id){
 
@@ -222,4 +246,51 @@ error stop_disk(disk_id id){
   return EXIT_SUCCESS;;
 }
 
+/**
+ * This function creates and initializes a new disk.
+ * It allocates enough memory for size blocks
+ * and puts size in the block 0
+ *
+ *
+ */
+error init_disk(char* name, int size){
+  disk_id id = 0;
+  
+  while((id<DD_MAX)&&(_disk[id]!=NULL))
+    id++;
+  if(id == DD_MAX) {
+    errnum = OD_FULL;
+    return OD_FULL;
+  } else {
+    int fd;
+    
+    if ((fd = open(name,O_RDWR|O_CREAT,S_IRUSR|S_IWUSR)) == -1){
+      errnum = D_OPEN_ERR;
+      return D_OPEN_ERR;      
+    } else {    
+      disk_ent dent;
+      block b;
+      error r;
 
+      strncpy(dent.name, name, D_NAME_MAXLEN+1);
+      dent.fd = fd;
+      dent.size =size;
+      dent.npart =0;
+      _disk[id] = &dent;
+      
+      if ((r = write_physical_block(id,b,size))!=EXIT_SUCCESS){
+	printerror("init_disk");
+	return r;
+      } else {
+	_writeint(0, b, 0);
+	_writeint(size, b, 0);
+	if ((r = write_physical_block(id,b,0))!=EXIT_SUCCESS){	  
+	  printerror("init_disk");
+	  return r;
+	} else {   
+	  return stop_disk(id);
+	}
+      } 
+    }
+  }
+}

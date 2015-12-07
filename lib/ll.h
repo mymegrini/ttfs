@@ -6,6 +6,7 @@
 #define B_SIZE 1024    /***< block size */
 #define DD_MAX 50      /***< maximum number of open disk */
 #define D_PARTMAX 3    /***< maximum number of partitions in a disk */
+#define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 /**
  * A structure to represent blocks
@@ -59,4 +60,12 @@ error sync_disk(disk_id id);
  */
 error stop_disk(disk_id id);
 
+/**
+ * @brief This function creates and initializes a new disk
+ * @param[in] name disk name
+ * @param[in] size disk size
+ * @param[out] id wheere disk id is stored
+ * @return Returns an error if encountered
+ */
+error init_disk(char* name, int size);
 #endif

@@ -12,21 +12,25 @@ typedef int  error;
 
 
 /**
- * Contain the last error
+ * Contains the last error
  */
 extern int errnum;
 
 
-
+/**
+ * Prints an errror message on error output 
+ */
 extern void printerror(char *s);
-	    
-#define D_WRONGID 1    /**< Wrong disk_id  */
-#define B_OUT_OF_DISK 2    /**< Access impossible: block number out of the disk */
-#define D_SEEK_ERR 3    /**< Error while seeking to a block */
-#define D_READ_ERR 4    /**< Error while reading a block */
-#define D_WRITE_ERR 5    /**< Error while writing a block */
-#define OD_FULL 6      /**< Array _disk full */ 
-#define D_OPEN_ERR 7   /**< Error while opening a disk */
-#define D_NEWDISK 8    /**< If a disk is created */
+
+#define EXIT_SUCCESS 0    /**< Successful execution */
+#define C_FORMAT 1    /**< Bad command format */
+#define D_WRONGID 2    /**< Wrong disk_id  */
+#define B_OUT_OF_DISK 3    /**< Access impossible: block number out of the disk */
+#define D_SEEK_ERR 4    /**< Error while seeking to a block */
+#define D_READ_ERR 5    /**< Error while reading a block */
+#define D_WRITE_ERR 6    /**< Error while writing a block */
+#define OD_FULL 7      /**< Array _disk full */ 
+#define D_OPEN_ERR 8   /**< Error while opening a disk */
+#define D_NEWDISK 9    /**< If a disk is created */
 
 #endif
