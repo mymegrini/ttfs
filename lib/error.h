@@ -1,5 +1,5 @@
 #ifndef ERROR_H
-#define ERROR_H 1
+#define ERROR_H
 
 #define ERR_STRLEN 80
 
@@ -10,17 +10,10 @@
  */
 typedef int  error;
 
-
-/**
- * Contains the last error
- */
-extern int errnum;
-
-
 /**
  * Prints an errror message on error output 
  */
-extern void printerror(char *s);
+extern void printerror(char *s, error err);
 
 #define EXIT_SUCCESS 0    /**< Successful execution */
 #define C_FORMAT 1    /**< Bad command format */
