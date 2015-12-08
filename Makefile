@@ -4,14 +4,14 @@ VPATH = src:obj:lib
 
 EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))
 HEADERS = $(wildcard src/*.h) $(wildcard lib/*.h)
-OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) $(patsubst lib/%.c, obj/%.o, $(wildcard lib/*.c))
+OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) $(patsubst lib/%.c, obj/%.o, $(wildcard !lib/tfs.c lib/*.c))
 
-LIBO = ll.o error.o block.o
+LIBO = obj/ll.o obj/error.o obj/block.o
 LIB = bin/libtfs.so
 
 all: $(EXEC)
 
-lib: $(LIB) obj/$(LIBO)
+lib: $(LIB) $(LIBO)
 
 path:	# changes PATH variable for more pleasant command calls
 	sh setup.sh
@@ -23,13 +23,13 @@ obj/libtfs.o: lib/tfs.c
 	$(CC) -fpic -c -o $@ $<
 
 bin/%: obj/%.o $(LIBO) $(LIB)
-	$(CC) -Lbin -ltfs -o $@ $< $(OBJECTS)
+	$(CC) -o $@ $^
 
 obj/%.o: %.c
 	$(CC) $(CFLAGS) -c -Ilib -o $@ $^
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS) $(LIBO)
 
 mrproper: clean
-	rm -f $(patsubst %, bin/%, $(EXEC)) lib/$(LIB)
+	rm -f $(EXEC) lib/$(LIB)
