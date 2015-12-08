@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
   char name[D_NAME_MAXLEN+1];
   char* argn;
   int disk;
-  block b;
+  block *b = new_block();   // block filled with 0 bytes
   
   while ((opt = getopt(argc, argv, "s:d")) != -1) {
     switch (opt) {
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]){
     wintle(size, b, 0);
     wintle(0, b, 1);
     
-    if (write(disk, &b, B_SIZE)==-1){
+    if (write(disk, b, B_SIZE)==-1){
 	printerror("tfscreate", D_OPEN_ERR);
 	exit(D_OPEN_ERR);
     }
@@ -114,10 +114,11 @@ int main(int argc, char* argv[]){
       exit(D_SEEK_ERR);
     }
     
-    if (write(disk, &b, B_SIZE)==-1){
+    if (write(disk, b, B_SIZE)==-1){
 	printerror("tfscreate", D_OPEN_ERR);
 	exit(D_OPEN_ERR);
     }
+    free(b);  //  free block
     close(disk);
     exit(EXIT_SUCCESS);
   }

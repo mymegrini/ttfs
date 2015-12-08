@@ -7,15 +7,18 @@
 #include <string.h>
 #include <block.h>
 
+
+typedef uint32_t ad_b;    /**< address for blocks in the disk */
+
 /**
- * A structure containing informations about an opened disk                                                        
+ * A structure containing informations about an opened disk                    
  */
 typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
-  uint32_t part[D_PARTMAX];    /**< index of partitions, null at the creation. */
+  uint32_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
 } disk_ent;
 
 static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
