@@ -12,16 +12,6 @@
  */
 typedef uint8_t error;
 
-<<<<<<< HEAD
-
-/**
- * Contains the last error
- */
-extern error errnum;
-
-
-=======
->>>>>>> lowlevel
 /**
  * Prints an errror message on error output 
  */
