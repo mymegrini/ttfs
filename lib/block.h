@@ -35,11 +35,11 @@ block * new_block( void );
  * 
  *
  * @param[out] value pointer where read integer is stored 
- * @param[in] b the block from which integer is read
+ * @param[in] *b the block from which integer is read
  * @param[in] idx index of integer in block
  * @return void
  */
-void rintle(uint32_t* value, block b, ad_byt idx);
+void rintle(uint32_t* value, block *b, ad_byt idx);
 /**
  * Writes an integer in little-endian to a block
  * at a specified index
@@ -49,6 +49,6 @@ void rintle(uint32_t* value, block b, ad_byt idx);
  * @param[in] idx index of integer in block
  * @return void
  */
-void wintle(uint32_t value, block b, ad_byt idx);
+void wintle(uint32_t value, block *b, ad_byt idx);
 
 #endif

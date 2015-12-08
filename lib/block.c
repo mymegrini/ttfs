@@ -1,11 +1,14 @@
 #include "block.h"
 #include <string.h> // for memset call
 
-block * new_block( void ) {
-  
-  block *b = (block *) malloc( sizeof(block) );
-  memset( b, 0, B_SIZE );
-  return b;
+
+/**
+ * @brief  Return a pointer to a new empty block.
+ *         Filled by bytes 0. 
+ * @return block *
+ */
+block * new_block( void ) { 
+  return (block *) calloc( B_SIZE, sizeof(byte) );
 }
 
 
