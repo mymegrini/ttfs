@@ -1,3 +1,3 @@
 #!/bin/bash
 
-export PATH=$PATH:$PWD/bin;
+export PATH=$PATH:./bin;
