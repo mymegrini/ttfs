@@ -1,38 +1,35 @@
 CC = gcc
 CFLAGS = -Wall --pedantic -O3
-VPATH = src:obj
-EXEC = tfs_create # tfs_partition tfs_format tfs_cp tfs_mv tfs_rm tfs_cat tfs_mkdir ...
-LIB = lib/libtfs.so
-HEADERS = $(wildcard lib/*.h) $(wildcard src/*.h)
-OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) obj/ll.o obj/error.o
+VPATH = src:obj:lib
 
-all: bin/$(EXEC)
+EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))
+HEADERS = $(wildcard src/*.h) $(wildcard lib/*.h)
+OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) $(patsubst lib/%.c, obj/%.o, $(wildcard lib/*.c))
 
-lib: $(LIB)
+LIBO = ll.o error.o block.o
+LIB = bin/libtfs.so
+
+all: $(EXEC)
+
+lib: $(LIB) obj/$(LIBO)
 
 path:	# changes PATH variable for more pleasant command calls
 	sh setup.sh
 
-obj/ll.o: lib/ll.c lib/error.h
-	$(CC) $(CFLAGS) -c -Ilib -lerror -o $@ $<
-
-obj/error.o: lib/error.c
-	$(CC) $(CFLAGS) -c -Ilib -o $@ $<
-
-lib/libtfs.so: obj/libtfs.o
-	$(CC) $(CFLAGS) -shared -o $@ $<
+bin/libtfs.so: obj/libtfs.o
+	$(CC) $(CFLAGS) -Ilib -Isrc -shared -o $@ $<
 
 obj/libtfs.o: lib/tfs.c
 	$(CC) -fpic -c -o $@ $<
 
-bin/%: $(OBJECTS) $(LIB)
-	$(CC) -Llib -ltfs -o $@ $^
+bin/%: obj/%.o $(LIBO) $(LIB)
+	$(CC) -Lbin -ltfs -o $@ $< $(OBJECTS)
 
-obj/%.o: src/%.c lib/ll.h lib/libtfs.so 
-	$(CC) $(CFLAGS) -c -Ilib -lll -lerror -o $@ $<
+obj/%.o: %.c
+	$(CC) $(CFLAGS) -c -Ilib -o $@ $^
 
 clean:
-	rm -f $(OBJECTS) lib/libtfs.o
+	rm -f $(OBJECTS)
 
 mrproper: clean
-	rm -f $(patsubst %, bin/%, $(EXEC)) $(LIB)
+	rm -f $(patsubst %, bin/%, $(EXEC)) lib/$(LIB)

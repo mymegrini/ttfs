@@ -1,17 +1,14 @@
 #include "error.h"
 #include <stdio.h>
 
-/**
- * Initializing errnum value at 0
- */
-error errnum = 0;
 
 /**
  * Contains descriptions of all errors for
  * for the purpose of human readable error 
  * outputs
  */
-char* _errlist[] = {
+
+static char* _errlist[] = {
   "SUCCESS",
   "Wrong disk id",
   "Access impossible: block number out of the disk",
@@ -31,6 +28,7 @@ char* _errlist[] = {
  * of error output
  *\return void 
  */
-void printerror(char* s){
-  fprintf(stderr, "%s: %s\n", s, _errlist[errnum]);
+
+void printerror(char* s, error err){
+  fprintf(stderr, "%s: %s", s, _errlist[err]);
 }
