@@ -42,7 +42,7 @@ int main(int argc, char* argv[]){
   char name[D_NAME_MAXLEN+1];
   char* argn;
   int disk;
-  block *b = new_block();   // block filled with 0 bytes
+  block b = new_block();   // block filled with 0 bytes
   
   while ((opt = getopt(argc, argv, "s:d")) != -1) {
     switch (opt) {

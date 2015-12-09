@@ -7,6 +7,11 @@
 #include <string.h>
 #include <block.h>
 
+#define SIZE_INT 4
+
+#define B0_IDX_DSIZE 0    /**< index of disk size */
+#define B0_IDX_PRTCOUNT 4    /**< index of number of partition */
+#define B0_IDX_PRTABLE 8    /**< index of partion table */
 
 typedef uint32_t ad_b;    /**< address for blocks in the disk */
 
@@ -47,7 +52,7 @@ error read_physical_block(disk_id id,block b,uint32_t num){
   // check if the disk is a new empty file
   // if not, return D_NEWDISK
   if ( num == 0 ) {
-    int r = read(_disk[id]->fd, &b, B_SIZE);
+    int r = read(_disk[id]->fd, b, B_SIZE);
     if ( r == -1 ) {
       // error message
       return D_READ_ERR;
@@ -61,7 +66,7 @@ error read_physical_block(disk_id id,block b,uint32_t num){
       // error message
       return D_SEEK_ERR;
     }
-    int r = read(_disk[id]->fd, &b, B_SIZE);
+    int r = read(_disk[id]->fd, b, B_SIZE);
     if ( r == -1 ) {
       // error message
       return D_READ_ERR;
@@ -124,10 +129,11 @@ error start_disk(char *name,disk_id *id){
   if(new_fd == -1){
   }
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
-  block b_read;
+  block b_read = new_block();
   error err_read = read_physical_block(i,b_read,0);
   
   if(err_read != EXIT_SUCCESS){
+    free( b_read );
     return err_read;
   }
 
@@ -135,16 +141,16 @@ error start_disk(char *name,disk_id *id){
   dent->name[D_NAME_MAXLEN]=0;
   strncpy(dent->name, name, D_NAME_MAXLEN);
   dent->fd=new_fd;
-  rintle(&dent->size,b_read,0);
-  rintle(&dent->npart,b_read,1);
+  rintle(&dent->size,b_read,0*SIZE_INT);
+  rintle(&dent->npart,b_read,1*SIZE_INT);
   
   int j = 0;
   for(j=0;j<dent->npart && j<D_PARTMAX;j++){
-    rintle(dent->part+j, b_read, 2+j);
+    rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*SIZE_INT);
   }
-  
+  free(b_read);
   _disk[i] =dent;
-
+  
   return EXIT_SUCCESS;
 }
 
