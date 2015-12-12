@@ -17,13 +17,13 @@ block new_block( void ) {
  * integer pointer 
  * 
  */
-void rintle(uint32_t* value, block b, ad_byt idx){
-    *value = b->data[idx]
-    +256*(b->data[idx+1]
-	  +256*(b->data[idx+2]
-		+256*b->data[idx+3]
-		)
-	  );
+error rintle(uint32_t* value, block b, addr idx){
+  if (idx<0 || idx>B_SIZE-5) return B_WRONGIDX;
+  *value = ((uint32_t)b->data[idx])
+    | (((uint32_t)b->data[idx+1])<<8)
+    | (((uint32_t)b->data[idx+2])<<16)
+    | (((uint32_t)b->data[idx+3])<<24);
+  return EXIT_SUCCESS;
 }
 
 /**
@@ -32,12 +32,11 @@ void rintle(uint32_t* value, block b, ad_byt idx){
  * integer pointer
  *
  */
-void wintle(uint32_t value, block b, ad_byt idx){
-  b->data[idx] = value % 256;
-  value = value / 256;
-  b->data[idx+1] = value % 256;
-  value = value / 256;
-  b->data[idx+2] = value % 256;
-  value = value / 256;
-  b->data[idx+3] = value % 256;
+error wintle(uint32_t value, block b, addr idx){
+  if (idx<0 || idx>B_SIZE-5) return B_WRONGIDX;
+  b->data[idx] = (byte) value;
+  b->data[idx+1] = (byte) (value>>8);
+  b->data[idx+2] = (byte) (value>>16);
+  b->data[idx+3] = (byte) (value>>24);
+  return EXIT_SUCCESS;
 }

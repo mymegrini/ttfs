@@ -17,7 +17,8 @@ static char* _errlist[] = {
   "Error while writing a block",
   "Array _disk full",
   "Error while opening a disk",
-  "If a disk is created"
+  "If a disk is created",
+  "Wrong block index"
 };
 
 /**

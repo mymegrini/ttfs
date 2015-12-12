@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include "error.h"
 
 #define B_SIZE 1024    /***< block size */
 
-
 typedef uint8_t byte;    /**< a byte in the disk */
-typedef uint16_t ad_byt;    /**< byte address in a block */
-typedef uint16_t addiff_byt;    /**< difference of add_byte */
-#define MAX_BYTADDR 1023
+typedef int16_t addr;    /**< byte address in a block */
+//typedef uint16_t addiff_byt;    /**< difference of add_byte */
+//#define MAX_BYTADDR 1023
 
 
 /**
@@ -22,6 +22,7 @@ struct block {
 
 typedef struct block* block;   /**< a block is a pointer to a struct block */
 
+
 /**
  * @brief Return a pointer to a new empty.
           An empty block is full of bytes 0. 
@@ -30,7 +31,6 @@ typedef struct block* block;   /**< a block is a pointer to a struct block */
  */
 block new_block( void );
 
-
 /**
  * @brief Reads an integer in little-endian from a block
  * 
@@ -38,9 +38,11 @@ block new_block( void );
  * @param[out] value pointer where read integer is stored 
  * @param[in] b the block from which integer is read
  * @param[in] idx index of integer in block
- * @return void
+ * @return error if index out of bound
+ * @see B_WRONGIDX
  */
-void rintle(uint32_t* value, block b, ad_byt idx);
+error rintle(uint32_t* value, block b, addr idx);
+
 /**
  * Writes an integer in little-endian to a block
  * at a specified index
@@ -48,8 +50,8 @@ void rintle(uint32_t* value, block b, ad_byt idx);
  * @param[in] value of integer to be written 
  * @param[out] b the block to which integer is written
  * @param[in] idx index of integer in block
- * @return void
+ * @return error if index out of bound
+ * @see B_WRONGIDX
  */
-void wintle(uint32_t value, block b, ad_byt idx);
-
+error wintle(uint32_t value, block b, addr idx);
 #endif

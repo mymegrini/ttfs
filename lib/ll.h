@@ -12,7 +12,7 @@
 /**
  * A structure to represent an index of the DISK_ID array
  */
-typedef int disk_id;
+typedef uint8_t disk_id;
 
 /**
  * @brief This function associates an id number to a disk
