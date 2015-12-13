@@ -152,7 +152,7 @@ Usage: %s [--help] -s <size> [[-d] <name>]\n",
     }
     
     wintle(size, b, 0);
-    wintle(0, b, 1);
+    wintle(0, b, 4);
     
     if (lseek(disk, 0, SEEK_SET)==-1){
       printerror(argv[0], D_SEEK_ERR);
