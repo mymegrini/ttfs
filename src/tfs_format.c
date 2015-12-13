@@ -2,6 +2,9 @@
 #include "block.h"
 #include "ll.h"
 #include <getopt.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define DEF_NAME "disk.tfs"   /***< default disk name */
 
@@ -21,6 +24,7 @@
  * <max-file-count> files
  *
  * @see C_FORMAT
+ * @see P_WRONGIDX
  * @see EXIT_SUCCESS
  */
 int main(int argc, char* argv[]){
@@ -44,11 +48,11 @@ int main(int argc, char* argv[]){
     
     switch (c) {
     case 'h':
-      printf("This command creates a minimal filesystem on an\n\
-existing partition\n					       \
-Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n     \
-  -p\t--partition\tspecify partition id\n		       \
-  -f\t-mf\t\tspecify maximum file count for the file system\n  \
+      printf("This command creates a minimal filesystem in an \
+existing partition\n\
+Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n\
+  -p\t--partition\tspecify partition id\n\
+  -f\t-mf\t\tspecify maximum file count for the file system\n\
     \t--help\t\tdisplay this help and exit\n\n",
 	     argv[0]);
       exit(EXIT_SUCCESS);
@@ -88,17 +92,13 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n     \
     exit(C_FORMAT);
   } else {
     disk_id id;
-    block b;
     error err;
-
-    err = start_disk(name, &id);
     
+    err = start_disk(name, &id);    
     if(err!=EXIT_SUCCESS){
       printerror("start_disk", err);
       exit(err);
     }
-
-    b= new_block();
     
-  }  
+  }
 }

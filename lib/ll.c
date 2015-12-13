@@ -23,12 +23,10 @@ typedef struct {
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint8_t npart;   /**< number of partitions */
-  uint8_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
+  uint32_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
 } disk_ent;
 
 static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
-
-
 
 
 /**
