@@ -11,7 +11,7 @@
 
 #define B0_IDX_DSIZE 0    /**< index of disk size */
 #define B0_IDX_PRTCOUNT 4    /**< index of number of partition */
-#define B0_IDX_PRTABLE 8    /**< index of partion table */
+#define B0_IDX_PRTABLE 8    /**< index of partition table */
 
 typedef uint32_t ad_b;    /**< address for blocks in the disk */
 
@@ -22,8 +22,8 @@ typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
-  uint32_t npart;   /**< number of partitions */
-  uint32_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
+  uint8_t npart;   /**< number of partitions */
+  uint8_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
 } disk_ent;
 
 static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
