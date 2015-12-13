@@ -63,7 +63,7 @@ int main(int argc, char* argv[]){
     switch (c) {
     case 'h':
       printf("This command creates and initializes a new disk\n\
-Usage: %s [--help] -s <size> [[-d] <name>]\n\n\
+Usage: %s [--help] -s <size> [[-do] <name>]\n\n\
   -s\t--size\t\tspecify size of disk (strictly positive integer required)\n\
   -d\t--dev\t\tstore disk in 'dev' folder\n\
   -o\t--overwrite\toverwrite existing disk\n\
@@ -75,14 +75,14 @@ Usage: %s [--help] -s <size> [[-d] <name>]\n\n\
 	if(atoi(optarg)<1){
 	  fprintf(stderr,
 		  "%s: strictly positive <size> value required\n\
-Usage: %s [--help] -s <size> [[-d] <name>]\n",
+Usage: %s [--help] -s <size> [[-do] <name>]\n",
 		  argv[0],argv[0]);
 	  exit(C_FORMAT);
 	}
 	size = (size==-1 && atoi(optarg)>0) ? atoi(optarg) : size;
 	break;
       } else {
-	fprintf(stderr, "Usage: %s [--help] -s <size> [[-d] <name>]\n",argv[0]);
+	fprintf(stderr, "Usage: %s [--help] -s <size> [[-do] <name>]\n",argv[0]);
 	exit(C_FORMAT);
       }     
     case 'd':
@@ -92,7 +92,7 @@ Usage: %s [--help] -s <size> [[-d] <name>]\n",
       flags |= F_OWR;
       break;
     default: /* '?' */
-      fprintf(stderr, "Usage: %s [--help] -s <size> [[-d] <name>]\n",argv[0]);
+      fprintf(stderr, "Usage: %s [--help] -s <size> [[-do] <name>]\n",argv[0]);
       exit(C_FORMAT);
     }
   }
@@ -100,7 +100,7 @@ Usage: %s [--help] -s <size> [[-d] <name>]\n",
   if(size<1){
     fprintf(stderr,
 	    "%s: strictly positive <size> value required\n\
-Usage: %s [--help] -s <size> [[-d] <name>]\n",
+Usage: %s [--help] -s <size> [[-do] <name>]\n",
 	    argv[0],argv[0]);
     exit(C_FORMAT);
   }
