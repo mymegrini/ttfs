@@ -8,4 +8,7 @@ obj: contains compiler-generated object files (contains .gitignore)
 src: contains source files
 
 Makefile: make command instruction tree
-setup.sh: adds './bin' folder to PATH environment variable
+setup.sh: launches 'make' command
+	  adds '$PWD/bin' folder to PATH environment variable
+	  switches to 'dev' folder where disks located
+	  > launch with 'source setup.sh'
