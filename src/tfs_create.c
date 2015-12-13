@@ -70,8 +70,8 @@ Usage: %s [-o] -s <size> [<name>]\n\n\
 Usage: %s [-o] -s <size> [<name>]\n",
 		  argv[0], argv[0]);
 	  exit(C_FORMAT);
-	} else 
-	size = (size==-1 && atoi(optarg)>0) ? atoi(optarg) : size;
+	} else
+	size = (size==-1) ? atoi(optarg) : size;
 	break;
       } else {
 	fprintf(stderr, "Usage: %s [-o] -s <size> [<name>]\n",argv[0]);
