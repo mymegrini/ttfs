@@ -4,13 +4,13 @@
 #include "error.h"
 #include "block.h"
 
-#define DD_MAX 50      /***< maximum number of open disk */
-#define D_PARTMAX 3    /***< maximum number of partitions in a disk */
+#define DD_MAX 100      /***< maximum number of open disk */
+#define D_PARTMAX 10    /***< maximum number of partitions in a disk */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 
 /**
- * A structure to represent an index of the DISK_ID array
+ * A type to represent an index of the DISK_ID array
  */
 typedef uint8_t disk_id;
 
