@@ -8,20 +8,15 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#define DEF_PATH "dev/"    /***< preferred disk location */
-#define DEF_NAME "disk"   /***< default disk name */
-#define DEF_EXT ".tfs"  /***< preferred disk location */
-#define F_PATH 1     /***< flag for default disk location */
-#define F_NAME 2    /***< flag for default disk name */
-#define F_EXT 4     /***< flag for default disk extention */
-#define F_OWR 8     /***< flag for overwrite option */
+#define DEF_NAME "disk.tfs"   /***< default disk name */
+#define F_OWR 1    /***< flag for overwrite option */
 
 #ifndef D_NAME_MAXLEN
-#define D_NAME_MAXLEN 79     /***< disk name maximum length */
+#define D_NAME_MAXLEN 81     /***< disk name maximum length */
 #endif
 
 /**
- * @brief This function creates and initializes a new disk
+ * @brief This command creates and initializes a new disk
  * @param[in] name disk name
  * @param[in] size disk size
  * @param[out] id wheere disk id is stored
@@ -38,11 +33,10 @@
  */
 
 int main(int argc, char* argv[]){
-  int c;
+   int c;
   int size = -1;
   int flags = 0;
   char name[D_NAME_MAXLEN+1];
-  char* argn;
   int disk;
   block b = new_block();   // block filled with 0 bytes
   
@@ -51,11 +45,10 @@ int main(int argc, char* argv[]){
     static struct option long_options[] = {
       {"help", no_argument, NULL, 'h'},
       {"size",  required_argument, NULL, 's'},
-      {"dev",  no_argument, NULL, 'd'},
       {"overwrite",  no_argument, NULL, 'o'},
       {0, 0, 0, 0}
     };
-    c = getopt_long(argc, argv, "s:do",
+    c = getopt_long(argc, argv, "s:o",
                  long_options, &index);
     
     if (c==-1) break;
@@ -63,36 +56,32 @@ int main(int argc, char* argv[]){
     switch (c) {
     case 'h':
       printf("This command creates and initializes a new disk\n\
-Usage: %s [--help] -s <size> [[-do] <name>]\n\n\
-  -s\t--size\t\tspecify size of disk (strictly positive integer required)\n\
-  -d\t--dev\t\tstore disk in 'dev' folder\n\
+Usage: %s [-o] -s <size> [<name>]\n\n\
+  -s\t--size\t\tspecify size of disk (requires strictly positive value)\n\
   -o\t--overwrite\toverwrite existing disk\n\
     \t--help\t\tdisplay this help and exit\n\n",
 	     argv[0]);
       exit(EXIT_SUCCESS);
     case 's':
-      if (size==-1 && optarg != NULL) {
+      if (optarg != NULL) {
 	if(atoi(optarg)<1){
 	  fprintf(stderr,
-		  "%s: strictly positive <size> value required\n\
-Usage: %s [--help] -s <size> [[-do] <name>]\n",
-		  argv[0],argv[0]);
+		  "%s: requires strictly positive <size> value\n\
+Usage: %s [-o] -s <size> [<name>]\n",
+		  argv[0], argv[0]);
 	  exit(C_FORMAT);
-	}
+	} else 
 	size = (size==-1 && atoi(optarg)>0) ? atoi(optarg) : size;
 	break;
       } else {
-	fprintf(stderr, "Usage: %s [--help] -s <size> [[-do] <name>]\n",argv[0]);
+	fprintf(stderr, "Usage: %s [-o] -s <size> [<name>]\n",argv[0]);
 	exit(C_FORMAT);
-      }     
-    case 'd':
-      flags |= F_PATH;
-      break;
+      }
     case 'o':
       flags |= F_OWR;
       break;
     default: /* '?' */
-      fprintf(stderr, "Usage: %s [--help] -s <size> [[-do] <name>]\n",argv[0]);
+      fprintf(stderr, "Usage: %s [-o] -s <size> [<name>]\n",argv[0]);
       exit(C_FORMAT);
     }
   }
@@ -100,26 +89,21 @@ Usage: %s [--help] -s <size> [[-do] <name>]\n",
   if(size<1){
     fprintf(stderr,
 	    "%s: strictly positive <size> value required\n\
-Usage: %s [--help] -s <size> [[-do] <name>]\n",
-	    argv[0],argv[0]);
+Usage: %s [-o] -s <size> [<name>]\n",
+	    argv[0], argv[0]);
     exit(C_FORMAT);
   }
   
-  if(optind >= argc) {
-    flags|= F_NAME;
-    argn=DEF_NAME;
-  }
-  else argn=argv[optind];
+  if(optind < argc){
+    if(strncmp(argv[optind]+strlen(argv[optind])-4, ".tfs", 4)==0)
+      strncpy(name, argv[optind], D_NAME_MAXLEN);
+    else {      
+      strncpy(name, argv[optind], D_NAME_MAXLEN-4);
+      strncat(name, ".tfs", D_NAME_MAXLEN-strlen(name));
+    }
+  } else strncpy(name, DEF_NAME, 9);
 
-  if (strncmp(argn+(strlen(argn)-4), DEF_EXT, 4)==0) flags|= F_EXT;
-
-  if ((flags & F_PATH) !=0) strncpy(name, DEF_PATH, D_NAME_MAXLEN+1);
-
-  strncat(name, argn, D_NAME_MAXLEN-strlen(name)-4);
-  
-  if ((flags & F_EXT) == 0) strncat(name, DEF_EXT, D_NAME_MAXLEN-strlen(name));
-
-  if ((flags & F_OWR)== 0 && access(name, F_OK)==0){
+  if ((flags & F_OWR)==0 && access(name, F_OK)==0){
     char answer = 0;
     while(answer == 0){
       printf("%s: disk '%s' already exists. Overwrite? [Y/n] ",
