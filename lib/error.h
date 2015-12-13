@@ -26,7 +26,6 @@ extern void printerror(char *s, error err);
 #define D_WRITE_ERR 6    /**< Error while writing a block */
 #define OD_FULL 7      /**< Array _disk full */ 
 #define D_OPEN_ERR 8   /**< Error while opening a disk */
-#define D_NEWDISK 9    /**< If a disk is created */
-#define B_WRONGIDX 10 /**< Wrong block index */
+#define B_WRONGIDX 9 /**< Wrong block index */
 
 #endif

@@ -17,7 +17,6 @@ static char* _errlist[] = {
   "Error while writing a block",
   "Array _disk full",
   "Error while opening a disk",
-  "If a disk is created",
   "Wrong block index"
 };
 
@@ -31,5 +30,5 @@ static char* _errlist[] = {
  */
 
 void printerror(char* s, error err){
-  fprintf(stderr, "%s: %s", s, _errlist[err]);
+  fprintf(stderr, "%s: %s\n", s, _errlist[err]);
 }
