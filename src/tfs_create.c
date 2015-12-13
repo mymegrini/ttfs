@@ -164,7 +164,7 @@ Usage: %s [--help] -s <size> [[-do] <name>]\n",
     }    
     free(b);  //free block
     close(disk);
-    printf("%s: %d\n",name,size);
+    printf("%s: %dB\n",name,size*B_SIZE);
     exit(EXIT_SUCCESS);
   }
 }
