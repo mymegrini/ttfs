@@ -54,13 +54,6 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n     \
       exit(EXIT_SUCCESS);
     case 'p':
       if (optarg != NULL){
-	if(atoi(optarg)<0){
-	  fprintf(stderr,
-		  "%s: requires positive <partition> value\n\
-Usage: %s -p <partition> -mf <max-file-count> [<name>]\n",
-		  argv[0], argv[0]);
-	  exit(C_FORMAT);
-	} else
 	partition = (partition==-1) ? atoi(optarg) : partition;
 	break;
       } else {
