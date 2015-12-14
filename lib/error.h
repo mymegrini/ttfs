@@ -30,6 +30,6 @@ extern void printerror(char *s, error err);
 #define B_WRONGIDX 10 /**< Wrong block index */
 #define P_WRONGIDX 11 /**< Wrong partition index */
 #define P_CORRUPTED 12  /**< Partition size does not match disk size */
-
+#define B_WRONGNAME 13 /**< Wrong block name */
 
 #endif
