@@ -7,7 +7,7 @@
 #define DD_MAX 100      /***< maximum number of open disk */
 #define D_PARTMAX 10    /***< maximum number of partitions in a disk */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
-
+#define SIZEOF_INT 4    /**< size of an int */
 
 /**
  * A type to represent an index of the DISK_ID array

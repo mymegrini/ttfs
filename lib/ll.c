@@ -45,31 +45,17 @@ static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an ind
  * \see D_READ_ERR
  */
 error read_physical_block(disk_id id,block b,uint32_t num){
-
-  // In the case of reading the block 0,
-  // check if the disk is a new empty file
-  // if not, return D_NEWDISK
-  if ( num == 0 ) {
-    int r = read(_disk[id]->fd, b, B_SIZE);
-    if ( r == -1 ) {
-      // error message
-      return D_READ_ERR;
-    } else if ( r == 0 ){
-      // error message
-      return D_NEWDISK;
+  
+  if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
+    // error message
+    return D_SEEK_ERR;
     }
+  int r = read(_disk[id]->fd, b, B_SIZE);
+  if ( r == -1 ) {
+    // error message
+    return D_READ_ERR;
   }
-  else {
-    if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
-      // error message
-      return D_SEEK_ERR;
-    }
-    int r = read(_disk[id]->fd, b, B_SIZE);
-    if ( r == -1 ) {
-      // error message
-      return D_READ_ERR;
-    }
-  }  
+    
   return EXIT_SUCCESS;
 }
 
@@ -98,7 +84,7 @@ error write_physical_block(disk_id id,block b,uint32_t num){
       // error message
       return D_SEEK_ERR;
     }
-    if ( write(_disk[id]->fd, &b,  B_SIZE) == -1 ) {
+    if ( write(_disk[id]->fd, b,  B_SIZE) == -1 ) {
       // error message
       return D_WRITE_ERR;
     }
@@ -123,10 +109,16 @@ error start_disk(char *name,disk_id *id){
     i++;
   if(i == DD_MAX) return OD_FULL;
   
-  int new_fd = open(name,O_RDWR,S_IRUSR|S_IWUSR);
+  int new_fd = open(name,O_RDWR);
   if(new_fd == -1){
+    return D_OPEN_ERR;
   }
+
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
+  dent->name[D_NAME_MAXLEN]=0;
+  strncpy(dent->name, name, D_NAME_MAXLEN);
+  dent->fd=new_fd;
+  _disk[i] =dent;
   block b_read = new_block();
   error err_read = read_physical_block(i,b_read,0);
   
@@ -135,10 +127,6 @@ error start_disk(char *name,disk_id *id){
     return err_read;
   }
 
-  //dent->name = (char*) malloc((D_NAME_MAXLEN+1)*sizeof(char));
-  dent->name[D_NAME_MAXLEN]=0;
-  strncpy(dent->name, name, D_NAME_MAXLEN);
-  dent->fd=new_fd;
   rintle(&dent->size,b_read,0*SIZE_INT);
   rintle(&dent->npart,b_read,1*SIZE_INT);
   
@@ -147,7 +135,6 @@ error start_disk(char *name,disk_id *id){
     rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*SIZE_INT);
   }
   free(b_read);
-  _disk[i] =dent;
   
   return EXIT_SUCCESS;
 }

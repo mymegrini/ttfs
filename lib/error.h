@@ -32,4 +32,5 @@ extern void printerror(char *s, error err);
 #define P_CORRUPTED 12  /**< Partition size does not match disk size */
 #define B_WRONGNAME 13 /**< Wrong block name */
 
+
 #endif
