@@ -205,35 +205,28 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n"
 	exit(err);
       }
 
-      err = wintle(filecount/16+3, b, 4*INT_SIZE);    
+      err = wintle(filecount/16+2, b, 4*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
 	free(b);
 	printerror("wintle first free block", err);
 	exit(err);
       }
 
-      err = wintle(filecount/16+2, b, 5*INT_SIZE);    
-      if(err!=EXIT_SUCCESS){
-	free(b);
-	printerror("wintle first free block", err);
-	exit(err);
-      }
-
-      err = wintle(filecount, b, 6*INT_SIZE);    
+      err = wintle(filecount, b, 5*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
 	free(b);
 	printerror("wintle max file count", err);
 	exit(err);
       }
 
-      err = wintle(filecount-1, b, 7*INT_SIZE);    
+      err = wintle(filecount-1, b, 6*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
 	free(b);
 	printerror("wintle free file count", err);
 	exit(err);
       }
 
-      err = wintle(1, b, 8*INT_SIZE);    
+      err = wintle(1, b, 7*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
 	free(b);
 	printerror("wintle first free file", err);
