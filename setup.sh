@@ -1,3 +1,4 @@
 #!/bin/bash
-
-export PATH=$PATH:./bin;
+make
+export PATH="$PATH:$PWD/bin"
+cd dev

@@ -11,7 +11,7 @@
 
 #define B0_IDX_DSIZE 0    /**< index of disk size */
 #define B0_IDX_PRTCOUNT 4    /**< index of number of partition */
-#define B0_IDX_PRTABLE 8    /**< index of partion table */
+#define B0_IDX_PRTABLE 8    /**< index of partition table */
 
 typedef uint32_t ad_b;    /**< address for blocks in the disk */
 
@@ -27,8 +27,6 @@ typedef struct {
 } disk_ent;
 
 static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
-
-
 
 
 /**
@@ -228,3 +226,28 @@ error stop_disk(disk_id id){
   free(_disk[id]);
   return EXIT_SUCCESS;;
 }
+<<<<<<< HEAD
+=======
+
+
+/**
+ * Returns disk information
+ * 
+ * 
+ */
+error disk_stat(disk_id id, d_stat* stat){
+  
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    return D_WRONGID;
+  } else {
+    int n;
+    strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN);
+    stat->size = _disk[id]->size;
+    stat->npart = _disk[id]->npart;
+    for (n=0; n<stat->npart; n++){
+      stat->part[n] = _disk[id]->part[n];
+    }
+    return EXIT_SUCCESS;
+  }
+}
+>>>>>>> 829381918b16ae3cad31ed8cf6d9c828be92b850
