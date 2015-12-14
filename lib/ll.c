@@ -123,24 +123,30 @@ error start_disk(char *name,disk_id *id){
   int i = 0;
   while((i<DD_MAX)&&(_disk[i]!=NULL))
     i++;
-  if(i == DD_MAX) return OD_FULL;
+  if(i == DD_MAX) 
+    return OD_FULL;
   
   int new_fd = open(name,O_RDWR,S_IRUSR|S_IWUSR);
   if(new_fd == -1){
   }
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
+  dent->name[D_NAME_MAXLEN]=0;
+  strncpy(dent->name, name, D_NAME_MAXLEN);
+  dent->fd=new_fd;
+  _disk[i] =dent;
+
   block b_read = new_block();
   error err_read = read_physical_block(i,b_read,0);
   
   if(err_read != EXIT_SUCCESS){
     free( b_read );
+    free(dent);
+    _disk[i]=NULL;
     return err_read;
   }
 
   //dent->name = (char*) malloc((D_NAME_MAXLEN+1)*sizeof(char));
-  dent->name[D_NAME_MAXLEN]=0;
-  strncpy(dent->name, name, D_NAME_MAXLEN);
-  dent->fd=new_fd;
+
   rintle(&dent->size,b_read,0*SIZE_INT);
   rintle(&dent->npart,b_read,1*SIZE_INT);
   
@@ -149,7 +155,6 @@ error start_disk(char *name,disk_id *id){
     rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*SIZE_INT);
   }
   free(b_read);
-  _disk[i] =dent;
   
   return EXIT_SUCCESS;
 }
@@ -223,4 +228,3 @@ error stop_disk(disk_id id){
   free(_disk[id]);
   return EXIT_SUCCESS;;
 }
-
