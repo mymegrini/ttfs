@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall --pedantic -O3
+CFLAGS = -Wall --pedantic -O3 -std=c99
 VPATH = src:obj:lib
 
 EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))

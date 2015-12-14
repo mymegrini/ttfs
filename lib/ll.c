@@ -114,11 +114,13 @@ error start_disk(char *name,disk_id *id){
     return D_OPEN_ERR;
   }
 
+  *id = i;
+
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
   dent->name[D_NAME_MAXLEN]=0;
   strncpy(dent->name, name, D_NAME_MAXLEN);
   dent->fd=new_fd;
-  _disk[i] =dent;
+  _disk[i] = dent;
   block b_read = new_block();
   error err_read = read_physical_block(i,b_read,0);
   
