@@ -10,6 +10,7 @@
 
 static char* _errlist[] = {
   "SUCCESS",
+  "Bad command format",
   "Wrong disk id",
   "Access impossible: block number out of the disk",
   "Error while seeking to a block",
@@ -19,7 +20,8 @@ static char* _errlist[] = {
   "Error while opening a disk",
   "New empty disk",
   "Wrong block index",
-  "Wrong partition index"
+  "Wrong partition index",
+  "Partition size does not match disk size"
 };
 
 /**

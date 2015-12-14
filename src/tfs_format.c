@@ -24,6 +24,7 @@
  *
  * @see C_FORMAT
  * @see P_WRONGIDX
+ * @see P_CORRUPTED
  * @see EXIT_SUCCESS
  */
 int main(int argc, char* argv[]){
@@ -121,21 +122,35 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n"
     } else {
       uint32_t psize;
       uint32_t pidx =1;
-      block b = new_block();
+      block b;
       uint32_t k;
       
-      psize = stat.part[partition];
+      psize = stat.part[partition];      
+      if(psize<(filecount/16)+3){
+	printf("%s: partition too small for specified <max-file-count> value\n"
+	       ,argv[0]);
+	exit(C_FORMAT);	
+      }
+
       for(k=0; k<partition; k++) pidx+=stat.part[k];
 
+      if(pidx+psize>stat.size-1){
+	printerror(argv[0],P_CORRUPTED);
+	exit(P_CORRUPTED);
+      }
+
+      b= new_block();
       err = read_block(id, b, pidx);    
       if(err!=EXIT_SUCCESS){
-	printerror("read_block", err);
+	printerror("read_block 0", err);
+	free(b);
 	exit(err);
       }
 
       err = rintle(&k, b, 0);    
       if(err!=EXIT_SUCCESS){
 	printerror("rintle 0", err);
+	free(b);
 	exit(err);
       }
 
@@ -151,6 +166,7 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n"
 	    break;
 	  case 'n':
 	  case 'N':
+	    free(b);
 	    exit(EXIT_SUCCESS);
 	  default:
 	    answer = 0;
@@ -161,31 +177,78 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n"
       free(b);
       b=new_block();
 
-      err = wrintle(MAGIC_NUMBER, b, 0);    
+      err = wintle(MAGIC_NUMBER, b, 0*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
-	printerror("wintle 0", err);
+	free(b);
+	printerror("wintle magic number", err);
 	exit(err);
       }
 
-      err = wrintle(B_SIZE, b, 4);    
+      err = wintle(B_SIZE, b, 1*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
-	printerror("wintle 4", err);
+	free(b);
+	printerror("wintle block size", err);
 	exit(err);
       }
       
-      err = wrintle(psize, b, 8);    
+      err = wintle(psize, b, 2*INT_SIZE);    
       if(err!=EXIT_SUCCESS){
-	printerror("wintle 0", err);
+	free(b);
+	printerror("wintle part size", err);
+	exit(err);
+      }
+
+      err = wintle(psize-(filecount/16+3), b, 3*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle free block count", err);
+	exit(err);
+      }
+
+      err = wintle(filecount/16+3, b, 4*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle first free block", err);
+	exit(err);
+      }
+
+      err = wintle(filecount/16+2, b, 5*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle first free block", err);
+	exit(err);
+      }
+
+      err = wintle(filecount, b, 6*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle max file count", err);
+	exit(err);
+      }
+
+      err = wintle(filecount-1, b, 7*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle free file count", err);
+	exit(err);
+      }
+
+      err = wintle(1, b, 8*INT_SIZE);    
+      if(err!=EXIT_SUCCESS){
+	free(b);
+	printerror("wintle first free file", err);
+	exit(err);
+      }
+
+      err = write_block(id, b, pidx);    
+      if(err!=EXIT_SUCCESS){
+	printerror("write_block 0", err);
+	free(b);
 	exit(err);
       }
 
       
-      err = wrintle(psize, b, 8);    
-      if(err!=EXIT_SUCCESS){
-	printerror("wintle 0", err);
-	exit(err);
-      }
-
+      
     }    
   }
 }
