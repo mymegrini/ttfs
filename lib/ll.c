@@ -222,3 +222,23 @@ error stop_disk(disk_id id){
   return EXIT_SUCCESS;;
 }
 
+
+/**
+ * Returns disk information
+ * 
+ * 
+ */
+error disk_stat(disk_id id, d_stat* stat){
+  
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    return D_WRONGID;
+  } else {
+    int n;
+    strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN+1);
+    stat->size = _disk[id]->size;
+    stat->npart = _disk[id]->npart;
+    for (n=0; n<npart; n++){
+      stat->part[n] = _disk[id]->part[n];
+    }
+  }
+}
