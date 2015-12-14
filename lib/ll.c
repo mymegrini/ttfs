@@ -22,7 +22,7 @@ typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
-  uint8_t npart;   /**< number of partitions */
+  uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX];    /**< size of partitions, null at the creation. */
 } disk_ent;
 
@@ -234,11 +234,12 @@ error disk_stat(disk_id id, d_stat* stat){
     return D_WRONGID;
   } else {
     int n;
-    strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN+1);
+    strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN);
     stat->size = _disk[id]->size;
     stat->npart = _disk[id]->npart;
-    for (n=0; n<npart; n++){
+    for (n=0; n<stat->npart; n++){
       stat->part[n] = _disk[id]->part[n];
     }
+    return EXIT_SUCCESS;
   }
 }
