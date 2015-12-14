@@ -20,8 +20,8 @@ typedef uint8_t disk_id;
 typedef struct {
   char name[D_NAME_MAXLEN];      /**< name of the disk */
   uint32_t size;   /**< size of the disk */
-  uint8_t npart;   /**< number of partitions */
-  uint8_t part[D_PARTMAX];    /**< parition sizes */
+  uint32_t npart;   /**< number of partitions */
+  uint32_t part[D_PARTMAX];    /**< parition sizes */
 } d_stat;
 
 /**
