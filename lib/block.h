@@ -6,6 +6,7 @@
 #include "error.h"
 
 #define B_SIZE 1024    /***< block size */
+#define INT_SIZE 4
 
 typedef uint8_t byte;    /**< a byte in the disk */
 typedef int16_t addr;    /**< byte address in a block */

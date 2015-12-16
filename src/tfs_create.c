@@ -4,16 +4,15 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
 
 #define DEF_NAME "disk.tfs"   /***< default disk name */
 #define F_OWR 1    /***< flag for overwrite option */
-
-#ifndef D_NAME_MAXLEN
-#define D_NAME_MAXLEN 81     /***< disk name maximum length */
-#endif
+#define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 /**
  * @brief This command creates and initializes a new disk

@@ -7,7 +7,7 @@
 #define DD_MAX 100      /***< maximum number of open disk */
 #define D_PARTMAX 10    /***< maximum number of partitions in a disk */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
-
+#define SIZEOF_INT 4    /**< size of an int */
 
 /**
  * A type to represent an index of the DISK_ID array
@@ -20,8 +20,8 @@ typedef uint8_t disk_id;
 typedef struct {
   char name[D_NAME_MAXLEN];      /**< name of the disk */
   uint32_t size;   /**< size of the disk */
-  uint8_t npart;   /**< number of partitions */
-  uint8_t part[D_PARTMAX];    /**< parition sizes */
+  uint32_t npart;   /**< number of partitions */
+  uint32_t part[D_PARTMAX];    /**< parition sizes */
 } d_stat;
 
 /**

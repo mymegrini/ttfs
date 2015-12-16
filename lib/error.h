@@ -28,7 +28,9 @@ extern void printerror(char *s, error err);
 #define D_OPEN_ERR 8   /**< Error while opening a disk */
 #define D_NEWDISK 9    /**< If a disk is created */
 #define B_WRONGIDX 10 /**< Wrong block index */
-#define D_WRONGNAME 12 /**< Wrong disk name */
 #define P_WRONGIDX 11 /**< Wrong partition index */
+#define P_CORRUPTED 12  /**< Partition size does not match disk size */
+#define B_WRONGNAME 13 /**< Wrong block name */
+
 
 #endif
