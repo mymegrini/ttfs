@@ -3,33 +3,31 @@ CFLAGS = -Wall --pedantic -O3 -std=c99
 VPATH = src:obj:lib
 
 EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))
-HEADERS = $(wildcard src/*.h) $(wildcard lib/*.h)
-OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) $(patsubst lib/%.c, obj/%.o, $(wildcard !lib/tfs.c lib/*.c))
+LIB = bin/libtfs.so bin/libll.so
 
-LIBO = obj/ll.o obj/error.o obj/block.o
-LIB = bin/libtfs.so
+OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) \
+$(patsubst lib/%.c, obj/%.o, $(wildcard lib/*.c))
 
 all: $(EXEC)
 
-lib: $(LIB) $(LIBO)
+lib: $(LIB)
 
-path:	# changes PATH variable for more pleasant command calls
-	sh setup.sh
+bin/libtfs.so: lib/tfs.c bin/libll.so $(LIBO)
+	$(CC) $(CFLAGS) -fpic -c -Ilib -o obj/tfs.o lib/tfs.c
+	$(CC) -shared -Lbin -lll -o bin/libtfs.so obj/tfs.o
 
-bin/libtfs.so: obj/libtfs.o
-	$(CC) $(CFLAGS) -Ilib -Isrc -shared -o $@ $<
+bin/libll.so: lib/ll.c
+	$(CC) $(CFLAGS) -fpic -c -Ilib -o obj/ll.o lib/ll.c
+	$(CC) -shared -o bin/libll.so obj/ll.o
 
-obj/libtfs.o: lib/tfs.c
-	$(CC) -fpic -c -o $@ $<
-
-bin/%: obj/%.o $(LIBO) $(LIB)
-	$(CC) -o $@ $^
+bin/%: obj/%.o $(LIB) $(OBJECTS)
+	$(CC) -Lbin -lll -ltfs -o $@ $^
 
 obj/%.o: %.c
 	$(CC) $(CFLAGS) -c -Ilib -o $@ $^
 
 clean:
-	rm -f $(OBJECTS) $(LIBO)
+	rm -f $(OBJECTS)
 
 mrproper: clean
-	rm -f $(EXEC) lib/$(LIB)
+	rm -f $(EXEC) $(LIB)
