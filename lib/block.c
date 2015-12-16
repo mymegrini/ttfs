@@ -1,6 +1,5 @@
 #include "block.h"
-#include <string.h> // for memset call
-
+#include <stdlib.h>
 
 /**
  * @brief  Return a new empty block, filled by 0. 
