@@ -115,14 +115,14 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
   testerror("init_ftab", wintle(pidx+filecount/16+2, b, 3*INT_SIZE));
   while(++index < filecount){
     while((index % 16) > 0){
-      testerror("init_ftab", wintle(index, b, (15+(index-1)*16)*INT_SIZE));
+      testerror("init_ftab", wintle(index, b, (15+(index-1)%16)*INT_SIZE));
       index++;
     }
-    testerror("init_ftab", wintle(index, b, (15+(index-1)*16)*INT_SIZE));
+    testerror("init_ftab", wintle(index, b, (15+(index-1)%16)*INT_SIZE));
     testerror("init_ftab", write_block(id, b, (index-1)/16));
     memset(b->data, 0, sizeof(b->data));
   }
-  testerror("init_ftab", wintle((index-1), b, (15+(index-1)*16)*INT_SIZE));
+  testerror("init_ftab", wintle((index-1), b, (15+(index-1)%16)*INT_SIZE));
   testerror("init_ftab", write_block(id, b, (index-1)/16));
   free(b);
   puts("Done.");
@@ -162,14 +162,14 @@ void init_root(int id, uint32_t ridx){
  */
 void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
-  int index = pidx+(filecount/16)+3;
+  uint32_t index = pidx+(filecount/16)+3;
   puts("Formatting volume...");
   while(++index<psize){    
-    testerror("init_ftab", wintle(index, b, 255*INT_SIZE));
-    testerror("init_ftab", write_block(id, b, index-1));
+    testerror("init_fblocks", wintle(index, b, 255*INT_SIZE-1));
+    testerror("init_fblocks", write_block(id, b, index-1));
   }    
-  testerror("init_ftab", wintle(index-1, b, 255*INT_SIZE));
-  testerror("init_ftab", write_block(id, b, index-1));
+  testerror("init_fblocks", wintle(index-1, b, 255*INT_SIZE-1));
+  testerror("init_fblockl", write_block(id, b, index-1));
   free(b);
   puts("Done.");
 }
@@ -217,7 +217,7 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     
     for(k=0; k<partition; k++) pidx+=stat.part[k];
     
-    if(pidx+psize>stat.size-1){
+    if(pidx+psize>stat.size){
       printerror(argv0,P_CORRUPTED);
       exit(P_CORRUPTED);
     }
@@ -225,26 +225,24 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     b= new_block();
     testerror("read_block 0", read_block(id, b, pidx));
     testerror("rintle 0", rintle(&k, b, 0));
-    
+
     if((flags & F_OWR)==0 && k == 0x31534654){
       printf("%s: partition %d already contains a filesystem.\n",
 	     argv0, partition);
       if (answer("Overwrite? [Y/n]")==0)
 	exit(EXIT_SUCCESS);
-      else {
-	free(b);
-		
-	init_sblock(id, pidx, psize, filecount);	
-	init_ftab(id, pidx, psize, filecount);
-	init_root(id, pidx+filecount/16+2);
-	init_fblocks(id, pidx, psize, filecount);
-
-	printf("%s : Formatting successfully completed.\n\
-Disk: %s (%d)\nPartition: %d (%d)\nTTFS max file count = %d\n",
-	       argv0, name, stat.size, partition, psize, filecount);
-
-      }
     }
+
+    free(b);
+    
+    init_sblock(id, pidx, psize, filecount);	
+    init_ftab(id, pidx, psize, filecount);
+    init_root(id, pidx+filecount/16+2);
+    init_fblocks(id, pidx, psize, filecount);
+
+    printf("%s : Formatting successfully completed.\n\
+Disk: %s (%dB)\nPartition: %d (%dB)\nTTFS max file count = %d\n",
+	   argv0, name, stat.size*B_SIZE, partition, psize*B_SIZE, filecount);    
   }
 }
 
@@ -328,7 +326,7 @@ existing partition");
 
   if (partition<0 || filecount<1){
     fprintf(stderr,
-	    "%s: requires positive <partition> and strictly positive <max-file-count> values\n"
+	    "%s: requires correct <partition> and <max-file-count> values\n"
 	    ,argv[0]);
     usage(argv[0], stderr);
     exit(C_FORMAT);
