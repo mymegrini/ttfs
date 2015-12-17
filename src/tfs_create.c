@@ -48,7 +48,6 @@ Usage: %s [-o] -s <size> [<name>]\n", argv0, argv0);
  * waits for the user's answer and returns it
  */
 int answer(char* prompt){
-  fpurge(stdin);
   printf("%s", prompt);
   switch(getchar()){
   case 'Y':	
@@ -58,6 +57,7 @@ int answer(char* prompt){
   case 'N':
     return 0;
   default:
+    while(getchar() != '\n');
     return answer(prompt);
   }
 }

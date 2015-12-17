@@ -9,20 +9,20 @@ HEADERS = $(wildcard *.h)
 OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) \
 $(patsubst lib/%.c, obj/lib%.o, $(wildcard lib/*.c))
 
-LIBLINK = -Llib -lll -ltfs
+LIBLINK = -lll -ltfs
 
 all : $(EXEC)
 
 lib : $(LIB)
 
-bin/libll.so : obj/libll.o obj/libblock.o obj/liberror.o
+bin/libll.so : obj/liberror.o obj/libblock.o obj/libll.o 
 	$(CC) -shared -o $@ $^
 
 bin/libtfs.so : obj/libtfs.o
 	$(CC) -shared -o $@ $^
 
 bin/% : obj/%.o $(LIB)
-	$(CC) -Lbin $(LIBLINK) -o $@ $< $(LIBO)
+	$(CC) -o $@ $< -Lbin $(LIBLINK)
 
 obj/lib%.o : %.c $(HEADERS)
 	$(CC) $(CFLAGS) -fpic -c -Ilib -o $@ $<	
