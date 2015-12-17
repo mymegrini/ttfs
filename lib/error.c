@@ -36,3 +36,15 @@ static char* _errlist[] = {
 void printerror(char* s, error err){
   fprintf(stderr, "%s: %s\n", s, _errlist[err]);
 }
+
+
+/**
+ * This function prints an error message and terminates the
+ * program if <err> is not EXIT_SUCCESS
+ */
+void testerror(char* msg, error err){    
+  if(err!=EXIT_SUCCESS){
+    printerror(msg, err);
+    exit(err);
+  }
+}

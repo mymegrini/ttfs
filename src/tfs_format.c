@@ -68,73 +68,20 @@ void usage(char* argv0, FILE* out){
 	  argv0);
 }
 
+
+
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
-  error err;
-  block b=new_block();
-
-  err = wintle(MAGIC_NUMBER, b, 0*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle magic number", err);
-    exit(err);
-  }
-  
-  err = wintle(B_SIZE, b, 1*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle block size", err);
-    exit(err);
-  }
-  
-  err = wintle(psize, b, 2*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle part size", err);
-    exit(err);
-  }
-  
-  err = wintle(psize-(filecount/16+3), b, 3*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle free block count", err);
-    exit(err);
-  }
-  
-  err = wintle(filecount/16+2, b, 4*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle first free block", err);
-    exit(err);
-  }
-  
-  err = wintle(filecount, b, 5*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle max file count", err);
-    exit(err);
-  }
-  
-  err = wintle(filecount-1, b, 6*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle free file count", err);
-    exit(err);
-  }
-  
-  err = wintle(1, b, 7*INT_SIZE);    
-  if(err!=EXIT_SUCCESS){
-    free(b);
-    printerror("wintle first free file", err);
-    exit(err);
-  }
-  
-  err = write_block(id, b, pidx);    
-  if(err!=EXIT_SUCCESS){
-    printerror("write_block 0", err);
-    free(b);
-    exit(err);
-  }
-
+  block b = new_block();  
+  testerror("wintle magic number", wintle(MAGIC_NUMBER, b, 0*INT_SIZE));  
+  testerror("wintle block size", wintle(B_SIZE, b, 1*INT_SIZE));
+  testerror("wintle part size", wintle(psize, b, 2*INT_SIZE)); 
+  testerror("wintle free block count", wintle(psize-(filecount/16+3), b, 3*INT_SIZE));    
+  testerror("wintle first free block", wintle(filecount/16+2, b, 4*INT_SIZE));
+  testerror("wintle max file count", wintle(filecount, b, 5*INT_SIZE));
+  testerror("wintle free file count", wintle(filecount-1, b, 6*INT_SIZE));
+  testerror("wintle first free file", wintle(1, b, 7*INT_SIZE));
+  testerror("write_block 0", write_block(id, b, pidx));
+  free(b);
 }
 
 void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
@@ -151,20 +98,10 @@ void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
 
 void format_partition(char* name, int partition, int filecount, char* argv0, int flags){
   disk_id id;
-  error err;
   d_stat stat;
   
-  err = start_disk(name, &id);    
-  if(err!=EXIT_SUCCESS){
-    printerror("start_disk", err);
-    exit(err);
-  }
-  
-  err = disk_stat(id, &stat);    
-  if(err!=EXIT_SUCCESS){
-    printerror("disk_stat", err);
-    exit(err);
-  }
+  testerror("start_disk", start_disk(name, &id));  
+  testerror("disk_stat", disk_stat(id, &stat));
   
   if (partition<0 || partition >D_PARTMAX-1 || partition>stat.npart-1){
     printerror(argv0, P_WRONGIDX);
@@ -190,19 +127,8 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     }
     
     b= new_block();
-    err = read_block(id, b, pidx);    
-    if(err!=EXIT_SUCCESS){
-      printerror("read_block 0", err);
-      free(b);
-      exit(err);
-    }
-    
-    err = rintle(&k, b, 0);    
-    if(err!=EXIT_SUCCESS){
-      printerror("rintle 0", err);
-      free(b);
-      exit(err);
-    }
+    testerror("read_block 0", read_block(id, b, pidx));
+    testerror("rintle 0", rintle(&k, b, 0));
     
     if((flags & F_OWR)==0 && k == 0x31534654){
       printf("%s: partition %d already contains a filesystem.\n",

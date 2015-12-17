@@ -17,6 +17,16 @@ typedef uint8_t error;
  */
 extern void printerror(char *s, error err);
 
+/**
+ * @brief This function forces an exit if an error is encountered
+ * @param[in] err error value
+ * @param[in] msg error message header
+ * @return void
+ * 
+ * @see printerror
+ */
+void testerror(char* msg, error err);
+
 #define EXIT_SUCCESS 0    /**< Successful execution */
 #define C_FORMAT 1    /**< Bad command format */
 #define D_WRONGID 2    /**< Wrong disk_id  */
@@ -31,6 +41,5 @@ extern void printerror(char *s, error err);
 #define P_WRONGIDX 11 /**< Wrong partition index */
 #define P_CORRUPTED 12  /**< Partition size does not match disk size */
 #define B_WRONGNAME 13 /**< Wrong block name */
-
 
 #endif
