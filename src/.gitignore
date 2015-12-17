@@ -2,5 +2,6 @@
 *~
 .*
 \#*\#
+*.tfs
 # Except this file
 !.gitignore
