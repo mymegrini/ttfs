@@ -52,7 +52,6 @@ int answer(char* prompt){
   }
 }
 
-
 /**
  * @brief This function prints the command prototype
  * @param[in] argv0 command name
@@ -68,47 +67,131 @@ void usage(char* argv0, FILE* out){
 	  argv0);
 }
 
-
+/**
+ * @brief This function initializes a partition's superblock
+ * @param[in] id disk id
+ * @param[in] pidx partition index
+ * @param[in] psize partition size
+ * @param[in] filecount max file count
+ * @return void
+ * 
+ * This function fills in the initial filesystem's description
+ * for the partition located at <pidx> on the disk opened at <id>
+ */
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
+  block b = new_block();
+  int fbc = psize-(filecount/16+3);
   puts("Initializing superblock...");
-  block b = new_block();  
-  testerror("wintle magic number", wintle(MAGIC_NUMBER, b, 0*INT_SIZE));  
-  testerror("wintle block size", wintle(B_SIZE, b, 1*INT_SIZE));
-  testerror("wintle part size", wintle(psize, b, 2*INT_SIZE)); 
-  testerror("wintle free block count", wintle(psize-(filecount/16+3), b, 3*INT_SIZE));    
-  testerror("wintle first free block", wintle(filecount/16+2, b, 4*INT_SIZE));
-  testerror("wintle max file count", wintle(filecount, b, 5*INT_SIZE));
-  testerror("wintle free file count", wintle(filecount-1, b, 6*INT_SIZE));
-  testerror("wintle first free file", wintle(1, b, 7*INT_SIZE));
-  testerror("write_block 0", write_block(id, b, pidx));
+  testerror("init_sblock magic number", wintle(MAGIC_NUMBER, b, 0*INT_SIZE));  
+  testerror("init_sblock block size", wintle(B_SIZE, b, 1*INT_SIZE));
+  testerror("init_sblock part size", wintle(psize, b, 2*INT_SIZE)); 
+  testerror("init_sblock free block count", wintle(fbc, b, 3*INT_SIZE));    
+  testerror("init_sblock first free block", wintle(fbc ? filecount/16+2 : 0, b, 4*INT_SIZE));
+  testerror("init_sblock max file count", wintle(filecount, b, 5*INT_SIZE));
+  testerror("init_sblock free file count", wintle(filecount-1, b, 6*INT_SIZE));
+  testerror("init_sblock first free file", wintle(1, b, 7*INT_SIZE));
+  testerror("init_sblock", write_block(id, b, pidx));
   free(b);
   puts("Done.");
 }
 
+/**
+ * @brief This function initializes a partition's file table
+ * @param[in] id disk id
+ * @param[in] pidx partition index
+ * @param[in] psize partition size
+ * @param[in] filecount max file count
+ * @return void
+ * 
+ * This function creates the root directory's file table entry
+ * then proceeds to chain the remain free file table entries
+ */
 void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
+  block b = new_block();
+  int index = 0;
   puts("Creating file table...");
-  block b = new_block();
-  
+  testerror("init_ftab", wintle(B_SIZE, b, 0));
+  testerror("init_ftab", wintle(1, b, 1*INT_SIZE));
+  testerror("init_ftab", wintle(pidx+filecount/16+2, b, 3*INT_SIZE));
+  while(++index < filecount){
+    while((index % 16) > 0){
+      testerror("init_ftab", wintle(index, b, (15+(index-1)*16)*INT_SIZE));
+      index++;
+    }
+    testerror("init_ftab", wintle(index, b, (15+(index-1)*16)*INT_SIZE));
+    testerror("init_ftab", write_block(id, b, (index-1)/16));
+    memset(b->data, 0, sizeof(b->data));
+  }
+  testerror("init_ftab", wintle((index-1), b, (15+(index-1)*16)*INT_SIZE));
+  testerror("init_ftab", write_block(id, b, (index-1)/16));
   free(b);
   puts("Done.");
 }
 
+/**
+ * @brief This function initializes a file system's root directory
+ * @param[in] id disk id
+ * @param[in] ridx root directory's index on the disk
+ * @return void
+ * 
+ * This function initializes the data block occupied by the root
+ * directory with the appropriate values
+ */
 void init_root(int id, uint32_t ridx){
+  block b = new_block();
   puts("Creating root directory...");
-  block b = new_block();
-  
+  testerror("init_root", wintle(0, b, 0));
+  strcpy((char*)b->data+INT_SIZE, ".");
+  testerror("init_root", wintle(0, b, 32));
+  strcpy((char*)b->data+9*INT_SIZE, "..");
+  testerror("init_root", write_block(id, b, ridx)); 
   free(b);
   puts("Done.");
 }
 
+/**
+ * @brief This function chains the volume's free blocks
+ * @param[in] id disk id
+ * @param[in] pidx partition index
+ * @param[in] psize partition size
+ * @param[in] filecount max file count
+ * @return void
+ * 
+ * This function chains the volume's free blocks making
+ * last free block its own successor
+ */
 void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
-  puts("Formatting volume..."); 
   block b = new_block();
-  
+  int index = pidx+(filecount/16)+3;
+  puts("Formatting volume...");
+  while(++index<psize){    
+    testerror("init_ftab", wintle(index, b, 255*INT_SIZE));
+    testerror("init_ftab", write_block(id, b, index-1));
+  }    
+  testerror("init_ftab", wintle(index-1, b, 255*INT_SIZE));
+  testerror("init_ftab", write_block(id, b, index-1));
   free(b);
   puts("Done.");
 }
 
+/**
+ * @brief This function opens a disk and formats one of its partitions
+ * @param[in] name name of the disk
+ * @param[in] partition index of the partition
+ * @param[in] filecount max file count
+ * @param[in] argv0 name of the calling command
+ * @param[in] flags value containing option flags
+ * @return void
+ * 
+ * This function opens a disk and proceeds to format one of its
+ * partitions, provided it is empty or the user clears it for 
+ * overwriting.
+ *
+ * @see init_sblock
+ * @see init_ftab
+ * @see init_root
+ * @see init_fblocks
+ */
 void format_partition(char* name, int partition, int filecount, char* argv0, int flags){
   disk_id id;
   d_stat stat;
@@ -165,7 +248,18 @@ Disk: %s (%d)\nPartition: %d (%d)\nTTFS max file count = %d\n",
   }
 }
 
-
+/**
+ * @brief This function parses command line input
+ * @param[in] id disk id
+ * @param[in] pidx partition index
+ * @param[in] psize partition size
+ * @param[in] filecount max file count
+ * @return void
+ * 
+ * This function parses command line input and launches
+ * auxiliary functions with the appropriate parameters
+ * and options
+ */
 int main(int argc, char* argv[]){
   int c;
   int partition = -1;
