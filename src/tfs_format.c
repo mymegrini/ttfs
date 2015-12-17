@@ -69,8 +69,8 @@ void usage(char* argv0, FILE* out){
 }
 
 
-
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
+  puts("Initializing superblock...");
   block b = new_block();  
   testerror("wintle magic number", wintle(MAGIC_NUMBER, b, 0*INT_SIZE));  
   testerror("wintle block size", wintle(B_SIZE, b, 1*INT_SIZE));
@@ -82,18 +82,31 @@ void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   testerror("wintle first free file", wintle(1, b, 7*INT_SIZE));
   testerror("write_block 0", write_block(id, b, pidx));
   free(b);
+  puts("Done.");
 }
 
 void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
-
+  puts("Creating file table...");
+  block b = new_block();
+  
+  free(b);
+  puts("Done.");
 }
 
 void init_root(int id, uint32_t ridx){
-
+  puts("Creating root directory...");
+  block b = new_block();
+  
+  free(b);
+  puts("Done.");
 }
 
 void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
-
+  puts("Formatting volume..."); 
+  block b = new_block();
+  
+  free(b);
+  puts("Done.");
 }
 
 void format_partition(char* name, int partition, int filecount, char* argv0, int flags){
@@ -138,21 +151,10 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
       else {
 	free(b);
 		
-	puts("Initializing superblock...");
-	init_sblock(id, pidx, psize, filecount);
-	puts("Done.");
-	
-	puts("Creating file table...");
+	init_sblock(id, pidx, psize, filecount);	
 	init_ftab(id, pidx, psize, filecount);
-	puts("Done.");
-
-	puts("Creating root directory...");
 	init_root(id, pidx+filecount/16+2);
-	puts("Done.");
-
-	puts("Formatting volume..."); 
 	init_fblocks(id, pidx, psize, filecount);
-	puts("Done.");
 
 	printf("%s : Formatting successfully completed.\n\
 Disk: %s (%d)\nPartition: %d (%d)\nTTFS max file count = %d\n",
