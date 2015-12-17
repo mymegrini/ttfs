@@ -26,6 +26,20 @@
  */
 
 /**
+ * @brief This function prints the command prototype
+ * @param[in] argv0 command name
+ * @param[out] out output stream
+ * @return void
+ * 
+ * This function prints the command prototype to the
+ * <out> stream
+ */
+void usage(char* argv0, FILE* out){
+  fprintf(out, "%s: requires strictly positive <size> value\n\
+Usage: %s [-o] -s <size> [<name>]\n", argv0, argv0);
+}
+
+/**
  * @brief This function waits for an answer from the user
  * @param[in] prompt message for the user
  * @return Returns 0 for [n/N] and 1 for [y/Y]
@@ -134,32 +148,32 @@ int main(int argc, char* argv[]){
 
     switch (c) {
     case 'h':
-      printf("This command creates and initializes a new disk\n\
-Usage: %s [-o] -s <size> [<name>]\n\n\
-  -s\t--size\t\tspecify size of disk (requires strictly positive value)\n\
+      puts("This command creates and initializes a new disk");
+      usage(argv[0], stdout);
+      puts("  -s\t--size\t\tspecify size of disk (requires strictly positive value)\n \
   -o\t--overwrite\toverwrite existing disk\n\
-    \t--help\t\tdisplay this help and exit\n\n",
-	     argv[0]);
+    \t--help\t\tdisplay this help and exit\n");
       exit(EXIT_SUCCESS);
     case 's':
       if (optarg != NULL) {
 	if(atoi(optarg)<1){
 	  fprintf(stderr,
-		  "%s: requires strictly positive <size> value\n\
-Usage: %s [-o] -s <size> [<name>]\n",
-		  argv[0], argv[0]);
+		  "%s: requires strictly positive <size> value\n",
+		  argv[0]);
+	  usage(argv[0], stderr);
 	  exit(C_FORMAT);
 	} else
 	size = (size==-1) ? atoi(optarg) : size;
 	break;
       } else {
-	fprintf(stderr, "Usage: %s [-o] -s <size> [<name>]\n",argv[0]);
+	usage(argv[0], stderr);
 	exit(C_FORMAT);
       }
     case 'o':
       flags |= F_OWR;
       break;
     default: /* '?' */
+      usage(argv[0], stderr);
       fprintf(stderr, "Usage: %s [-o] -s <size> [<name>]\n",argv[0]);
       exit(C_FORMAT);
     }
@@ -167,9 +181,9 @@ Usage: %s [-o] -s <size> [<name>]\n",
   
   if(size<1){
     fprintf(stderr,
-	    "%s: strictly positive <size> value required\n\
-Usage: %s [-o] -s <size> [<name>]\n",
-	    argv[0], argv[0]);
+	    "%s: strictly positive <size> value required\n",
+	    argv[0]);
+    usage(argv[0], stderr);
     exit(C_FORMAT);
   }
   
