@@ -4,5 +4,6 @@
 *.o
 *.so
 \#*\#
+*.tfs
 # Except this file
 !.gitignore

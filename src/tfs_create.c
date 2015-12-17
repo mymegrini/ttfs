@@ -35,8 +35,7 @@
  * <out> stream
  */
 void usage(char* argv0, FILE* out){
-  fprintf(out, "%s: requires strictly positive <size> value\n\
-Usage: %s [-o] -s <size> [<name>]\n", argv0, argv0);
+  fprintf(out, "Usage: %s [-o] -s <size> [<name>]\n", argv0);
 }
 
 /**
@@ -199,8 +198,7 @@ int main(int argc, char* argv[]){
   if ((flags & F_OWR)==0 && access(name, F_OK)==0){
     printf("%s: disk '%s' already exists.\n",
 	   argv[0], name);
-    if (answer("Overwrite? [Y/n] "))
-      create_disk(name, size, argv[0]);
-    else exit(EXIT_SUCCESS);
+    if (answer("Overwrite? [Y/n] ")==0) exit(EXIT_SUCCESS);
   }
+  create_disk(name, size, argv[0]);
 }
