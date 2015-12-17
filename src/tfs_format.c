@@ -38,7 +38,6 @@
  * waits for the user's answer and returns it
  */
 int answer(char* prompt){
-  fpurge(stdin);
   printf("%s", prompt);
   switch(getchar()){
   case 'Y':	
@@ -48,11 +47,26 @@ int answer(char* prompt){
   case 'N':
     return 0;
   default:
+    while(getchar() != '\n');
     return answer(prompt);
   }
 }
 
 
+/**
+ * @brief This function prints the command prototype
+ * @param[in] argv0 command name
+ * @param[out] out output stream
+ * @return void
+ * 
+ * This function prints the command prototype to the
+ * <out> stream
+ */
+void usage(char* argv0, FILE* out){
+  fprintf(out,
+	  "Usage: %s -p <partition> -mf <max-file-count> [<name>]\n",
+	  argv0);
+}
 
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   error err;
@@ -135,7 +149,7 @@ void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
 
 }
 
-void format_partition(char* name, int partition, int filecount char* argv0){
+void format_partition(char* name, int partition, int filecount, char* argv0, int flags){
   disk_id id;
   error err;
   d_stat stat;
@@ -153,7 +167,7 @@ void format_partition(char* name, int partition, int filecount char* argv0){
   }
   
   if (partition<0 || partition >D_PARTMAX-1 || partition>stat.npart-1){
-    printerror(argv[0], P_WRONGIDX);
+    printerror(argv0, P_WRONGIDX);
     exit(P_WRONGIDX);
   } else {
     uint32_t psize;
@@ -164,14 +178,14 @@ void format_partition(char* name, int partition, int filecount char* argv0){
     psize = stat.part[partition];      
     if(psize<(filecount/16)+3){
       printf("%s: partition too small for specified <max-file-count> value\n"
-	     ,argv[0]);
+	     ,argv0);
       exit(C_FORMAT);	
     }
     
     for(k=0; k<partition; k++) pidx+=stat.part[k];
     
     if(pidx+psize>stat.size-1){
-      printerror(argv[0],P_CORRUPTED);
+      printerror(argv0,P_CORRUPTED);
       exit(P_CORRUPTED);
     }
     
@@ -192,7 +206,7 @@ void format_partition(char* name, int partition, int filecount char* argv0){
     
     if((flags & F_OWR)==0 && k == 0x31534654){
       printf("%s: partition %d already contains a filesystem.\n",
-	     argv[0], partition);
+	     argv0, partition);
       if (answer("Overwrite? [Y/n]")==0)
 	exit(EXIT_SUCCESS);
       else {
@@ -207,19 +221,16 @@ void format_partition(char* name, int partition, int filecount char* argv0){
 	puts("Done.");
 
 	puts("Creating root directory...");
-	init_root(id, pidx, psize, filecount);
+	init_root(id, pidx+filecount/16+2);
 	puts("Done.");
 
 	puts("Formatting volume..."); 
 	init_fblocks(id, pidx, psize, filecount);
 	puts("Done.");
 
-
 	printf("%s : Formatting successfully completed.\n\
-Disk: %s (%d)\n\
-Partition: %d (%d)\n\ 
-TTFS max file count = %d\n",
-	       argv[0], name, stat.size, partition, psize, filecount);
+Disk: %s (%d)\nPartition: %d (%d)\nTTFS max file count = %d\n",
+	       argv0, name, stat.size, partition, psize, filecount);
 
       }
     }
@@ -250,21 +261,21 @@ int main(int argc, char* argv[]){
     
     switch (c) {
     case 'h':
-      printf("This command creates a minimal filesystem in an \
-existing partition\n\
-Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n\
+      puts("This command creates a minimal filesystem in an \
+existing partition");
+      usage(argv[0], stdout);
+      puts("\
   -p\t--partition\tspecify partition id\n\
   -f\t-mf\t\tspecify maximum file count for the file system\n\
   -o\t--overwrite\toverwrite existing partition\n\
-    \t--help\t\tdisplay this help and exit\n\n",
-	     argv[0]);
+    \t--help\t\tdisplay this help and exit\n\n");
       exit(EXIT_SUCCESS);
     case 'p':
       if (optarg != NULL){
 	partition = (partition==-1) ? atoi(optarg) : partition;
 	break;
       } else {
-	fprintf(stderr, "Usage: %s -p <partition> -mf <max-file-count> [<name>]\n",argv[0]);
+	usage(argv[0], stderr);
 	exit(C_FORMAT);
       }     
     case 'f':
@@ -272,14 +283,14 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n\
 	filecount = (filecount==-1) ? atoi(optarg) : filecount;
 	break;
       } else {
-	fprintf(stderr, "Usage: %s -p <partition> -mf <max-file-count> [<name>]\n",argv[0]);
+	usage(argv[0], stderr);
 	exit(C_FORMAT);
       }
     case 'o':
       flags |= F_OWR;
       break;
     default: /* '?' */
-      fprintf(stderr, "Usage: %s -p <partition> -mf <max-file-count> [<name>]\n",argv[0]);
+      usage(argv[0], stderr);
       exit(C_FORMAT);
     }
   }
@@ -295,10 +306,10 @@ Usage: %s -p <partition> -mf <max-file-count> [<name>]\n\n\
 
   if (partition<0 || filecount<1){
     fprintf(stderr,
-	    "%s: requires positive <partition> and strictly positive <max-file-count> values\n\
-Usage: %s -p <partition> -mf <max-file-count> [<name>]\n"
-	    ,argv[0],argv[0]);
+	    "%s: requires positive <partition> and strictly positive <max-file-count> values\n"
+	    ,argv[0]);
+    usage(argv[0], stderr);
     exit(C_FORMAT);
-  } else format_partition(name, partition, filecount, argv[0]);
+  } else format_partition(name, partition, filecount, argv[0], flags);
 }
 
