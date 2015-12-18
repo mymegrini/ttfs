@@ -21,13 +21,13 @@ bin/libll.so : obj/liberror.o obj/libblock.o obj/libll.o
 bin/libtfs.so : obj/libtfs.o
 	$(CC) -shared -o $@ $^
 
-bin/% : obj/%.o $(LIB)
+bin/% : obj/%.o
 	$(CC) -o $@ $< -Lbin $(LIBLINK)
 
 obj/lib%.o : %.c $(HEADERS)
 	$(CC) $(CFLAGS) -fpic -c -Ilib -o $@ $<	
 
-obj/%.o : src/%.c $(HEADERS)
+obj/%.o : src/%.c
 	$(CC) $(CFLAGS) -c -Ilib -o $@ $<
 
 clean :

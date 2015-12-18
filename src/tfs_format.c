@@ -10,6 +10,8 @@
 #define F_OWR 1    /***< flag for overwrite option */
 #define MAGIC_NUMBER 0x31534654 /***< magic number */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
+#define INT_BSIZE 4  /***< int byte size */
+#define FTAB_ENTRY_BSIZE 16*INT_BSIZE   /***< file tab entry size */
 
 /**
  * @brief This command creates a minimal filesystem
@@ -80,19 +82,34 @@ void usage(char* argv0, FILE* out){
  */
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
-  int fbc = psize-(filecount/16+3);
-  puts("Initializing superblock...");
-  testerror("init_sblock magic number", wintle(MAGIC_NUMBER, b, 0*INT_SIZE));  
-  testerror("init_sblock block size", wintle(B_SIZE, b, 1*INT_SIZE));
-  testerror("init_sblock part size", wintle(psize, b, 2*INT_SIZE)); 
-  testerror("init_sblock free block count", wintle(fbc, b, 3*INT_SIZE));    
-  testerror("init_sblock first free block", wintle(fbc ? filecount/16+2 : 0, b, 4*INT_SIZE));
-  testerror("init_sblock max file count", wintle(filecount, b, 5*INT_SIZE));
-  testerror("init_sblock free file count", wintle(filecount-1, b, 6*INT_SIZE));
-  testerror("init_sblock first free file", wintle(1, b, 7*INT_SIZE));
-  testerror("init_sblock", write_block(id, b, pidx));
+  int fbc = psize-(filecount-1)/16-3;
+  int mn = MAGIC_NUMBER;
+  
+  testerror("init_sblock", wintle(MAGIC_NUMBER, b, 0*INT_BSIZE));
+  printf("Filesystem label= %s\n", (char*)&mn);
+  
+  testerror("init_sblock", wintle(B_SIZE, b, 1*INT_BSIZE));
+  printf("Block size= %d\n", B_SIZE);
+  
+  testerror("init_sblock", wintle(psize, b, 2*INT_BSIZE)); 
+  printf("Volume block count= %d\n", psize);
+  
+  testerror("init_sblock", wintle(fbc, b, 3*INT_BSIZE));
+  printf("Free block count= %d ", fbc);
+  
+  testerror("init_sblock", wintle(fbc ? (filecount-1)/16+3 : 0, b, 4*INT_BSIZE));
+  if(fbc) printf("(%d .. %d)\n", (filecount-1)/16+3, psize-1);
+  else puts("");
+  
+  testerror("init_sblock", wintle(filecount, b, 5*INT_BSIZE));
+  printf("Maximum file count= %d ", filecount);
+  
+  testerror("init_sblock", wintle(filecount-1, b, 6*INT_BSIZE));
+  printf("(%d free)\n", filecount-1);
+  
+  testerror("init_sblock", wintle(1, b, 7*INT_BSIZE));  
+  testerror("init_sblock", write_block(id, b, pidx));  
   free(b);
-  puts("Done.");
 }
 
 /**
@@ -109,23 +126,28 @@ void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
 void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
   int index = 0;
-  puts("Creating file table...");
+  
   testerror("init_ftab", wintle(B_SIZE, b, 0));
-  testerror("init_ftab", wintle(1, b, 1*INT_SIZE));
-  testerror("init_ftab", wintle(pidx+filecount/16+2, b, 3*INT_SIZE));
-  while(++index < filecount){
-    while((index % 16) > 0){
-      testerror("init_ftab", wintle(index, b, (15+(index-1)%16)*INT_SIZE));
+  testerror("init_ftab", wintle(1, b, 1*INT_BSIZE));
+  testerror("init_ftab", wintle((filecount-1)/16+2, b, 3*INT_BSIZE));
+  
+  printf("Writing file table %3d%%", 100*index/filecount);
+  
+  while(index < filecount-1){
+    while(index < 16*(index/16+1) && index < filecount-1){
+      testerror("init_ftab", wintle(index+1, b, 15*INT_BSIZE+(index%16)*FTAB_ENTRY_BSIZE));
       index++;
     }
-    testerror("init_ftab", wintle(index, b, (15+(index-1)%16)*INT_SIZE));
-    testerror("init_ftab", write_block(id, b, (index-1)/16));
+    testerror("init_ftab", write_block(id, b, pidx+index/16+1));	      
+    printf("\b\b\b\b%3d%%", 100*index/filecount);    
     memset(b->data, 0, sizeof(b->data));
+    index++;
   }
-  testerror("init_ftab", wintle((index-1), b, (15+(index-1)%16)*INT_SIZE));
-  testerror("init_ftab", write_block(id, b, (index-1)/16));
+  testerror("init_ftab", wintle(index, b, 15*INT_BSIZE+(index%16)*FTAB_ENTRY_BSIZE));
+  testerror("init_ftab", write_block(id, b, pidx+index/16+1));
+  
+  printf("\b\b\b\b%3d%%\n", 100*index/filecount);
   free(b);
-  puts("Done.");
 }
 
 /**
@@ -139,14 +161,14 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
  */
 void init_root(int id, uint32_t ridx){
   block b = new_block();
-  puts("Creating root directory...");
+  printf("Creating root directory: ");
   testerror("init_root", wintle(0, b, 0));
-  strcpy((char*)b->data+INT_SIZE, ".");
+  strcpy((char*)b->data+INT_BSIZE, ".");
   testerror("init_root", wintle(0, b, 32));
-  strcpy((char*)b->data+9*INT_SIZE, "..");
+  strcpy((char*)b->data+9*INT_BSIZE, "..");
   testerror("init_root", write_block(id, b, ridx)); 
   free(b);
-  puts("Done.");
+  puts("done");
 }
 
 /**
@@ -162,16 +184,20 @@ void init_root(int id, uint32_t ridx){
  */
 void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
-  uint32_t index = pidx+(filecount/16)+3;
-  puts("Formatting volume...");
+  uint32_t index = pidx+((filecount-1)/16)+3;
+  printf("Formatting volume %3d%%", index/psize);
   while(++index<psize){    
-    testerror("init_fblocks", wintle(index, b, 255*INT_SIZE-1));
-    testerror("init_fblocks", write_block(id, b, index-1));
-  }    
-  testerror("init_fblocks", wintle(index-1, b, 255*INT_SIZE-1));
-  testerror("init_fblockl", write_block(id, b, index-1));
+    testerror("init_fblocks", wintle(index, b, 255*INT_BSIZE-1));
+    testerror("init_fblocks", write_block(id, b, pidx+index-1));
+    printf("\b\b\b\b%3d%%", 100*index/psize);
+    memset(b->data, 0, sizeof(b->data));
+  }
+  if (index-1<psize){
+    testerror("init_fblocks", wintle(index-1, b, 255*INT_BSIZE-1));
+    testerror("init_fblockl", write_block(id, b, pidx+index-1));
+    printf("\b\b\b\b%3d%%\n", 100*index/psize);
+  } else printf("\b\b\b\b%3d%%\n", 100);
   free(b);
-  puts("Done.");
 }
 
 /**
@@ -209,10 +235,10 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     uint32_t k;
     
     psize = stat.part[partition];      
-    if(psize<(filecount/16)+3){
+    if(psize<((filecount-1)/16)+3){
       printf("%s: partition too small for specified <max-file-count> value\n"
 	     ,argv0);
-      exit(C_FORMAT);	
+      exit(C_FORMAT);
     }
     
     for(k=0; k<partition; k++) pidx+=stat.part[k];
@@ -229,7 +255,7 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     if((flags & F_OWR)==0 && k == 0x31534654){
       printf("%s: partition %d already contains a filesystem.\n",
 	     argv0, partition);
-      if (answer("Overwrite? [Y/n]")==0)
+      if (answer("Overwrite? [Y/n] ")==0)
 	exit(EXIT_SUCCESS);
     }
 
@@ -237,12 +263,12 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     
     init_sblock(id, pidx, psize, filecount);	
     init_ftab(id, pidx, psize, filecount);
-    init_root(id, pidx+filecount/16+2);
+    init_root(id, pidx+(filecount-1)/16+2);
     init_fblocks(id, pidx, psize, filecount);
 
-    printf("%s : Formatting successfully completed.\n\
-Disk: %s (%dB)\nPartition: %d (%dB)\nTTFS max file count = %d\n",
-	   argv0, name, stat.size*B_SIZE, partition, psize*B_SIZE, filecount);    
+    /*printf("%s : Formatting successfully completed.\n	\
+\t%s : \t(%dB)\n\tPartition %d : \t(%dB)\n\t%dB\n",
+argv0, name, stat.size*B_SIZE, partition, psize*B_SIZE, B_SIZE*((filecount-1)/16+2));*/    
   }
 }
 
