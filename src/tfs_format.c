@@ -11,7 +11,7 @@
 #define MAGIC_NUMBER 0x31534654 /***< magic number */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 #define INT_BSIZE 4  /***< int byte size */
-#define FTAB_ENTRY_BSIZE 16*INT_BSIZE   /***< file tab entry size */
+#define TFSENT_BSIZE 64   /***< file tab entry size */
 
 /**
  * @brief This command creates a minimal filesystem
@@ -89,7 +89,7 @@ void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   printf("Filesystem label= %s\n", (char*)&mn);
   
   testerror("init_sblock", wintle(B_SIZE, b, 1*INT_BSIZE));
-  printf("Block size= %d\n", B_SIZE);
+  printf("Block size= %dB\n", B_SIZE);
   
   testerror("init_sblock", wintle(psize, b, 2*INT_BSIZE)); 
   printf("Volume block count= %d\n", psize);
@@ -133,21 +133,23 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
   
   printf("Writing file table %3d%%", 100*index/filecount);
   
-  while(index < filecount-1){
-    while(index < 16*(index/16+1) && index < filecount-1){
-      testerror("init_ftab", wintle(index+1, b, 15*INT_BSIZE+(index%16)*FTAB_ENTRY_BSIZE));
-      index++;
+  while(index < filecount){
+    testerror("init_ftab", wintle(index+1==filecount?index:index+1,
+				  b,
+				  15*INT_BSIZE+(index%16)*TFSENT_BSIZE));
+    if ((index+1)/16==index/16+1){
+      testerror("init_ftab", write_block(id, b, pidx+index/16+1));	      
+      printf("\b\b\b\b%3d%%", 100*index/filecount);    
+      memset(b->data, 0, sizeof(b->data));
     }
-    testerror("init_ftab", write_block(id, b, pidx+index/16+1));	      
-    printf("\b\b\b\b%3d%%", 100*index/filecount);    
-    memset(b->data, 0, sizeof(b->data));
     index++;
   }
-  testerror("init_ftab", wintle(index, b, 15*INT_BSIZE+(index%16)*FTAB_ENTRY_BSIZE));
-  testerror("init_ftab", write_block(id, b, pidx+index/16+1));
-  
-  printf("\b\b\b\b%3d%%\n", 100*index/filecount);
+  if((index+1)/16 < index/16+1){
+    testerror("init_ftab", write_block(id, b, pidx+index/16+1));  
+    printf("\b\b\b\b%3d%%\n", 100*index/filecount);
+  }
   free(b);
+  printf("File table block size= %d\n", (filecount-1)/16+1);
 }
 
 /**
@@ -184,19 +186,16 @@ void init_root(int id, uint32_t ridx){
  */
 void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
-  uint32_t index = pidx+((filecount-1)/16)+3;
+  uint32_t index = (filecount-1)/16+3;
   printf("Formatting volume %3d%%", index/psize);
-  while(++index<psize){    
-    testerror("init_fblocks", wintle(index, b, 255*INT_BSIZE-1));
-    testerror("init_fblocks", write_block(id, b, pidx+index-1));
+  while(index<psize){    
+    testerror("init_fblocks", wintle(index+1==psize?index:index+1, b, 255*INT_BSIZE));
+    testerror("init_fblocks", write_block(id, b, pidx+index));
     printf("\b\b\b\b%3d%%", 100*index/psize);
     memset(b->data, 0, sizeof(b->data));
+    index++;
   }
-  if (index-1<psize){
-    testerror("init_fblocks", wintle(index-1, b, 255*INT_BSIZE-1));
-    testerror("init_fblockl", write_block(id, b, pidx+index-1));
-    printf("\b\b\b\b%3d%%\n", 100*index/psize);
-  } else printf("\b\b\b\b%3d%%\n", 100);
+  printf("\b\b\b\b%3d%%\n", 100*index/psize);
   free(b);
 }
 

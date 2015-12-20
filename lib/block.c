@@ -17,7 +17,7 @@ block new_block( void ) {
  * 
  */
 error rintle(uint32_t* value, block b, addr idx){
-  if (idx<0 || idx>B_SIZE-5) return B_WRONGIDX;
+  if (idx<0 || idx>B_SIZE-4) return B_WRONGIDX;
   *value = ((uint32_t)b->data[idx])
     | (((uint32_t)b->data[idx+1])<<8)
     | (((uint32_t)b->data[idx+2])<<16)
@@ -32,7 +32,7 @@ error rintle(uint32_t* value, block b, addr idx){
  *
  */
 error wintle(uint32_t value, block b, addr idx){
-  if (idx<0 || idx>B_SIZE-5) return B_WRONGIDX;
+  if (idx<0 || idx>B_SIZE-4) return B_WRONGIDX;
   b->data[idx] = (byte) value;
   b->data[idx+1] = (byte) (value>>8);
   b->data[idx+2] = (byte) (value>>16);
