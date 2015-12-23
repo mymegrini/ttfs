@@ -224,7 +224,7 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
   testerror("start_disk", start_disk(name, &id));  
   testerror("disk_stat", disk_stat(id, &stat));
   
-  if (partition<0 || partition >D_PARTMAX-1 || partition>stat.npart-1){
+  if (partition<0 || partition>D_PARTMAX-1 || partition+1>stat.npart){
     printerror(argv0, P_WRONGIDX);
     exit(P_WRONGIDX);
   } else {
