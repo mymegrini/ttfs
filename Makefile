@@ -1,11 +1,11 @@
 CC = gcc
 CFLAGS = -Wall --pedantic -O3 -std=c99
-VPATH = src:obj:lib:bin
+VPATH = src:lib
 
 EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))
 LIB = bin/libll.so bin/libtfs.so
 
-HEADERS = $(wildcard *.h)
+HEADERS = $(wildcard lib/*.h) $(wildcard src/*.h)
 OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) \
 $(patsubst lib/%.c, obj/lib%.o, $(wildcard lib/*.c))
 
@@ -13,9 +13,11 @@ LIBLINK = -lll -ltfs
 
 all : $(EXEC)
 
+exec : $(EXEC)
+
 lib : $(LIB)
 
-bin/libll.so : obj/liberror.o obj/libblock.o obj/libll.o 
+bin/libll.so : obj/liberror.o obj/libblock.o obj/libll.o
 	$(CC) -shared -o $@ $^
 
 bin/libtfs.so : obj/libtfs.o
@@ -27,7 +29,7 @@ bin/% : obj/%.o
 obj/lib%.o : %.c $(HEADERS)
 	$(CC) $(CFLAGS) -fpic -c -Ilib -o $@ $<	
 
-obj/%.o : src/%.c
+obj/%.o : src/%.c $(HEADERS)
 	$(CC) $(CFLAGS) -c -Ilib -o $@ $<
 
 clean :

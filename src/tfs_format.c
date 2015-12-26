@@ -1,17 +1,15 @@
 #include "error.h"
 #include "block.h"
 #include "ll.h"
+#include "tfs.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #define DEF_NAME "disk.tfs"   /***< default disk name */
-#define F_OWR 1    /***< flag for overwrite option */
-#define MAGIC_NUMBER 0x31534654 /***< magic number */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
-#define INT_BSIZE 4  /***< int byte size */
-#define TFSENT_BSIZE 64   /***< file tab entry size */
+#define F_OWR 1    /***< flag for overwrite option */
 
 /**
  * @brief This command creates a minimal filesystem
@@ -83,31 +81,31 @@ void usage(char* argv0, FILE* out){
 void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
   int fbc = psize-(filecount-1)/16-3;
-  int mn = MAGIC_NUMBER;
+  int mn = TFS_MAGIC_NUMBER;
   
-  testerror("init_sblock", wintle(MAGIC_NUMBER, b, 0*INT_BSIZE));
+  testerror("init_sblock", wintle(TFS_MAGIC_NUMBER, b, TFS_MAGIC_NUMBER_INDEX));
   printf("Filesystem label= %s\n", (char*)&mn);
   
-  testerror("init_sblock", wintle(B_SIZE, b, 1*INT_BSIZE));
+  testerror("init_sblock", wintle(TFS_VOLUME_BLOCK_SIZE, b, TFS_VOLUME_BLOCK_SIZE_INDEX));
   printf("Block size= %dB\n", B_SIZE);
   
-  testerror("init_sblock", wintle(psize, b, 2*INT_BSIZE)); 
+  testerror("init_sblock", wintle(psize, b, TFS_VOLUME_BLOCK_COUNT_INDEX)); 
   printf("Volume block count= %d\n", psize);
   
-  testerror("init_sblock", wintle(fbc, b, 3*INT_BSIZE));
+  testerror("init_sblock", wintle(fbc, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX));
   printf("Free block count= %d ", fbc);
   
-  testerror("init_sblock", wintle(fbc ? (filecount-1)/16+3 : 0, b, 4*INT_BSIZE));
+  testerror("init_sblock", wintle(fbc ? (filecount-1)/16+3 : 0, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX));
   if(fbc) printf("(%d .. %d)\n", (filecount-1)/16+3, psize-1);
   else puts("");
   
-  testerror("init_sblock", wintle(filecount, b, 5*INT_BSIZE));
+  testerror("init_sblock", wintle(filecount, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX));
   printf("Maximum file count= %d ", filecount);
   
-  testerror("init_sblock", wintle(filecount-1, b, 6*INT_BSIZE));
+  testerror("init_sblock", wintle(filecount-1, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX));
   printf("(%d free)\n", filecount-1);
   
-  testerror("init_sblock", wintle(1, b, 7*INT_BSIZE));  
+  testerror("init_sblock", wintle(1, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX));  
   testerror("init_sblock", write_block(id, b, pidx));  
   free(b);
 }
@@ -127,16 +125,18 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
   int index = 0;
   
-  testerror("init_ftab", wintle(B_SIZE, b, 0));
-  testerror("init_ftab", wintle(1, b, 1*INT_BSIZE));
-  testerror("init_ftab", wintle((filecount-1)/16+2, b, 3*INT_BSIZE));
+  testerror("init_ftab", wintle(B_SIZE, b, TFS_FILE_SIZE_INDEX));
+  testerror("init_ftab", wintle(TFS_DIRECTORY_TYPE, b, TFS_FILE_TYPE_INDEX));
+  testerror("init_ftab", wintle((filecount-1)/16+2, b, TFS_DIRECT_INDEX(0)));
   
   printf("Writing file table %3d%%", 100*index/filecount);
   
   while(index < filecount){
-    testerror("init_ftab", wintle(index+1==filecount?index:index+1,
-				  b,
-				  15*INT_BSIZE+(index%16)*TFSENT_BSIZE));
+    if(index>0)
+      testerror("init_ftab", wintle(index+1==filecount?index:index+1,
+				    b,
+				    TFS_NEXT_FREE_FILE_ENTRY_INDEX
+				    +(index%16)*TFS_FILE_TABLE_ENTRY_SIZE));
     if ((index+1)/16==index/16+1){
       testerror("init_ftab", write_block(id, b, pidx+index/16+1));	      
       printf("\b\b\b\b%3d%%", 100*index/filecount);    
@@ -164,10 +164,10 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
 void init_root(int id, uint32_t ridx){
   block b = new_block();
   printf("Creating root directory: ");
-  testerror("init_root", wintle(0, b, 0));
-  strcpy((char*)b->data+INT_BSIZE, ".");
-  testerror("init_root", wintle(0, b, 32));
-  strcpy((char*)b->data+9*INT_BSIZE, "..");
+  testerror("init_root", wintle(0, b, TFS_DIRECTORY_ENTRY_INDEX(0)));
+  strcpy((char*)b->data+INT_SIZE, ".");
+  testerror("init_root", wintle(0, b, TFS_DIRECTORY_ENTRY_INDEX(1)));
+  strcpy((char*)b->data+9*INT_SIZE, "..");
   testerror("init_root", write_block(id, b, ridx)); 
   free(b);
   puts("done");
@@ -189,7 +189,8 @@ void init_fblocks(int id, uint32_t pidx, uint32_t psize, int filecount){
   uint32_t index = (filecount-1)/16+3;
   printf("Formatting volume %3d%%", index/psize);
   while(index<psize){    
-    testerror("init_fblocks", wintle(index+1==psize?index:index+1, b, 255*INT_BSIZE));
+    testerror("init_fblocks", wintle(index+1==psize?index:index+1,
+				     b, TFS_VOLUME_NEXT_FREE_BLOCK_INDEX));
     testerror("init_fblocks", write_block(id, b, pidx+index));
     printf("\b\b\b\b%3d%%", 100*index/psize);
     memset(b->data, 0, sizeof(b->data));
@@ -224,7 +225,7 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
   testerror("start_disk", start_disk(name, &id));  
   testerror("disk_stat", disk_stat(id, &stat));
   
-  if (partition<0 || partition >D_PARTMAX-1 || partition>stat.npart-1){
+  if (partition<0 || partition>D_PARTMAX-1 || partition+1>stat.npart){
     printerror(argv0, P_WRONGIDX);
     exit(P_WRONGIDX);
   } else {
@@ -263,11 +264,7 @@ void format_partition(char* name, int partition, int filecount, char* argv0, int
     init_sblock(id, pidx, psize, filecount);	
     init_ftab(id, pidx, psize, filecount);
     init_root(id, pidx+(filecount-1)/16+2);
-    init_fblocks(id, pidx, psize, filecount);
-
-    /*printf("%s : Formatting successfully completed.\n	\
-\t%s : \t(%dB)\n\tPartition %d : \t(%dB)\n\t%dB\n",
-argv0, name, stat.size*B_SIZE, partition, psize*B_SIZE, B_SIZE*((filecount-1)/16+2));*/    
+    init_fblocks(id, pidx, psize, filecount); 
   }
 }
 
