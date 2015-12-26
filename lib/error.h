@@ -27,6 +27,7 @@ extern void printerror(char *s, error err);
  */
 void testerror(char* msg, error err);
 
+
 #define EXIT_SUCCESS 0    /**< Successful execution */
 #define C_FORMAT 1    /**< Bad command format */
 #define D_WRONGID 2    /**< Wrong disk_id  */
