@@ -35,6 +35,8 @@
 #define TFS_DIRECTORY_ENTRY_INDEX(i) (32*i)       /***< TFS directory entry file index */
 #define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH 28    /***< TFS directory entry name maximum length */
 
+#include <sys/types.h>
+#include <dirent.h>
 
 /**
  * @brief This function attempts to create a directory named <path>
@@ -93,7 +95,7 @@ ssize_t tfs_write(int fildes,void *buf,size_t nbytes);
  * @param[in] fildes file descriptor
  * @return Returns 0 on success or -1 if an error occured
  */
-int tfs_close(fildes);
+int tfs_close(int fildes);
 
 /**
  * @brief This function repositions the offset of the open file associated with the file
