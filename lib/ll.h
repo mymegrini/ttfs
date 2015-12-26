@@ -9,6 +9,8 @@
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 #define SIZEOF_INT 4    /**< size of an int */
 
+#define DISKEXIST(id) ( id < DD_MAX && _disk[id] != NULL )
+
 /**
  * A type to represent an index of the DISK_ID array
  */
