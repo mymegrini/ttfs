@@ -1,5 +1,7 @@
 #include "error.h"
 #include "block.h"
+#include "utils.h"
+#include "default.h"
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -10,7 +12,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#define DEF_NAME "disk.tfs"   /***< default disk name */
 #define F_OWR 1    /***< flag for overwrite option */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
@@ -36,29 +37,6 @@
  */
 void usage(char* argv0, FILE* out){
   fprintf(out, "Usage: %s [-o] -s <size> [<name>]\n", argv0);
-}
-
-/**
- * @brief This function waits for an answer from the user
- * @param[in] prompt message for the user
- * @return Returns 0 for [n/N] and 1 for [y/Y]
- *
- * This function displays a prompt message <prompt> and
- * waits for the user's answer and returns it
- */
-int answer(char* prompt){
-  printf("%s", prompt);
-  switch(getchar()){
-  case 'Y':	
-  case 'y':
-    return 1;
-  case 'n':
-  case 'N':
-    return 0;
-  default:
-    while(getchar() != '\n');
-    return answer(prompt);
-  }
 }
 
 /**
@@ -187,13 +165,13 @@ int main(int argc, char* argv[]){
   }
   
   if(optind < argc){
-    if(strncmp(argv[optind]+strlen(argv[optind])-4, ".tfs", 4)==0)
+    if(strncmp(argv[optind]+strlen(argv[optind])-4, DEF_EXT, 4)==0)
       strncpy(name, argv[optind], D_NAME_MAXLEN);
     else {      
       strncpy(name, argv[optind], D_NAME_MAXLEN-4);
       strncat(name, ".tfs", D_NAME_MAXLEN-strlen(name));
     }
-  } else strncpy(name, DEF_NAME, 9);
+  } else strncpy(name, DEF_FILENAME, 9);
 
   if ((flags & F_OWR)==0 && access(name, F_OK)==0){
     printf("%s: disk '%s' already exists.\n",

@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #define STRBADCHAR (-1)
 #define UINT32TOOBIG (-10)

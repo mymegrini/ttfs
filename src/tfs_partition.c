@@ -28,6 +28,8 @@
 #define MOD_FORCE 4
 #define MOD_HELP 8
 #define MOD_DEFAULT MOD_SAFE
+#define YES 1
+#define NO 0
 
 error partition( char *name, uint32_t *partsize, int nb_part, long long unsigned totalsize, short mode );
 error part_append( disk_id d_id, uint32_t *partsize, int nb_part, long long unsigned totalsize );
@@ -40,48 +42,6 @@ void help( char *argv0 );
 #include <ctype.h>
 #include <string.h>
 #include <inttypes.h>
-
-long long int
-atou ( char *s ) {
-  int size = strlen(s);
-  uint32_t val = 0;
-  int count = 0;
-  uint32_t below_max = (UINT32_MAX - 1) / 10;
-  while ( isdigit(*s) ) {
-    if (val > below_max)
-      return UINT32TOOBIG;
-    val = val*10 + ( *s++ - '0' );
-    ++count;
-  }
-  return (count==size)?val:STRBADCHAR;
-}
-
-#define YES 1
-#define NO 0
-
-/**
- * @brief This function waits for an answer from the user
- * @param[in] prompt message for the user
- * @return Returns 0 for [n/N] and 1 for [y/Y]
- *
- * This function displays a prompt message <prompt> and
- * waits for the user's answer and returns it
- */
-
-int answer(char* prompt){
-  printf("%s", prompt);
-  switch(getchar()){
-  case 'Y':	
-  case 'y':
-    return YES;
-  case 'n':
-  case 'N':
-    return NO;
-  default:
-    while(getchar() != '\n');
-    return answer(prompt);
-  }
-}
 
 /**
  * @brief Partitionate the disk.

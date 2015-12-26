@@ -2,12 +2,13 @@
 #include "block.h"
 #include "ll.h"
 #include "tfs.h"
+#include "utils.h"
+#include "default.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define DEF_NAME "disk.tfs"   /***< default disk name */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 #define F_OWR 1    /***< flag for overwrite option */
 
@@ -27,30 +28,6 @@
  * @see P_CORRUPTED
  * @see EXIT_SUCCESS
  */
-
-
-/**
- * @brief This function waits for an answer from the user
- * @param[in] prompt message for the user
- * @return Returns 0 for [n/N] and 1 for [y/Y]
- *
- * This function displays a prompt message <prompt> and
- * waits for the user's answer and returns it
- */
-int answer(char* prompt){
-  printf("%s", prompt);
-  switch(getchar()){
-  case 'Y':	
-  case 'y':
-    return 1;
-  case 'n':
-  case 'N':
-    return 0;
-  default:
-    while(getchar() != '\n');
-    return answer(prompt);
-  }
-}
 
 /**
  * @brief This function prints the command prototype
@@ -338,13 +315,13 @@ existing partition");
   }
   
   if(optind < argc){
-    if(strncmp(argv[optind]+strlen(argv[optind])-4, ".tfs", 4)==0)
+    if(strncmp(argv[optind]+strlen(argv[optind])-4, DEF_EXT, 4)==0)
       strncpy(name, argv[optind], D_NAME_MAXLEN);
     else {      
       strncpy(name, argv[optind], D_NAME_MAXLEN-4);
       strncat(name, ".tfs", D_NAME_MAXLEN-strlen(name));
     }
-  } else strncpy(name, DEF_NAME, 9);
+  } else strncpy(name, DEF_FILENAME, 9);
 
   if (partition<0 || filecount<1){
     fprintf(stderr,
