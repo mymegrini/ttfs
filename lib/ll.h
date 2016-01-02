@@ -75,4 +75,16 @@ error stop_disk(disk_id id);
  */
 error disk_stat(disk_id id, d_stat* stat);
 
+/**
+ * @brief This function returns partition's id 
+ * @param[in] id Disk id
+ * @param[in] i_part index of partition in the disk's block zero
+ * @param[in] id_part id of partition
+ * @return Returns an error if encountered
+ */
+error id_partition(disk_id id, uint32_t i_part, disk_id * id_part);
+
+
+
+
 #endif
