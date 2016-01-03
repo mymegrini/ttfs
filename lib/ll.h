@@ -81,6 +81,8 @@ error disk_stat(disk_id id, d_stat* stat);
  * @param[in] partid partition id
  * @param[out] partidx to store partition's superblock index
  * @return Returns an error if encountered
+ * @see D_WRONGID
+ * @see P_WRONGIDX
  */
 error p_index(disk_id id, uint32_t partid, uint32_t* partidx);
 
