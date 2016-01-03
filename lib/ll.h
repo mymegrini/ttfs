@@ -76,15 +76,13 @@ error stop_disk(disk_id id);
 error disk_stat(disk_id id, d_stat* stat);
 
 /**
- * @brief This function returns partition's id 
+ * @brief This function returns the partition's physical index
  * @param[in] id Disk id
- * @param[in] i_part index of partition in the disk's block zero
- * @param[in] id_part id of partition
+ * @param[in] partid partition id
+ * @param[out] partidx to store partition's superblock index
  * @return Returns an error if encountered
  */
-error id_partition(disk_id id, uint32_t i_part, disk_id * id_part);
-
-
+error p_index(disk_id id, uint32_t partid, uint32_t* partidx);
 
 
 #endif

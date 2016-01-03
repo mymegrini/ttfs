@@ -242,29 +242,18 @@ error disk_stat(disk_id id, d_stat* stat){
 
 
 /**
- * Returns block zero's id of partition 
+ * Returns a partition superblock's index on the volume
  *
  *
  */
-error id_partition(disk_id id, uint32_t i_part, disk_id * id_part){
-   block b_zero = new_block();
-   error err_read = read_block(id,b_zero,0);
-   if(err_read != EXIT_SUCCESS){  
-     //error message
-     printf("Erreur read : %d\n",err_read);
-     return err_read;
-     return err_read;
-   } 
-   uint32_t nb_part;
-   rintle(&nb_part,b_zero,1*INT_SIZE);
-   int partition = 0;
-   int c = 1;
-   for(partition = 0 ; partition<i_part;partition ++){
-     uint32_t size_partition;
-     rintle(&size_partition,b_zero,(partition+2)*INT_SIZE);
-     c=c+size_partition;
-   }
-   *id_part=id+c+nb_part;
-
-   return EXIT_SUCCESS;
+uint32_t sum(disk_id id, uint32_t partid){
+  if (partid==0) return 0;
+  else return (_disk[id]->part[partid-1])+sum(id,partid-1);
+}
+error p_index(disk_id id, uint32_t partid, uint32_t* partidx){
+  if (partid>_disk[id]->npart) return P_WRONGIDX;
+  else {
+    *partidx = sum(id,partid);
+    return EXIT_SUCCESS;
+  }
 }
