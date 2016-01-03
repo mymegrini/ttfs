@@ -174,8 +174,12 @@ file_freeblocks ( uint32_t inode );
  *  
  * If the working path has not been initialized by a first call
  * and you follow a path (with something likefollow_path(NULL, &entry))$
- * then error TFS_ERRPATH_NOWORKINGPATH is raised
+ * then error TFS_ERRPATH_NOWORKINGPATH is returned.
  *
+ * About memory allocation:
+ * An internal static char* is used to work on, it is automatically
+ * released after reaching a leaf or after
+ * 
  * @param[in] path 
  * @param[out] entry 
  * @return error EXIT_SUCCESS, TFS_PATHLEAF, TFS_ERRPATH_NOPFX, 
@@ -183,7 +187,7 @@ file_freeblocks ( uint32_t inode );
  *               
  */
 error
-path_follow ( char * path, char ** entry );
+path_follow ( const char * path, char ** entry );
 
 
 

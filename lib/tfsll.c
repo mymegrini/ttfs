@@ -74,7 +74,7 @@ file_freeblocks ( uint32_t inode ) {
 #define PATH_FPFXLEN 7
 #define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
 error
-path_follow( char * path, char **entry ) {
+path_follow( const char * path,  char **entry ) {
   static char *workpath = NULL;
   if (path == NULL) {
     if (workpath == NULL)
@@ -92,6 +92,8 @@ path_follow( char * path, char **entry ) {
   }
   else {
     if (PATH_ISVALID(path)) {
+      if (workpath != NULL)
+	free(workpath);
       workpath = strdup(path);
       strtok(workpath, PATH_STRSEP);
       return EXIT_SUCCESS;
