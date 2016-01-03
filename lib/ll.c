@@ -246,14 +246,10 @@ error disk_stat(disk_id id, d_stat* stat){
  *
  *
  */
-uint32_t sum(disk_id id, uint32_t partid){
-  if (partid==0) return 0;
-  else return (_disk[id]->part[partid-1]) + sum(id,partid-1);
-}
 error p_index(disk_id id, uint32_t partid, uint32_t* partidx){
   if (id>DD_MAX || _disk[id]==NULL) return D_WRONGID;
   if (partid>D_PARTMAX-1 || partid>_disk[id]->npart) return P_WRONGIDX;
-      
-  *partidx = sum(id,partid);
+  *partidx = 1;
+  while (partidx-- >0) *partidx += _disk[id]->part[partid];
   return EXIT_SUCCESS;
 }
