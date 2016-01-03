@@ -11,9 +11,9 @@ $(patsubst lib/%.c, obj/lib%.o, $(wildcard lib/*.c))
 
 LIBLINK = -lll -ltfs -lutils
 
-all : $(EXEC)
+all : lib exe
 
-exec : $(EXEC)
+exe : $(EXEC)
 
 lib : $(LIB)
 

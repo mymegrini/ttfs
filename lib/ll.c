@@ -240,3 +240,16 @@ error disk_stat(disk_id id, d_stat* stat){
   }
 }
 
+
+/**
+ * Returns a partition superblock's index on the volume
+ *
+ *
+ */
+error p_index(disk_id id, uint32_t partid, uint32_t* partidx){
+  if (id>DD_MAX || _disk[id]==NULL) return D_WRONGID;
+  if (partid>D_PARTMAX-1 || partid>_disk[id]->npart) return P_WRONGIDX;
+  *partidx = 1;
+  while (partid-- >0) *partidx += _disk[id]->part[partid];
+  return EXIT_SUCCESS;
+}

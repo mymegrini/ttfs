@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include "block.h"
+#include "tfs.h"
 #include <getopt.h>
 
 #define F_LONG 1 /***< Long flag */
@@ -17,13 +18,13 @@
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 /**
- * Analyze a disk
+ * @brief Analyze a disk
  * Print the size of the disk, number of partitions and size of them
  *
- * \param name the name of the disk 
- * \return error 
+ * \@param name the name of the disk 
+ * \@return error 
  */
-error tfs_analyze(char *name){
+error tfs_analyze(char *name,int mode,int partition){
 
 disk_id id;
  
@@ -41,7 +42,7 @@ error err_start = start_disk(name,&id);
    return err_read;
  }
 
- printf("\t\t\tDISK %s :\n\n",name);
+ printf("\n\t\t\tDISK %s :\n\n",name);
  
  uint32_t size_disk;
  rintle(&size_disk,b_zero,0*INT_SIZE);
@@ -51,15 +52,44 @@ error err_start = start_disk(name,&id);
  rintle(&nb_part,b_zero,1*INT_SIZE);
  printf("%-22s %6d \n\n","Number of partitions :",nb_part);
  
- int i = 0;
- if(nb_part != 0)
+ if(partition>-1 && mode==MODE_PART){
    printf("%-20s %15s %15s\n","Partition Index","Size (blocks)","Size (bytes)");
- for(i=0;i<nb_part;i++){
-   uint32_t size_part;
-   rintle(&size_part,b_zero,(i+2)*INT_SIZE);
-   printf("%-20d %15d %15d\n",(i+1),size_part,size_part*B_SIZE);  
+   uint32_t size_partition;
+   rintle(&size_partition,b_zero,(partition+2)*INT_SIZE);
+   printf("%-20d %15d %15d\n",(partition+1),size_partition,size_partition*B_SIZE); 
+   printf("%-20s %-20s %-20s %-20s\n \n","Total space","Free Space (blocks)","Free Space (bytes)","First Free Block");
+
+   disk_id id_part;
+   error err_read_part_id = id_partition(id,partition,&id_part);
+   if(err_read_part_id != EXIT_SUCCESS){
+     printf("Erreur read id of partition : %d\n",err_read_part_id);
+   }
+   printf("id : %d %d\n",id_part,id);
+
+   block b_zero_part = new_block();
+   error err_read_part = read_block(id,b_zero_part,id_part-1);
+   if(err_read_part != EXIT_SUCCESS){  
+     //error message
+     printf("Erreur read : %d\n",err_read_part);
+     return err_read;
+   }
+
+   uint32_t first_free_b, free_space, total_space;
+   rintle(&first_free_b,b_zero_part,TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
+   rintle(&free_space,b_zero_part,TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
+   rintle(&total_space,b_zero_part,TFS_VOLUME_BLOCK_SIZE_INDEX);
+   printf("%-20d %-20d %-20d %-20d\n",total_space,free_space,free_space*B_SIZE,first_free_b);
+ }else{
+   int i = 0;
+   if(nb_part != 0)
+     printf("%-20s %15s %15s\n","Partition Index","Size (blocks)","Size (bytes)");
+   for(i=0;i<nb_part;i++){
+     uint32_t size_part;
+     rintle(&size_part,b_zero,(i+2)*INT_SIZE);
+     printf("%-20d %15d %15d\n",(i+1),size_part,size_part*B_SIZE);  
+   }
  }
- 
+
  return EXIT_SUCCESS;
 }
 
@@ -97,7 +127,7 @@ Usage: %s [-p <partition>] [-l] [name]\n\n\
     case 'p':
       if (optarg != NULL){
 	partition = (partition==-1) ? atoi(optarg) : partition;
-	mode |= MODE_PART;
+	mode = MODE_PART;
 	break;
       } else {
 	fprintf(stderr,"Usage: %s [-p <partition>] [-l] [name]\n",argv[0]);
@@ -127,7 +157,7 @@ Usage: %s [-p <partition>] [-l] [name]\n",argv[0],argv[0]);
   }
   */
   
-  tfs_analyze(name);
+  tfs_analyze(name,mode,partition);
 
   return 0;
 }
