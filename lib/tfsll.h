@@ -9,13 +9,16 @@
 #ifndef TFSLL_H
 #define TFSLL_H 1
 
-#include <inttypes.h>
+//////////////////////////////////////////////////////////////////////
+// HEADERS
+//////////////////////////////////////////////////////////////////////
+#include <stdint.h>
 
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // TYPES
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Directory entry
@@ -43,9 +46,9 @@ typedef struct {
 
 
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // FUNCTIONS
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Puch the block at b_addr to free blocks list
@@ -134,19 +137,53 @@ file_freeblocks ( uint32_t inode );
 
 
 
+#define TFS_PATHLEAF 1
+#define TFS_ERRPATH_NOPFX 104
+#define TFS_ERRPATH_NOWORKINGPATH 200
 /**
  * @brief Follow a path
  *
- * Follow the path path.
- * After execution, entry contains the next entry
- * from the path, and path has been modified
- * containing the path after entry.
- * @param path 
- * @param entry 
- * @return error TFS_ERRPATH if path is not valid
+ * Follow the path path by filling entry with the next entry.
+ * entry should be the adress of a char *.
+ *
+ * Usage:
+ *
+ * First, call path_follow with the full path, i.e. prefixed
+ * by FILE://, and the adress of an unitialized char*.
+ * For the first call, the pointer *entry is not modified
+ * so you can pass NULL.
+ * If the path is not prefixed, TFS_ERRPATH_NOPFX is returned.
+ * Example:
+ *    char path[] = "FILE://disk/vol/entry1/entry2"
+ *    if (path_follow(path, NULL) == TFS_ERRPATH) ...;
+ * 
+ * To follow the the previous path, you should now call
+ * follow_path with a null path and the adress of an unitialized 
+ * char*.
+ * If the last call has reached a leaf, then TFS_PATHLEAF is returned
+ * and entry stay unchanged.
+ * If you try calling path_follow(NULL,NULL) you will get a
+ * segmentation fault. 
+ * Example:
+ *     char *entry;
+ *     while (path_follow(NULL, &entry) != TFS_PATHLEAF)
+ *        {
+ *          printf("Entry : %s\n", entry);
+ *        }
+ *     printf("Last entry %s was a leaf.\n");
+ *  
+ * If the working path has not been initialized by a first call
+ * and you follow a path (with something likefollow_path(NULL, &entry))$
+ * then error TFS_ERRPATH_NOWORKINGPATH is raised
+ *
+ * @param[in] path 
+ * @param[out] entry 
+ * @return error EXIT_SUCCESS, TFS_PATHLEAF, TFS_ERRPATH_NOPFX, 
+ *               TFS_ERRPATH_NOWORKINGPATH
+ *               
  */
 error
-path_follow ( char * path, char * entry );
+path_follow ( char * path, char ** entry );
 
 
 

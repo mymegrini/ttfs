@@ -7,6 +7,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "tfsll.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 
 error
@@ -64,12 +67,41 @@ file_freeblocks ( uint32_t inode ) {
 }
 
 
-
+// Macros for path_follow
+#define PATH_STRSEP "/"
+#define PATH_STRSEP "/"
+#define PATH_FPFX "FILE://"
+#define PATH_FPFXLEN 7
+#define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
 error
-path_follow ( char * path, char * entry ) {
-
-  return EXIT_SUCCESS;
+path_follow( char * path, char **entry ) {
+  static char *workpath = NULL;
+  if (path == NULL) {
+    if (workpath == NULL)
+      return TFS_ERRPATH_NOWORKINGPATH;
+    else {
+      *entry = strtok(NULL, PATH_STRSEP);
+      if (*entry == NULL) {
+	free(workpath);
+	workpath = NULL;
+	return TFS_PATHLEAF;
+      }
+      else
+	return EXIT_SUCCESS;
+    }
+  }
+  else {
+    if (PATH_ISVALID(path)) {
+      workpath = strdup(path);
+      strtok(workpath, PATH_STRSEP);
+      return EXIT_SUCCESS;
+    }
+    else
+      return TFS_ERRPATH_NOPFX;
+  }
 }
+
+
 
 //////////////////////////////////////////////////////////////////////
 // $Log:$
