@@ -102,7 +102,7 @@ void init_ftab(int id, uint32_t pidx, uint32_t psize, int filecount){
   block b = new_block();
   int index = 0;
   
-  testerror("init_ftab", wintle(B_SIZE, b, TFS_FILE_SIZE_INDEX));
+  testerror("init_ftab", wintle(2*TFS_DIRECTORY_ENTRY_SIZE, b, TFS_FILE_SIZE_INDEX));
   testerror("init_ftab", wintle(TFS_DIRECTORY_TYPE, b, TFS_FILE_TYPE_INDEX));
   testerror("init_ftab", wintle((filecount-1)/16+2, b, TFS_DIRECT_INDEX(0)));
   
