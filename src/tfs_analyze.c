@@ -59,15 +59,15 @@ error err_start = start_disk(name,&id);
    printf("%-20d %15d %15d\n",(partition+1),size_partition,size_partition*B_SIZE); 
    printf("%-20s %-20s %-20s %-20s\n \n","Total space","Free Space (blocks)","Free Space (bytes)","First Free Block");
 
-   disk_id id_part;
-   error err_read_part_id = id_partition(id,partition,&id_part);
+   uint32_t id_part;
+   error err_read_part_id = p_index(id,partition,&id_part);
    if(err_read_part_id != EXIT_SUCCESS){
      printf("Erreur read id of partition : %d\n",err_read_part_id);
    }
    printf("id : %d %d\n",id_part,id);
 
    block b_zero_part = new_block();
-   error err_read_part = read_block(id,b_zero_part,id_part-1);
+   error err_read_part = read_block(id,b_zero_part,id_part);
    if(err_read_part != EXIT_SUCCESS){  
      //error message
      printf("Erreur read : %d\n",err_read_part);
@@ -157,7 +157,7 @@ Usage: %s [-p <partition>] [-l] [name]\n",argv[0],argv[0]);
   }
   */
   
-  tfs_analyze(name,mode,partition);
+  tfs_analyze(name,mode,partition-1);
 
   return 0;
 }
