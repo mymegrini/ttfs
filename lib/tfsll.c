@@ -6,11 +6,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "ll.h"
 #include "tfsll.h"
+#include "block.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-
+#define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
 
 struct tfs_description {
   uint32_t magic_number;
@@ -23,8 +25,8 @@ struct tfs_description {
   uint32_t freefile_first;
 }
 
-void
-write_tfsdescription ( uint32_t vol_addr, tfs_description *desc )
+error
+write_tfsdescription (const disk_id id, const uint32_t vol_addr, const tfs_description * desc)
 {
   block b = new_block();
   wintle(desc->magic_number, b, 0);
@@ -35,14 +37,22 @@ write_tfsdescription ( uint32_t vol_addr, tfs_description *desc )
   wintle(desc->nmax_f, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
   wintle(desc->nfree_f, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
   wintle(desc->ifree_f, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
-  write_block(id, b, vol_addr);
+  error e = write_block(id, b, vol_addr);
   free(block);
+  return e;
 }
 
-tfs_description *
-read_tfsdescription ( uint32_t vol_addr )
+
+
+error
+read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description * desc)
 {
-  tfs_description *desc = (tfs_description *) malloc(sizeof(tfs_description));
+  block b = new_block();
+  error e = read_block(id, b, vol_addr);
+  if (e != EXIT_SUCCESS) {
+    free(b);
+    return e;
+  }
   rintle(&desc->magic_number, b, 0);
   rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX);
   rintle(&desc->tfs_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
@@ -51,12 +61,60 @@ read_tfsdescription ( uint32_t vol_addr )
   rintle(&desc->nmax_f, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
   rintle(&desc->nfree_f, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
   rintle(&desc->ifree_f, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
+  free(b);
   return des;
 }
 
 
 error
-freeblock_push ( disk_id id, uint32_t vol, const uint32_t b_addr ) {
+freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr) {
+  tfs_description *tfs_d = (tfs_description *) malloc(sizeof(tfs_description));
+  error e = read_tfsdescription(id, vol, uint32_t vol_addr);
+  if (e != EXIT_SUCCESS)
+    return e;
+  block b = new_block();
+  wintle(tfs_d->freeb_first, b, LASTINT_IDX);
+  e = write_block(id, b, vol_addr + b_addr);
+  free(b);
+  if (e != EXIT_SUCCESS)
+    return e;
+  return write_tfsdescription(id, vol_addr, tfs_d);
+}
+
+
+#define TFS_FULL 200
+error
+freeblock_rm (const disk_id id, const uint32_t vol_addr) {
+  tfs_description *desc = (tfs_description *) malloc(sizeof(tfs_description));
+  error e = read_tfsdescription(id, vol_addr, desc);
+  if (e != EXIT_SUCCESS) {
+    free(desc);
+    return e;
+  }
+  block b = new_block();
+  e = read_block(id, b, vol_addr + desc->freeb_first);
+  if (e != EXIT_SUCCESS) {
+    free(desc);
+    free(b);
+    return e;
+  }
+  uint32_t nextfreeb;
+  e = rintle(&nextfreeb, b, LASTINT_IDX);
+  free(b);
+  if (e != EXIT_SUCCESS) {
+    free(desc);
+    return e;
+  }
+  desc->freeb_first = nextfreeb;
+  e = write_tfsdescription(id, vol_addr, desc);
+  free(desc); 
+  return e;
+}
+
+
+
+error
+directory_pushent (disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry ) {
 
   return EXIT_SUCCESS;
 }
@@ -64,7 +122,7 @@ freeblock_push ( disk_id id, uint32_t vol, const uint32_t b_addr ) {
 
 
 error
-freeblock_rm ( disk_id id, uint32_t vol, const uint32_t b_addr ) {
+directory_rment (disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry) {
 
   return EXIT_SUCCESS;
 }
@@ -72,7 +130,7 @@ freeblock_rm ( disk_id id, uint32_t vol, const uint32_t b_addr ) {
 
 
 error
-directory_pushent ( disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry  ) {
+file_pushblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
 
   return EXIT_SUCCESS;
 }
@@ -80,7 +138,7 @@ directory_pushent ( disk_id id, uint32_t vol, DIR directory, const struct dirent
 
 
 error
-directory_rment ( disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry ) {
+file_rmblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
 
   return EXIT_SUCCESS;
 }
@@ -88,23 +146,7 @@ directory_rment ( disk_id id, uint32_t vol, DIR directory, const struct dirent *
 
 
 error
-file_pushblock ( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr ) {
-
-  return EXIT_SUCCESS;
-}
-
-
-
-error
-file_rmblock( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr ) {
-
-  return EXIT_SUCCESS;
-}
-
-
-
-error
-file_freeblocks ( disk_id id, uint32_t vol, uint32_t inode ) {
+file_freeblocks (disk_id id, uint32_t vol, uint32_t inode) {
 
   return EXIT_SUCCESS;
 }
@@ -116,7 +158,7 @@ file_freeblocks ( disk_id id, uint32_t vol, uint32_t inode ) {
 #define PATH_FPFXLEN 7
 #define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
 error
-path_follow( const char * path,  char **entry ) {
+path_follow (const char * path,  char **entry) {
   static char *workpath = NULL;
   if (path == NULL) {
     if (workpath == NULL)
@@ -144,8 +186,6 @@ path_follow( const char * path,  char **entry ) {
       return TFS_ERRPATH_NOPFX;
   }
 }
-
-
 
 
 
