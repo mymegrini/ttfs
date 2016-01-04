@@ -39,6 +39,7 @@ struct dirent {
  */
 typedef struct {
   dirent           entry[16];     /**< current entries                */
+  uint8_t          offset;        /**< position of the current entry  */
   uint32_t         next_entries;  /**< block adress for next entries  */
   uint32_t         first_entries; /**< block adress for dirst entries */
   uint32_t         last_entries;  /**< block adress for last entries  */
@@ -57,7 +58,7 @@ typedef struct {
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
  */
 error
-freeblock_push ( const uint32_t b_addr );
+freeblock_push ( disk_id id, uint32_t vol, const uint32_t b_addr );
 
 
 
@@ -68,7 +69,7 @@ freeblock_push ( const uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
  */
 error
-freeblock_rm ( const uint32_t b_addr );
+freeblock_rm ( disk_id id, uint32_t vol, const uint32_t b_addr );
 
 
 
@@ -80,7 +81,7 @@ freeblock_rm ( const uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_FULL if the volume is full
  */
 error
-directory_pushent ( DIR directory, const struct dirent *restrict entry  );
+directory_pushent ( disk_id id, uint32_t vol, uint32_t inode, struct dirent *restrict entry  );
 
 
 
@@ -92,7 +93,7 @@ directory_pushent ( DIR directory, const struct dirent *restrict entry  );
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment ( DIR directory, const struct dirent *restrict entry );
+directory_rment ( disk_id id, uint32_t vol, uint32_t inode, const struct dirent *restrict entry );
 
 
 
@@ -106,7 +107,7 @@ directory_rment ( DIR directory, const struct dirent *restrict entry );
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_pushblock ( uint32_t inode, uint32_t b_addr );
+file_pushblock ( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
 
 
 
@@ -120,7 +121,7 @@ file_pushblock ( uint32_t inode, uint32_t b_addr );
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_rmblock( uint32_t inode, uint32_t b_addr );
+file_rmblock( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
 
 
 
@@ -133,7 +134,7 @@ file_rmblock( uint32_t inode, uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_ERRINODE if the inode is not valid
  */
 error
-file_freeblocks ( uint32_t inode );
+file_freeblocks ( disk_id id, uint32_t vol, uint32_t inode );
 
 
 
