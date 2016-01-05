@@ -19,40 +19,41 @@
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
-#define INT_SIZE 4                                /***< Integer size */
+#define INT_SIZE 4                                  /***< Integer size */
+#define INTX(i) (i*INT_SIZE)                        /***< Integer size multiples */
 
-#define TFS_MAGIC_NUMBER 0x31534654               /***< TFS version identifier "TFS1" */
-#define TFS_MAGIC_NUMBER_INDEX 0                  /***< TFS version identifier index in volume superblock */
-#define TFS_VOLUME_BLOCK_SIZE 1024                /***< TFS block size*/
-#define TFS_VOLUME_BLOCK_SIZE_INDEX 4             /***< TFS block size index in volume superblock */
-#define TFS_VOLUME_BLOCK_COUNT_INDEX 8            /***< TFS bllock count index in volume superblock */
-#define TFS_VOLUME_FREE_BLOCK_COUNT_INDEX 12      /***< TFS free block count index in volume superblock */
-#define TFS_VOLUME_FIRST_FREE_BLOCK_INDEX 16      /***< TFS first free block index in volume superblock */
-#define TFS_VOLUME_MAX_FILE_COUNT_INDEX 20        /***< TFS max file count index in volume superblock */
-#define TFS_VOLUME_FREE_FILE_COUNT_INDEX 24       /***< TFS free file count index in volume superblock */
-#define TFS_VOLUME_FIRST_FREE_FILE_INDEX 28       /***< TFS first free file index in volume superblock */
+#define TFS_MAGIC_NUMBER 0x31534654                 /***< TFS version identifier "TFS1" */
+#define TFS_MAGIC_NUMBER_INDEX INTX(0)              /***< TFS version identifier index in volume superblock */
+#define TFS_VOLUME_BLOCK_SIZE 1024                  /***< TFS block size*/
+#define TFS_VOLUME_BLOCK_SIZE_INDEX INTX(1)         /***< TFS block size index in volume superblock */
+#define TFS_VOLUME_BLOCK_COUNT_INDEX INTX(2)        /***< TFS bllock count index in volume superblock */
+#define TFS_VOLUME_FREE_BLOCK_COUNT_INDEX INTX(3)   /***< TFS free block count index in volume superblock */
+#define TFS_VOLUME_FIRST_FREE_BLOCK_INDEX INTX(4)   /***< TFS first free block index in volume superblock */
+#define TFS_VOLUME_MAX_FILE_COUNT_INDEX INTX(5)     /***< TFS max file count index in volume superblock */
+#define TFS_VOLUME_FREE_FILE_COUNT_INDEX INTX(6)    /***< TFS free file count index in volume superblock */
+#define TFS_VOLUME_FIRST_FREE_FILE_INDEX INTX(7)    /***< TFS first free file index in volume superblock */
 
-#define TFS_FILE_TABLE_INDEX 1                    /***< TFS index of the file table */
-#define TFS_FILE_TABLE_ENTRY_SIZE 64              /***< TFS file table entry size */
-#define TFS_FILE_SIZE_INDEX 0                     /***< TFS file size index in file table entry */
-#define TFS_FILE_TYPE_INDEX 4                     /***< TFS file type index in file table entry */
-#define TFS_REGULAR_TYPE 0                        /***< TFS regular file table entry type */
-#define TFS_DIRECTORY_TYPE 1                      /***< TFS directory file table entry type */
-#define TFS_PSEUDO_TYPE 2                         /***< TFS pseudo file table entry type */
-#define TFS_FILE_SUBTYPE_INDEX 8                  /***< TFS file pseudo-type index in file table entry */
-#define TFS_DATE_SUBTYPE 0                        /***< TFS date file table entry subtype */
-#define TFS_DISK_SUBTYPE 1                        /***< TFS disk file table entry subtype */
-#define TFS_DIRECT_INDEX(i) (12+i*INT_SIZE)       /***< TFS direct data block <i> file table entry index */
-#define TFS_DIRECT_BLOCKS_NUMBER 10               /***< TFS direct data blocks number in file table entry */
-#define TFS_INDIRECT1_INDEX 52                    /***< TFS indirect1 block index in file table entry */
-#define TFS_INDIRECT2_INDEX 56                    /***< TFS indirect2 block index in file table entry */
-#define TFS_NEXT_FREE_FILE_ENTRY_INDEX 60         /***< TFS next free file entry index in file table entry */
+#define TFS_FILE_TABLE_INDEX 1                      /***< TFS index of the file table */
+#define TFS_FILE_TABLE_ENTRY_SIZE INTX(16)          /***< TFS file table entry size */
+#define TFS_FILE_SIZE_INDEX INTX(0)                 /***< TFS file size index in file table entry */
+#define TFS_FILE_TYPE_INDEX INTX(1)                 /***< TFS file type index in file table entry */
+#define TFS_REGULAR_TYPE 0                          /***< TFS regular file table entry type */
+#define TFS_DIRECTORY_TYPE 1                        /***< TFS directory file table entry type */
+#define TFS_PSEUDO_TYPE 2                           /***< TFS pseudo file table entry type */
+#define TFS_FILE_SUBTYPE_INDEX INTX(2)              /***< TFS file pseudo-type index in file table entry */
+#define TFS_DATE_SUBTYPE 0                          /***< TFS date file table entry subtype */
+#define TFS_DISK_SUBTYPE 1                          /***< TFS disk file table entry subtype */
+#define TFS_DIRECT_INDEX(i) INTX(3+i)               /***< TFS direct data block <i> file table entry index */
+#define TFS_DIRECT_BLOCKS_NUMBER 10                 /***< TFS direct data blocks number in file table entry */
+#define TFS_INDIRECT1_INDEX INTX(13)                /***< TFS indirect1 block index in file table entry */
+#define TFS_INDIRECT2_INDEX INTX(14)                /***< TFS indirect2 block index in file table entry */
+#define TFS_NEXT_FREE_FILE_ENTRY_INDEX INTX(15)     /***< TFS next free file entry index in file table entry */
 
-#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX 1020     /***< TFS volume next free block index */
+#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX INTX(255)  /***< TFS volume next free block index */
 
-#define TFS_DIRECTORY_ENTRY_SIZE 32               /***< TFS directory entry size */
-#define TFS_DIRECTORY_ENTRY_INDEX(i) (32*i)       /***< TFS directory entry file index */
-#define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH 28    /***< TFS directory entry name maximum length */
+#define TFS_DIRECTORY_ENTRY_SIZE INTX(4)            /***< TFS directory entry size */
+#define TFS_DIRECTORY_ENTRY_INDEX(i) INTX(4*i)      /***< TFS directory entry file index */
+#define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH INTX(7) /***< TFS directory entry name maximum length */
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +67,7 @@
  */
 struct dirent {
   uint32_t       d_ino;       /**< file number    */
-  char           d_name[28];  /**< entry name     */
+  char           d_name[TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH];  /**< entry name     */
 };
 
 
@@ -74,7 +75,7 @@ struct dirent {
 /**
  * @brief Directory stream
  *
- * A directory is an abstract vision of a directory.
+ * A directory stream is an abstract vision of a directory.
  */
 typedef struct {
   dirent           entry[16];     /**< current entries                */
