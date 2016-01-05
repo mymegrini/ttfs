@@ -9,18 +9,31 @@
 #include "ll.h"
 #include "tfsll.h"
 #include "block.h"
-#include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+
+////////////////////////////////////////////////////////////////////////////////
+// MACROS
+////////////////////////////////////////////////////////////////////////////////
 
 #define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
 #define TFS_ERR_BIGFILE 100
+#define NENTBYBLOCK (B_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
+#define INO_FTBLOCK(inode) (1 + (inode/NENTBYBLOCK))
+#define INO_BPOS(inode) (inode % NENTBYBLOCK)
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TYPES
+////////////////////////////////////////////////////////////////////////////////
 
 typedef struct {
   uint32_t magic_number;
   uint32_t block_size;
   uint32_t volume_size;
-  uint32disk_id id, uint32_t vol, _t freeb_count;
+  uint32_t freeb_count;
   uint32_t freeb_first;
   uint32_t maxfile_count;
   uint32_t freefile_count;
@@ -38,14 +51,14 @@ typedef struct {
 } tfs_ftent;
 
 
-#define NENTBYBLOCK (B_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
-#define INO_FTBLOCK(inode) (1+(inode/NENTYBLOCK))
-#define INO_BPOS(inode) (inode%NENTYBLOCK)
 
+////////////////////////////////////////////////////////////////////////////////
+// FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////
 
-void
+static void
 read_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
-  const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY*bpos; 
+  const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos; 
   rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX);
   rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX);
   rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX);
@@ -56,9 +69,9 @@ read_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
 }
 
 
-
-void write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
-  const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY*bpos;
+static void
+write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
+  const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos;
   wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX);
   wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX);
   wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX);
@@ -70,26 +83,26 @@ void write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
 
 
 
-error
+static error
 write_tfsdescription (const disk_id id, const uint32_t vol_addr, const tfs_description * desc)
 {
   block b = new_block();
   wintle(desc->magic_number, b, 0);
   wintle(desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX);
-  wintle(desc->tfs_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
-  wintle(desc->nfree_b, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
-  wintle(desc->afree_b, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
-  wintle(desc->nmax_f, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
-  wintle(desc->nfree_f, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
-  wintle(desc->ifree_f, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
+  wintle(desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
+  wintle(desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
+  wintle(desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
+  wintle(desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
+  wintle(desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
+  wintle(desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
   error e = write_block(id, b, vol_addr);
-  free(block);
+  free(b);
   return e;
 }
 
 
 
-error
+static error
 read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description * desc)
 {
   block b = new_block();
@@ -100,31 +113,31 @@ read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description 
   }
   rintle(&desc->magic_number, b, 0);
   rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX);
-  rintle(&desc->tfs_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
-  rintle(&desc->nfree_b, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
-  rintle(&desc->afree_b, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
-  rintle(&desc->nmax_f, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
-  rintle(&desc->nfree_f, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
-  rintle(&desc->ifree_f, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
+  rintle(&desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
+  rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
+  rintle(&desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
+  rintle(&desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
+  rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
+  rintle(&desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
   free(b);
-  return des;
+  return EXIT_SUCCESS;
 }
 
 
 error
 freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr) {
   tfs_description tfs_d;
-  error e = read_tfsdescription(id, vol, &tfs_d);
+  error e = read_tfsdescription(id, vol_addr, &tfs_d);
   if (e != EXIT_SUCCESS)
     return e;
   block b = new_block();
-  wintle(tfs_d->freeb_first, b, LASTINT_IDX);
+  wintle(tfs_d.freeb_first, b, LASTINT_IDX);
   e = write_block(id, b, vol_addr + b_addr);
   free(b);
   if (e != EXIT_SUCCESS)
     return e;
   tfs_d.freeb_first = b_addr;
-  return write_tfsdescription(id, vol_addr, tfs_d);
+  return write_tfsdescription(id, vol_addr, &tfs_d);
 }
 
 
@@ -136,7 +149,7 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
   if (e != EXIT_SUCCESS) 
     return e;
   block b = new_block();
-  e = read_block(id, b, vol_addr + TFS_FILE_TABLE_ADDR desc.freeb_first);l
+  e = read_block(id, b, vol_addr + desc.freeb_first);
   if (e != EXIT_SUCCESS) {
     free(b);
     return e;
@@ -148,8 +161,7 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
     return e;
   }
   desc.freeb_first = nextfreeb;
-  e = write_tfsdescription(id, vol_addr, desc);
-  return e;
+  return write_tfsdescription(id, vol_addr, &desc);
 }
 
 
@@ -189,13 +201,14 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
     int pos = find_freedirent(b);
     if (pos != DIR_BLOCKFULL) {
       wintle(entry->d_ino, b, pos);
-      b->data[pos + SIZEOF_INT];
+      memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
+	     sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
       e = write_block(id, b, vol_addr + ft_inode_baddr);
       free(b);
       return e;
     }
   }
-  
+ 
   if ((e = read_block(id, b,  vol_addr + ftent.tfs_indirect1)) != EXIT_SUCCESS) {
     free(b);
     return e;
@@ -209,7 +222,8 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
     int pos = find_freedirent(indirect);
     if (pos != DIR_BLOCKFULL) {
       wintle(entry->d_ino, b, pos);
-      b->data[pos + SIZEOF_INT];
+      memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
+	     sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
       e = write_block(id, b, vol_addr + ft_inode_baddr);
       free(b);
       free(indirect);
@@ -231,8 +245,8 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
       return e;
     }
     for (int j = 0; j < B_SIZE/SIZEOF_INT; i++) {
-      uint32ut indirect2_addr;
-      rintle(uint32_t *value, block b, addr idx);
+      uint32_t indirect2_addr;
+      rintle(&indirect2_addr, indirect, INTX(j));
       if ((e = read_block(id, indirect2, vol_addr + indirect2_addr)) != EXIT_SUCCESS) {
 	free(b);
 	free(indirect);
@@ -242,7 +256,8 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
       int pos = find_freedirent(indirect);
       if (pos != DIR_BLOCKFULL) {
 	wintle(entry->d_ino, b, pos);
-	b->data[pos + SIZEOF_INT];
+	memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
+	       sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
 	e = write_block(id, b, vol_addr + ft_inode_baddr);
 	free(b);
 	free(indirect);
@@ -250,10 +265,11 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
 	return e;
       }    
     }
-    free(b);
-    free(indirect);
-    free(indirect2);
-    return TFS_ERR_BIGFILE;
+  }
+  free(b);
+  free(indirect);
+  free(indirect2);
+  return TFS_ERR_BIGFILE;
 }
 
 

@@ -19,9 +19,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
-#define INT_SIZE 4                                /***< Integer size */
-
 #define TFS_MAGIC_NUMBER 0x31534654               /***< TFS version identifier "TFS1" */
 #define TFS_MAGIC_NUMBER_INDEX 0                  /***< TFS version identifier index in volume superblock */
 #define TFS_VOLUME_BLOCK_SIZE 1024                /***< TFS block size*/
@@ -51,48 +48,18 @@
 
 #define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX 1020     /***< TFS volume next free block index */
 
-#define TFS_DIRECTORY_ENTRY_SIZE 32               /***< TFS directory entry size */
-#define TFS_DIRECTORY_ENTRY_INDEX(i) (32*i)       /***< TFS directory entry file index */
-#define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH 28    /***< TFS directory entry name maximum length */
 #define TFS_DIRECTORY_ENTRIES_BY_BLOCK(B_SIZE) (B_SIZE/TFS_DIRECTORY_ENTRY_SIZE)
-=======
+
 #define INT_SIZE 4                                  /***< Integer size */
 #define INTX(i) (i*INT_SIZE)                        /***< Integer size multiples */
+/** TFS directory entry name maximum length */
+#define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH 28
+/** TFS directory entry size */
+#define TFS_DIRECTORY_ENTRY_SIZE (INT_SIZE+TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH)
+/** TFS directory entry file index */
+#define TFS_DIRECTORY_ENTRY_INDEX(i) (i*TFS_DIRECTORY_ENTRY_SIZE)     
 
-#define TFS_MAGIC_NUMBER 0x31534654                 /***< TFS version identifier "TFS1" */
-#define TFS_MAGIC_NUMBER_INDEX INTX(0)              /***< TFS version identifier index in volume superblock */
-#define TFS_VOLUME_BLOCK_SIZE 1024                  /***< TFS block size*/
-#define TFS_VOLUME_BLOCK_SIZE_INDEX INTX(1)         /***< TFS block size index in volume superblock */
-#define TFS_VOLUME_BLOCK_COUNT_INDEX INTX(2)        /***< TFS bllock count index in volume superblock */
-#define TFS_VOLUME_FREE_BLOCK_COUNT_INDEX INTX(3)   /***< TFS free block count index in volume superblock */
-#define TFS_VOLUME_FIRST_FREE_BLOCK_INDEX INTX(4)   /***< TFS first free block index in volume superblock */
-#define TFS_VOLUME_MAX_FILE_COUNT_INDEX INTX(5)     /***< TFS max file count index in volume superblock */
-#define TFS_VOLUME_FREE_FILE_COUNT_INDEX INTX(6)    /***< TFS free file count index in volume superblock */
-#define TFS_VOLUME_FIRST_FREE_FILE_INDEX INTX(7)    /***< TFS first free file index in volume superblock */
 
-#define TFS_FILE_TABLE_INDEX 1                      /***< TFS index of the file table */
-#define TFS_FILE_TABLE_ENTRY_SIZE INTX(16)          /***< TFS file table entry size */
-#define TFS_FILE_SIZE_INDEX INTX(0)                 /***< TFS file size index in file table entry */
-#define TFS_FILE_TYPE_INDEX INTX(1)                 /***< TFS file type index in file table entry */
-#define TFS_REGULAR_TYPE 0                          /***< TFS regular file table entry type */
-#define TFS_DIRECTORY_TYPE 1                        /***< TFS directory file table entry type */
-#define TFS_PSEUDO_TYPE 2                           /***< TFS pseudo file table entry type */
-#define TFS_FILE_SUBTYPE_INDEX INTX(2)              /***< TFS file pseudo-type index in file table entry */
-#define TFS_DATE_SUBTYPE 0                          /***< TFS date file table entry subtype */
-#define TFS_DISK_SUBTYPE 1                          /***< TFS disk file table entry subtype */
-#define TFS_DIRECT_INDEX(i) INTX(3+i)               /***< TFS direct data block <i> file table entry index */
-#define TFS_DIRECT_BLOCKS_NUMBER 10                 /***< TFS direct data blocks number in file table entry */
-#define TFS_INDIRECT1_INDEX INTX(13)                /***< TFS indirect1 block index in file table entry */
-#define TFS_INDIRECT2_INDEX INTX(14)                /***< TFS indirect2 block index in file table entry */
-#define TFS_NEXT_FREE_FILE_ENTRY_INDEX INTX(15)     /***< TFS next free file entry index in file table entry */
-
-#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX INTX(255)  /***< TFS volume next free block index */
-
-#define TFS_DIRECTORY_ENTRY_SIZE INTX(4)            /***< TFS directory entry size */
-#define TFS_DIRECTORY_ENTRY_INDEX(i) INTX(4*i)      /***< TFS directory entry file index */
-#define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH INTX(7) /***< TFS directory entry name maximum length */
-
->>>>>>> a0e29a5515c25a4e40f1fc8d14c1633d4705b146
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -115,13 +82,13 @@ struct dirent {
  *
  * A directory stream is an abstract vision of a directory.
  */
-typedef struct {
-  dirent           entry[16];     /**< current entries                */
-  uint8_t          offset;        /**< position of the current entry  */
-  uint32_t         next_block;    /**< block adress for next entries  */
-  uint32_t         first_block; /**< block adress for dirst entries */
-  uint32_t         last_block;  /**< block adress for last entries  */
-} DIR;
+ typedef struct {
+//   dirent           entry[16];     /**< current entries                */
+   uint8_t          offset;        /**< position of the current entry  */
+//   uint32_t         next_block;    /**< block adress for next entries  */
+//   uint32_t         first_block; /**< block adress for dirst entries */
+//   uint32_t         last_block;  /**< block adress for last entries  */
+ } DIR;  
 
 
 
@@ -130,7 +97,7 @@ typedef struct {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Puch the block at b_addr to free blocks list
+* @brief Puch the block at b_addr to free blocks list
  * 
  * @param b_addr 
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
@@ -147,7 +114,7 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
  * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
  */
 error
-freeblock_rm (disk_id id, uint32_t vol, const uint32_t b_addr);
+freeblock_rm (const disk_id id, const uint32_t vol_addr);
 
 
 
@@ -159,7 +126,8 @@ freeblock_rm (disk_id id, uint32_t vol, const uint32_t b_addr);
  * @return error EXIT_SUCCESS, TFS_FULL if the volume is full
  */
 error
-directory_pushent (disk_id id, uint32_t vol, uint32_t inode, struct dirent *restrict entry );
+directory_pushent (const disk_id id, const uint32_t vol_addr,
+		   const uint32_t inode, const struct dirent *entry );
 
 
 
@@ -171,7 +139,8 @@ directory_pushent (disk_id id, uint32_t vol, uint32_t inode, struct dirent *rest
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment (disk_id id, uint32_t vol, uint32_t inode, const struct dirent *restrict entry);
+directory_rment (disk_id id, uint32_t vol, DIR directory,
+		 const struct dirent *restrict entry);
 
 
 
