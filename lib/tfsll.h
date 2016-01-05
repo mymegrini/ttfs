@@ -147,7 +147,7 @@ directory_rment (disk_id id, uint32_t vol, uint32_t inode, const struct dirent *
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_pushblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr);
+file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr);
 
 
 

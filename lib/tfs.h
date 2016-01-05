@@ -3,7 +3,7 @@
 
 #define INT_SIZE 4                                /***< Integer size */
 
-#define TFS_MAGIC_NUMBER 0x31534654               /***< TFS version identifier "TFS1" */
+#define  0x31534654               /***< TFS version identifier "TFS1" */
 #define TFS_MAGIC_NUMBER_INDEX 0                  /***< TFS version identifier index in volume superblock */
 #define TFS_VOLUME_BLOCK_SIZE 1024                /***< TFS block size*/
 #define TFS_VOLUME_BLOCK_SIZE_INDEX 4             /***< TFS block size index in volume superblock */
