@@ -12,9 +12,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+
 #define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
 
-struct tfs_description {
+typedef struct {
   uint32_t magic_number;
   uint32_t block_size;
   uint32_t volume_size;
@@ -23,7 +24,36 @@ struct tfs_description {
   uint32_t maxfile_count;
   uint32_t freefile_count;
   uint32_t freefile_first;
+} tfs_description;
+
+typedef struct {
+  uint32_t size;
+  uint32_t type;
+  uint32_t subtype;
+  uint32_t tfs_direct[TFS_DIRECT_BLOCKS_NUMBER];
+  uint32_t tfs_indirect1;
+  uint32_t tfs_indirect2;
+  uint32_t nextfreefile;
+} tfs_ftent;
+
+
+#define NENTBYBLOCK (B_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
+#define INO_FTBLOCK(inode) (inode/NENTYBLOCK)
+#define INO_BPOS(inode) (inode%NENTYBLOCK)
+
+
+void
+read_ftent ( block b, const uint32_t bpos, tfs_ftent * ftent ) {
+  const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY * bpos; 
+  rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX);
+  rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX);
+  rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX);
+  for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++)
+    rintle(&ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i));
+  rintle(&ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX);
+  rintle(&ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX);
 }
+
 
 error
 write_tfsdescription (const disk_id id, const uint32_t vol_addr, const tfs_description * desc)
@@ -68,8 +98,8 @@ read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description 
 
 error
 freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr) {
-  tfs_description *tfs_d = (tfs_description *) malloc(sizeof(tfs_description));
-  error e = read_tfsdescription(id, vol, uint32_t vol_addr);
+  tfs_description tfs_d;
+  error e = read_tfsdescription(id, vol, &tfs_d);
   if (e != EXIT_SUCCESS)
     return e;
   block b = new_block();
@@ -78,6 +108,7 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
   free(b);
   if (e != EXIT_SUCCESS)
     return e;
+  tfs_d.freeb_first = b_addr;
   return write_tfsdescription(id, vol_addr, tfs_d);
 }
 
@@ -85,16 +116,13 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
 #define TFS_FULL 200
 error
 freeblock_rm (const disk_id id, const uint32_t vol_addr) {
-  tfs_description *desc = (tfs_description *) malloc(sizeof(tfs_description));
-  error e = read_tfsdescription(id, vol_addr, desc);
-  if (e != EXIT_SUCCESS) {
-    free(desc);
+  tfs_description desc;
+  error e = read_tfsdescription(id, vol_addr, &desc);
+  if (e != EXIT_SUCCESS) 
     return e;
-  }
   block b = new_block();
-  e = read_block(id, b, vol_addr + desc->freeb_first);
+  e = read_block(id, b, vol_addr + TFS_FILE_TABLE_ADDR desc.freeb_first);l
   if (e != EXIT_SUCCESS) {
-    free(desc);
     free(b);
     return e;
   }
@@ -102,20 +130,26 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
   e = rintle(&nextfreeb, b, LASTINT_IDX);
   free(b);
   if (e != EXIT_SUCCESS) {
-    free(desc);
     return e;
   }
-  desc->freeb_first = nextfreeb;
+  desc.freeb_first = nextfreeb;
   e = write_tfsdescription(id, vol_addr, desc);
-  free(desc); 
   return e;
 }
 
 
 
 error
-directory_pushent (disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry ) {
-
+directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry ) {
+  tfs_description desc;
+  error e = read_tfsdescription(id, vol_addr, tfs_description *desc);
+  if (e != EXIT_SUCCESS)
+    return e;
+  const uint32_t ft_inode_baddr = inode / NENTBYBLOCK;
+  const uint32_t inode_bpos = inode % NENTBYBLOCK;
+  block b = new_block();
+  read_block(id, b, vol_addr + ft_inode_baddr);
+  
   return EXIT_SUCCESS;
 }
 
