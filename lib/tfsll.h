@@ -53,7 +53,7 @@
 #define TFS_DIRECTORY_ENTRY_SIZE 32               /***< TFS directory entry size */
 #define TFS_DIRECTORY_ENTRY_INDEX(i) (32*i)       /***< TFS directory entry file index */
 #define TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH 28    /***< TFS directory entry name maximum length */
-
+#define TFS_DIRECTORY_ENTRIES_BY_BLOCK(B_SIZE) (B_SIZE/TFS_DIRECTORY_ENTRY_SIZE)
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
