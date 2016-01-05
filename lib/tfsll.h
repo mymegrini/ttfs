@@ -58,7 +58,7 @@ typedef struct {
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
  */
 error
-freeblock_push ( disk_id id, uint32_t vol, const uint32_t b_addr );
+freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr);
 
 
 
@@ -69,7 +69,7 @@ freeblock_push ( disk_id id, uint32_t vol, const uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
  */
 error
-freeblock_rm ( disk_id id, uint32_t vol, const uint32_t b_addr );
+freeblock_rm (disk_id id, uint32_t vol, const uint32_t b_addr);
 
 
 
@@ -81,7 +81,7 @@ freeblock_rm ( disk_id id, uint32_t vol, const uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_FULL if the volume is full
  */
 error
-directory_pushent ( disk_id id, uint32_t vol, uint32_t inode, struct dirent *restrict entry  );
+directory_pushent (disk_id id, uint32_t vol, uint32_t inode, struct dirent *restrict entry );
 
 
 
@@ -93,7 +93,7 @@ directory_pushent ( disk_id id, uint32_t vol, uint32_t inode, struct dirent *res
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment ( disk_id id, uint32_t vol, uint32_t inode, const struct dirent *restrict entry );
+directory_rment (disk_id id, uint32_t vol, uint32_t inode, const struct dirent *restrict entry);
 
 
 
@@ -107,7 +107,7 @@ directory_rment ( disk_id id, uint32_t vol, uint32_t inode, const struct dirent 
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_pushblock ( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
+file_pushblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr);
 
 
 
@@ -121,7 +121,7 @@ file_pushblock ( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_rmblock( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
+file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr);
 
 
 
@@ -134,7 +134,7 @@ file_rmblock( disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr );
  * @return error EXIT_SUCCESS, TFS_ERRINODE if the inode is not valid
  */
 error
-file_freeblocks ( disk_id id, uint32_t vol, uint32_t inode );
+file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
 
 
 
@@ -188,7 +188,7 @@ file_freeblocks ( disk_id id, uint32_t vol, uint32_t inode );
  *               
  */
 error
-path_follow ( const char * path, char ** entry );
+path_follow (const char * path, char ** entry);
 
 
 
