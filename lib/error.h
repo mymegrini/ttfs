@@ -42,5 +42,6 @@ void testerror(char* msg, error err);
 #define P_WRONGIDX 11 /**< Wrong partition index */
 #define P_CORRUPTED 12  /**< Partition size does not match disk size */
 #define B_WRONGNAME 13 /**< Wrong block name */
+#define P_WRONGVALUE 14 /**< Wrong value of the partition (negative) */
 
 #endif

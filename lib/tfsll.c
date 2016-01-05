@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 #define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
+#define TFS_ERR_BIGFILE 100
 
 typedef struct {
   uint32_t magic_number;
@@ -266,9 +267,76 @@ directory_rment (disk_id id, uint32_t vol, DIR directory, const struct dirent *r
 
 
 error
-file_pushblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
+file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr) {
+  tfs_ftent ftent;
+  block b = new_block();
+  error e = read_block(id,b,vol_addr + INO_FTBLOCK(inode));
+  if(e != EXIT_SUCCESS){
+    free(b);
+    return e;
+  }
+  read_ftent(b,INO_BPOS(inode),&ftent);
+  int i = 0;
+  for(i=0;i<TFS_DIRECT_BLOCKS_NUMBER;i++){
+    if(ftent.tfs_direct[i] == 0){
+      ftent.tfs_direct[i] = b_addr;
+      write_ftent(b,INO_BPOS(inode),&ftent);
+      e = write_block(id,b,vol_addr + INO_FTBLOCK(inode));
+      free(b);
+      return e;
+    }
+  }
+  
+  e = read_block(id,b,vol_addr + ftent.tfs_indirect1);
+  if(e != EXIT_SUCCESS){
+    free(b);
+    return e;
+  }
+  uint32_t value;
+  int j = 0;
+  for(j=0;j<(B_SIZE/SIZEOF_INT);j++){
+    rintle(&value,b,j*SIZEOF_INT);
+    if(value == 0){
+      wintle(b_addr,b,j*SIZEOF_INT);
+      e = write_block(id,b,vol_addr + ftent.tfs_indirect1);
+      free(b);
+      return e;
+    }
+  }
+  
+  block b_i = new_block();
+  e = read_block(id,b,vol_addr + ftent.tfs_indirect2);
+  if(e != EXIT_SUCCESS){
+    free(b_i);
+    free(b);
+    return e;
+  }
+  uint32_t addr;
+  int k = 0;
+  for(k=0;k<(B_SIZE/SIZEOF_INT);k++){
+    rintle(&addr,b,k*SIZEOF_INT);
+    e = read_block(id,b_i,vol_addr + addr);
+    if(e != EXIT_SUCCESS){
+      free(b_i);
+      free(b);
+      return e;
+    }
+    int l = 0;
+    for(l=0;l<(B_SIZE/SIZEOF_INT);l++){
+      rintle(&value,b_i,l*SIZEOF_INT);
+      if(value == 0){
+	wintle(b_addr,b_i,l*SIZEOF_INT);
+	e = write_block(id,b_i,vol_addr + addr);
+	free(b_i);
+	free(b);
+	return e;
+      }
+    }
+  }
 
-  return EXIT_SUCCESS;
+  free(b_i);
+  free(b);
+  return TFS_ERR_BIGFILE;
 }
 
 
