@@ -9,6 +9,7 @@
 #include "ll.h"
 #include "tfsll.h"
 #include "block.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
