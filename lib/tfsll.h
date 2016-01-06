@@ -75,21 +75,6 @@ struct dirent {
 
 
 
-/**
- * @brief Directory stream
- *
- * A directory stream is an abstract vision of a directory.
- */
- typedef struct {
-//   dirent           entry[16];     /**< current entries                */
-   uint8_t          offset;        /**< position of the current entry  */
-//   uint32_t         next_block;    /**< block adress for next entries  */
-//   uint32_t         first_block; /**< block adress for dirst entries */
-//   uint32_t         last_block;  /**< block adress for last entries  */
- } DIR;  
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////

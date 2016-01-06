@@ -2,6 +2,9 @@
 #define TFS_H
 #include <sys/types.h>
 #include "tfsll.h"
+
+typedef struct _DIR *DIR;
+
 /**
  * @brief This function attempts to create a directory named <path>
  * @param[in] path specifies name and location of directory
