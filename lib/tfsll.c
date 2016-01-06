@@ -169,7 +169,7 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
 #define DIR_BLOCKFULL -1
 int
 find_freedirent (block b) {
-  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_BY_BLOCK(B_SIZE); i++) {
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK(B_SIZE); i++) {
     if (b->data[TFS_DIRECTORY_ENTRY_INDEX(i) + SIZEOF_INT] == 0) {
       // free entry
       return TFS_DIRECTORY_ENTRY_INDEX(i);
@@ -202,7 +202,7 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
     if (pos != DIR_BLOCKFULL) {
       wintle(entry->d_ino, b, pos);
       memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	     sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
+	     sizeof(byte)*TFS_NAME_MAX);
       e = write_block(id, b, vol_addr + ft_inode_baddr);
       free(b);
       return e;
@@ -223,7 +223,7 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
     if (pos != DIR_BLOCKFULL) {
       wintle(entry->d_ino, b, pos);
       memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	     sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
+	     sizeof(byte)*TFS_NAME_MAX);
       e = write_block(id, b, vol_addr + ft_inode_baddr);
       free(b);
       free(indirect);
@@ -257,7 +257,7 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
       if (pos != DIR_BLOCKFULL) {
 	wintle(entry->d_ino, b, pos);
 	memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	       sizeof(byte)*TFS_DIRECTORY_ENTRY_MAX_NAME_LENGTH);
+	       sizeof(byte)*TFS_NAME_MAX);
 	e = write_block(id, b, vol_addr + ft_inode_baddr);
 	free(b);
 	free(indirect);
