@@ -49,7 +49,7 @@
 #define TFS_INDIRECT2_INDEX INTX(4+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS indirect2 block index in file table entry */
 #define TFS_NEXT_FREE_FILE_ENTRY_INDEX INTX(5+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS next free file entry index */
 
-#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX TFS_VOLUME_BLOCK_SIZE-INT_SIZE /***< TFS volume next free block index */
+#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX (TFS_VOLUME_BLOCK_SIZE-INT_SIZE) /***< TFS volume next free block index */
 
 #define TFS_DIRECTORY_ENTRIES_PER_BLOCK(B_SIZE) (B_SIZE/TFS_DIRECTORY_ENTRY_SIZE)
 
