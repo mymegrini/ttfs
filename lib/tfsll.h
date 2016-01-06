@@ -24,7 +24,7 @@
 
 #define TFS_MAGIC_NUMBER 0x31534654               /***< TFS version identifier "TFS1" */
 #define TFS_MAGIC_NUMBER_INDEX INTX(0)            /***< TFS version identifier index in volume superblock */
-#define TFS_VOLUME_BLOCK_SIZE 1024                /***< TFS block size*/
+#define TFS_VOLUME_BLOCK_SIZE B_SIZE              /***< TFS block size*/
 #define TFS_VOLUME_BLOCK_SIZE_INDEX INTX(1)       /***< TFS block size index in volume superblock */
 #define TFS_VOLUME_BLOCK_COUNT_INDEX INTX(2)      /***< TFS bllock count index in volume superblock */
 #define TFS_VOLUME_FREE_BLOCK_COUNT_INDEX INTX(3) /***< TFS free block count index in volume superblock */
@@ -51,15 +51,14 @@
 
 #define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX (TFS_VOLUME_BLOCK_SIZE-INT_SIZE) /***< TFS volume next free block index */
 
-#define TFS_DIRECTORY_ENTRIES_PER_BLOCK(B_SIZE) (B_SIZE/TFS_DIRECTORY_ENTRY_SIZE)
+#define TFS_DIRECTORY_ENTRIES_PER_BLOCK (B_SIZE/TFS_DIRECTORY_ENTRY_SIZE)
 
 #define TFS_NAME_MAX 28                           /** TFS directory entry name maximum length */
 #define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX) /** TFS directory entry size */
 #define TFS_DIRECTORY_ENTRY_INDEX(i) (i*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
-#define TFS_FILE_MAX_SIZE (TFS_DIRECT_BLOCKS_NUMBER*B_SIZE \
-			   + (B_SIZE*(B_SIZE/INT_SIZE)) ·\
-			   + (B_SIZE*(B_SIZE/INT_SIZE)*(B_SIZE/INT_SIZE)))
+#define TFS_FILE_MAX_SIZE (B_SIZE*(TFS_DIRECT_BLOCKS_NUMBER + (B_SIZE/INT_SIZE)*(1 + (B_SIZE/INT_SIZE))))
+  
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -124,8 +123,7 @@ directory_pushent (const disk_id id, const uint32_t vol_addr,
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment (disk_id id, uint32_t vol, DIR directory,
-		 const struct dirent *restrict entry);
+directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
 
 
 
