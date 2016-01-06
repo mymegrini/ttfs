@@ -355,11 +355,29 @@ file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr) 
   return TFS_ERR_BIGFILE;
 }
 
-
+static error
+get_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
+  error e;
+  block b;
+  
+  if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=-1)
+    return e;
+  
+}
 
 error
 file_rmblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
+  error e;
+  tfs_ftent ftent;
+  block b;
+  
+  if ((e = freeblock_push(id, vol_addr, b_addr))!= EXIT_SUCCESS)
+    return e;
 
+  if ((e = read_ftent(b, 
+  
+
+  
   return EXIT_SUCCESS;
 }
 
@@ -367,7 +385,7 @@ file_rmblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
 
 error
 file_freeblocks (disk_id id, uint32_t vol, uint32_t inode) {
-
+  
   return EXIT_SUCCESS;
 }
 
