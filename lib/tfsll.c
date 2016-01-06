@@ -20,9 +20,8 @@
 #define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
 #define TFS_ERR_BIGFILE 100
 #define NENTBYBLOCK (B_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
-#define INO_FTBLOCK(inode) (1 + (inode/NENTBYBLOCK))
-#define INO_BPOS(inode) (inode % NENTBYBLOCK)
-#define TESTERROR(e,funcall) if ((e=funcall)!= EXIT_SUCCESS) return e
+#define INO_FTBLOCK(inode) (1 + ((inode)/NENTBYBLOCK))
+#define INO_BPOS(inode) ((inode) % NENTBYBLOCK)
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,13 +59,13 @@ static error
 read_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
   error e;
   const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos; 
-  TESTERROR(e,rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX));
-  TESTERROR(e,rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX));
-  TESTERROR(e,rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX));
+  if ((e = rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX))!=EXIT_SUCCESS) return e;
   for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++)
-    TESTERROR(e,rintle(&ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)));
-  TESTERROR(e,rintle(&ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX));
-  TESTERROR(e,rintle(&ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX));
+    if ((e = rintle(&ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)))!=EXIT_SUCCESS) return e;
+  if ((e = rintle(&ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = rintle(&ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX))!=EXIT_SUCCESS) return e;
   return EXIT_SUCCESS;
 }
 
@@ -75,8 +74,8 @@ get_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
   error e;
   block b = new_block();
   
-  TESTERROR(e,read_block(id, b, vol+INO_FTBLOCK(inode)));
-  TESTERROR(e,read_ftent(b, INO_BPOS(inode), ftent));
+  if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = read_ftent(b, INO_BPOS(inode), ftent))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   return EXIT_SUCCESS;
 }
@@ -86,13 +85,13 @@ write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
   error e;
   const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos;
   
-  TESTERROR(e,wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX));
-  TESTERROR(e,wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX));
-  TESTERROR(e,wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX));
+  if ((e = wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX))!=EXIT_SUCCESS) return e;
   for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++)
-    TESTERROR(e,wintle(ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)));
-  TESTERROR(e,wintle(ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX));
-  TESTERROR(e,wintle(ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX));
+    if ((e = wintle(ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)))!=EXIT_SUCCESS) return e;
+  if ((e = wintle(ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX))!=EXIT_SUCCESS) return e;
+  if ((e = wintle(ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX))!=EXIT_SUCCESS) return e;
   return EXIT_SUCCESS;
 }
 
@@ -101,9 +100,9 @@ put_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
   error e;
   block b = new_block();
   
-  TESTERROR(e,read_block(id, b, vol+INO_FTBLOCK(inode)));
-  TESTERROR(e,write_ftent(b, INO_BPOS(inode), ftent));
-  TESTERROR(e,write_block(id, b, vol+INO_FTBLOCK(inode)));
+  if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = write_ftent(b, INO_BPOS(inode), ftent))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = write_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   return EXIT_SUCCESS;
 }
@@ -114,15 +113,15 @@ write_tfsdescription (const disk_id id, const uint32_t vol_addr, const tfs_descr
 {
   error e;
   block b = new_block();
-  TESTERROR(e,wintle(desc->magic_number, b, 0));
-  TESTERROR(e,wintle(desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX));
-  TESTERROR(e,wintle(desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX));
-  TESTERROR(e,wintle(desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX));
-  TESTERROR(e,wintle(desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX));
-  TESTERROR(e,wintle(desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX));
-  TESTERROR(e,wintle(desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX));
-  TESTERROR(e,wintle(desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX));
-  TESTERROR(e,write_block(id, b, vol_addr));
+  if ((e = wintle(desc->magic_number, b, 0))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = write_block(id, b, vol_addr))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   return e;
 }
@@ -138,14 +137,14 @@ read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description 
     free(b);
     return e;
   }
-  TESTERROR(e,rintle(&desc->magic_number, b, 0));
-  TESTERROR(e,rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX));
-  TESTERROR(e,rintle(&desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX));
-  TESTERROR(e,rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX));
-  TESTERROR(e,rintle(&desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX));
-  TESTERROR(e,rintle(&desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX));
-  TESTERROR(e,rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX));
-  TESTERROR(e,rintle(&desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX));
+  if ((e = rintle(&desc->magic_number, b, 0))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = rintle(&desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   return EXIT_SUCCESS;
 }
@@ -157,9 +156,9 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
   error e;
   block b = new_block();
   
-  TESTERROR(e,read_tfsdescription(id, vol_addr, &tfs_d));
-  TESTERROR(e,wintle(tfs_d.freeb_first, b, LASTINT_IDX));
-  TESTERROR(e,write_block(id, b, vol_addr + b_addr));
+  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = wintle(tfs_d.freeb_first, b, LASTINT_IDX))!=EXIT_SUCCESS){free(b); return e;}
+  if ((e = write_block(id, b, vol_addr + b_addr))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   tfs_d.freeb_first = b_addr;
   return write_tfsdescription(id, vol_addr, &tfs_d);
@@ -205,14 +204,14 @@ find_freedirent (block b) {
 
 #define INDIRECT1_BEGIN (TFS_DIRECT_BLOCKS_NUMBER*B_SIZE)
 #define INDIRECT2_BEGIN (INDIRECT1_BEGIN + B_SIZE*B_SIZE/INT_SIZE)
-#define ISINDIRECT2(fileindex) (fileindex >= INDIRECT2_BEGIN)
-#define ISINDIRECT1(fileindex) (fileindex >= INDIRECT1_BEGIN && ! IS_INDIRECT2(fileindex))
-#define ISDIRECT(fileindex) (fileindex < INDIRECT1_BEGIN)
-#define DIRECT_IDX(fileindex) (fileindex/B_SIZE)
-#define DIRECT1_IDX(fileindex) (fileindex/B_SIZE - TFS_DIRECT_BLOCKS_NUMBER)
-#define DIRECT2_IDX1(fileindex) ((fileindex/B_SIZE - INDIRECT1_BEGIN) / B_SIZE/INT_SIZE)
-#define DIRECT2_IDX2(fileindex) ((fileindex/B_SIZE - INDIRECT1_BEGIN) % B_SIZE/INT_SIZE)
-#define LASTBYTE_POS(fileindex) (fileindex%B_SIZE)
+#define ISINDIRECT2(fileindex) ((fileindex) >= INDIRECT2_BEGIN)
+#define ISINDIRECT1(fileindex) ((fileindex) >= INDIRECT1_BEGIN && ! IS_INDIRECT2(fileindex))
+#define ISDIRECT(fileindex) ((fileindex) < INDIRECT1_BEGIN)
+#define DIRECT_IDX(fileindex) ((fileindex)/B_SIZE)
+#define DIRECT1_IDX(fileindex) ((fileindex)/B_SIZE - TFS_DIRECT_BLOCKS_NUMBER)
+#define DIRECT2_IDX1(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) / B_SIZE/INT_SIZE)
+#define DIRECT2_IDX2(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) % B_SIZE/INT_SIZE)
+#define LASTBYTE_POS(fileindex) ((fileindex)%B_SIZE)
 #define TFS_FILE_FULL 123
 error
 directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry ) {
@@ -402,9 +401,9 @@ file_rmblock (disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr) {
   tfs_ftent ftent;
   //block b;
   
-  TESTERROR(e,freeblock_push(id, vol, b_addr));
-  TESTERROR(e,get_ftent(id, vol, inode, &ftent));
-  TESTERROR(e,put_ftent(id, vol, inode, &ftent));
+  if ((e = freeblock_push(id, vol, b_addr))!=EXIT_SUCCESS) return e;
+  if ((e = get_ftent(id, vol, inode, &ftent))!=EXIT_SUCCESS) return e;
+  if ((e = put_ftent(id, vol, inode, &ftent))!=EXIT_SUCCESS) return e;
   return EXIT_SUCCESS;
 }
 

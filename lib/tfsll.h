@@ -44,7 +44,7 @@
 #define TFS_FILE_SUBTYPE_INDEX INTX(2)            /***< TFS file pseudo-type index in file table entry */
 #define TFS_DATE_SUBTYPE 0                        /***< TFS date file table entry subtype */
 #define TFS_DISK_SUBTYPE 1                        /***< TFS disk file table entry subtype */
-#define TFS_DIRECT_INDEX(i) INTX(3+i)             /***< TFS direct data block <i> file table entry index */
+#define TFS_DIRECT_INDEX(i) INTX(3+(i))             /***< TFS direct data block <i> file table entry index */
 #define TFS_INDIRECT1_INDEX INTX(3+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS indirect1 block index in file table entry */
 #define TFS_INDIRECT2_INDEX INTX(4+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS indirect2 block index in file table entry */
 #define TFS_NEXT_FREE_FILE_ENTRY_INDEX INTX(5+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS next free file entry index */
@@ -55,7 +55,7 @@
 
 #define TFS_NAME_MAX 28                           /** TFS directory entry name maximum length */
 #define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX) /** TFS directory entry size */
-#define TFS_DIRECTORY_ENTRY_INDEX(i) (i*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
+#define TFS_DIRECTORY_ENTRY_INDEX(i) ((i)*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
 #define TFS_FILE_MAX_SIZE (B_SIZE*(TFS_DIRECT_BLOCKS_NUMBER + (B_SIZE/INT_SIZE)*(1 + (B_SIZE/INT_SIZE))))
   
