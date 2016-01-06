@@ -57,7 +57,9 @@
 #define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX) /** TFS directory entry size */
 #define TFS_DIRECTORY_ENTRY_INDEX(i) (i*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
-
+#define TFS_FILE_MAX_SIZE (TFS_DIRECT_BLOCKS_NUMBER*B_SIZE \
+			   + (B_SIZE*(B_SIZE/INT_SIZE)) ·\
+			   + (B_SIZE*(B_SIZE/INT_SIZE)*(B_SIZE/INT_SIZE)))
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES

@@ -148,6 +148,7 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
   error e = read_tfsdescription(id, vol_addr, &desc);
   if (e != EXIT_SUCCESS) 
     return e;
+  uint32_t
   block b = new_block();
   e = read_block(id, b, vol_addr + desc.freeb_first);
   if (e != EXIT_SUCCESS) {
@@ -178,8 +179,16 @@ find_freedirent (block b) {
   return DIR_BLOCKFULL;
 }
 
-
-
+#define INDIRECT1_BEGIN (TFS_DIRECT_BLOCKS_NUMBER*B_SIZE)
+#define INDIRECT2_BEGIN (INDIRECT1_BEGIN + B_SIZE*B_SIZE/INT_SIZE)
+#define ISINDIRECT2(size) (size >= INDIRECT2_BEGIN)
+#define ISINDIRECT1(size) (size >= INDIRECT1_BEGIN && ! IS_INDIRECT(size))
+#define ISDIRECT(size) (size < INDIRECT1_BEGIN)
+#define DIRECT_IDX(size) (size/B_SIZE)
+#define DIRECT1_IDX(size) (size/B_SIZE - TFS_DIRECT_BLOCKS_NUMBER)
+#define DIRECT2_IDX1(size) ((size/B_SIZE - INDIRECT1_BEGIN) / B_SIZE/INT_SIZE)
+#define DIRECT2_IDX2(size) ((size/B_SIZE - INDIRECT1_BEGIN) % B_SIZE/INT_SIZE)
+#define LASTBYTE_POS(size) (size%B_SIZE)
 error
 directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry ) {
   tfs_description desc;
@@ -196,6 +205,13 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
     free(b);
     return TFS_ERR_OPERATION;
   }
+  if (ftent.size == TFS_FILE_MAX_SIZE) {
+    free(b);
+    return TFS_FILE_FULL;
+  }
+  uint32_t findblock = size /  
+
+
   for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++) {
     read_block(id, b, vol_addr + ftent.tfs_direct[i]);
     int pos = find_freedirent(b);
@@ -276,7 +292,7 @@ directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t ino
 
 error
 directory_rment (disk_id id, uint32_t vol, DIR directory, const struct dirent *restrict entry) {
-
+  
   return EXIT_SUCCESS;
 }
 
