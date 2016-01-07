@@ -54,18 +54,16 @@ typedef struct {
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static error
+static void
 read_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
-  error e;
   const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos; 
-  if ((e = rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX))!=EXIT_SUCCESS) return e;
+  rintle(&ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX);
+  rintle(&ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX);
+  rintle(&ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX);
   for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++)
-    if ((e = rintle(&ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)))!=EXIT_SUCCESS) return e;
-  if ((e = rintle(&ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = rintle(&ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX))!=EXIT_SUCCESS) return e;
-  return EXIT_SUCCESS;
+    rintle(&ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i));
+  rintle(&ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX);
+  rintle(&ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX);
 }
 
 static error
@@ -73,24 +71,22 @@ get_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
   error e;
   block b = new_block();
   if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = read_ftent(b, INO_BPOS(inode), ftent))!=EXIT_SUCCESS){free(b); return e;}
+  read_ftent(b, INO_BPOS(inode), ftent);
   free(b);
   return EXIT_SUCCESS;
 }
 
-static error
+static void
 write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
-  error e;
   const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos;
 
-  if ((e = wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX))!=EXIT_SUCCESS) return e;
+  wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX);
+  wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX);
+  wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX);
   for (int i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++)
-    if ((e = wintle(ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i)))!=EXIT_SUCCESS) return e;
-  if ((e = wintle(ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX))!=EXIT_SUCCESS) return e;
-  if ((e = wintle(ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX))!=EXIT_SUCCESS) return e;
-  return EXIT_SUCCESS;
+    wintle(ftent->tfs_direct[i], b, entry_pos + TFS_DIRECT_INDEX(i));
+  wintle(ftent->tfs_indirect1, b, entry_pos + TFS_INDIRECT1_INDEX);
+  wintle(ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX);
 }
 
 static error
@@ -99,7 +95,7 @@ put_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
   block b = new_block();
   
   if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = write_ftent(b, INO_BPOS(inode), ftent))!=EXIT_SUCCESS){free(b); return e;}
+  write_ftent(b, INO_BPOS(inode), ftent);
   if ((e = write_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
   return EXIT_SUCCESS;
@@ -111,15 +107,15 @@ write_tfsdescription (const disk_id id, const uint32_t vol_addr, const tfs_descr
 {
   error e;
   block b = new_block();
-  if ((e = wintle(desc->magic_number, b, 0))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = write_block(id, b, vol_addr))!=EXIT_SUCCESS){free(b); return e;}
+  wintle(desc->magic_number, b, 0);
+  wintle(desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX);
+  wintle(desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
+  wintle(desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
+  wintle(desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
+  wintle(desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
+  wintle(desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
+  wintle(desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
+  e = write_block(id, b, vol_addr);
   free(b);
   return e;
 }
@@ -135,14 +131,14 @@ read_tfsdescription (const disk_id id, const uint32_t vol_addr, tfs_description 
     free(b);
     return e;
   }
-  if ((e = rintle(&desc->magic_number, b, 0))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = rintle(&desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX))!=EXIT_SUCCESS){free(b); return e;}
+  rintle(&desc->magic_number, b, 0);
+  rintle(&desc->block_size, b, TFS_VOLUME_BLOCK_SIZE_INDEX);
+  rintle(&desc->volume_size, b, TFS_VOLUME_BLOCK_COUNT_INDEX);
+  rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_BLOCK_COUNT_INDEX);
+  rintle(&desc->freeb_first, b, TFS_VOLUME_FIRST_FREE_BLOCK_INDEX);
+  rintle(&desc->maxfile_count, b, TFS_VOLUME_MAX_FILE_COUNT_INDEX);
+  rintle(&desc->freefile_count, b, TFS_VOLUME_FREE_FILE_COUNT_INDEX);
+  rintle(&desc->freefile_first, b, TFS_VOLUME_FIRST_FREE_FILE_INDEX);
   free(b);
   return EXIT_SUCCESS;
 }
@@ -152,13 +148,23 @@ error
 freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr) {
   tfs_description tfs_d;
   error e;
-  block b = new_block();
+  block b;
+
+  //read volume superblock
+  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS) return e;
+  b= new_block();
   
-  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS){free(b); return e;}
-  if ((e = wintle(tfs_d.freeb_first, b, LASTINT_IDX))!=EXIT_SUCCESS){free(b); return e;}
+  //fill appropriate TFS_NEXT_FREE_FILE_ENTRY_INDEX value in b
+  if (tfs_d.freeb_count == 0) wintle(b_addr, b, TFS_NEXT_FREE_FILE_ENTRY_INDEX);
+  else wintle(tfs_d.freeb_first, b, TFS_NEXT_FREE_FILE_ENTRY_INDEX);
+
+  //write b in <b_addr> block
   if ((e = write_block(id, b, vol_addr + b_addr))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
+
+  //update tfs_d and write it to disk
   tfs_d.freeb_first = b_addr;
+  tfs_d.freeb_count++;
   return write_tfsdescription(id, vol_addr, &tfs_d);
 }
 
