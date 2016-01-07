@@ -98,7 +98,7 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
  * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
  */
 error
-freeblock_rm (const disk_id id, const uint32_t vol_addr);
+freeblock_rm (const disk_id id, const uint32_t vol_addr, uint32_t * b_addr);
 
 
 

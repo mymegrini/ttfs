@@ -16,7 +16,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
-
 #define LASTINT_IDX (B_SIZE - 1 - SIZEOF_INT)
 #define TFS_ERR_BIGFILE 100
 #define NENTBYBLOCK (B_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
@@ -73,7 +72,6 @@ static error
 get_ftent (disk_id id, uint32_t vol, uint32_t inode, tfs_ftent* ftent){
   error e;
   block b = new_block();
-  
   if ((e = read_block(id, b, vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS){free(b); return e;}
   if ((e = read_ftent(b, INO_BPOS(inode), ftent))!=EXIT_SUCCESS){free(b); return e;}
   free(b);
@@ -84,7 +82,7 @@ static error
 write_ftent (block b, const uint32_t bpos, tfs_ftent * ftent) {
   error e;
   const uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*bpos;
-  
+
   if ((e = wintle(ftent->size, b, entry_pos + TFS_FILE_SIZE_INDEX))!=EXIT_SUCCESS) return e;
   if ((e = wintle(ftent->type, b, entry_pos + TFS_FILE_TYPE_INDEX))!=EXIT_SUCCESS) return e;
   if ((e = wintle(ftent->subtype, b, entry_pos + TFS_FILE_SUBTYPE_INDEX))!=EXIT_SUCCESS) return e;
@@ -167,7 +165,7 @@ freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr
 
 #define TFS_FULL 200
 error
-freeblock_rm (const disk_id id, const uint32_t vol_addr) {
+freeblock_rm (const disk_id id, const uint32_t vol_addr, uint32_t * b_addr) {
   tfs_description desc;
   error e = read_tfsdescription(id, vol_addr, &desc);
   if (e != EXIT_SUCCESS) 
@@ -178,6 +176,7 @@ freeblock_rm (const disk_id id, const uint32_t vol_addr) {
     free(b);
     return e;
   }
+  *b_addr = desc.freeb_first;
   uint32_t nextfreeb;
   e = rintle(&nextfreeb, b, LASTINT_IDX);
   free(b);
@@ -205,111 +204,229 @@ find_freedirent (block b) {
 #define INDIRECT1_BEGIN (TFS_DIRECT_BLOCKS_NUMBER*B_SIZE)
 #define INDIRECT2_BEGIN (INDIRECT1_BEGIN + B_SIZE*B_SIZE/INT_SIZE)
 #define ISINDIRECT2(fileindex) ((fileindex) >= INDIRECT2_BEGIN)
-#define ISINDIRECT1(fileindex) ((fileindex) >= INDIRECT1_BEGIN && ! IS_INDIRECT2(fileindex))
+#define ISINDIRECT1(fileindex) ((fileindex) >= INDIRECT1_BEGIN	\
+				&& ! ISINDIRECT2(fileindex))
 #define ISDIRECT(fileindex) ((fileindex) < INDIRECT1_BEGIN)
 #define DIRECT_IDX(fileindex) ((fileindex)/B_SIZE)
-#define DIRECT1_IDX(fileindex) ((fileindex)/B_SIZE - TFS_DIRECT_BLOCKS_NUMBER)
-#define DIRECT2_IDX1(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) / B_SIZE/INT_SIZE)
-#define DIRECT2_IDX2(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) % B_SIZE/INT_SIZE)
+#define INDIRECT1_IDX(fileindex) ((fileindex)/B_SIZE - TFS_DIRECT_BLOCKS_NUMBER)
+#define INDIRECT2_IDX1(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) \
+				   / B_SIZE/INT_SIZE)
+#define INDIRECT2_IDX2(fileindex) (((fileindex)/B_SIZE - INDIRECT1_BEGIN) \
+				   % B_SIZE/INT_SIZE)
 #define LASTBYTE_POS(fileindex) ((fileindex)%B_SIZE)
 #define TFS_FILE_FULL 123
 error
-directory_pushent (const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry ) {
+directory_pushent (const disk_id id, const uint32_t vol_addr,
+		   const uint32_t inode, const struct dirent *entry )
+{
   tfs_description desc;
   error e = read_tfsdescription(id, vol_addr, &desc);
   if (e != EXIT_SUCCESS)
     return e;
+
+  // Read filetable entry
   const uint32_t ft_inode_baddr = INO_FTBLOCK(inode);
   const uint32_t inode_bpos = INO_BPOS(inode);
   block b = new_block();
   read_block(id, b, vol_addr + ft_inode_baddr);
   tfs_ftent ftent;
   read_ftent(b, inode_bpos, &ftent);
+  // It might be useless to check the type, but for now there is a test
   if (ftent.type != TFS_DIRECTORY_TYPE) {
     free(b);
     return TFS_ERR_OPERATION;
   }
+  // DIRECTORY FULL
   if (ftent.size == TFS_FILE_MAX_SIZE){
     free(b);
     return TFS_FILE_FULL;
   }
-  // uint32_t findblock = size / A completer
+  // actualize size in the cache for further writing
+  // before incrementation, size at least one time TFS_DIRECTORY_ENTRY_SIZE
+  // lesser than TFS_FILE_MAX_SIZE
+  ftent.size += TFS_DIRECTORY_ENTRY_SIZE;
+  
 
-  int i;
-  for (i = 0; i < TFS_DIRECT_BLOCKS_NUMBER; i++) {
-    read_block(id, b, vol_addr + ftent.tfs_direct[i]);
-    int pos = find_freedirent(b);
-    if (pos != DIR_BLOCKFULL) {
-      wintle(entry->d_ino, b, pos);
-      memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	     sizeof(byte)*TFS_NAME_MAX);
-      e = write_block(id, b, vol_addr + ft_inode_baddr);
-      free(b);
-      return e;
-    }
-  }
- 
-  if ((e = read_block(id, b,  vol_addr + ftent.tfs_indirect1)) != EXIT_SUCCESS) {
-    free(b);
-    return e;
-  }
-  block indirect = new_block();
-  uint32_t indirect_addr;
-  for (int i = 0; i < B_SIZE/SIZEOF_INT; i++) {
-    rintle(&indirect_addr, b, i * SIZEOF_INT);
-    if ((e = read_block(id, indirect, vol_addr + indirect_addr)) != EXIT_SUCCESS)
-      return e;
-    int pos = find_freedirent(indirect);
-    if (pos != DIR_BLOCKFULL) {
-      wintle(entry->d_ino, b, pos);
-      memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	     sizeof(byte)*TFS_NAME_MAX);
-      e = write_block(id, b, vol_addr + ft_inode_baddr);
-      free(b);
-      free(indirect);
-      return e;
-    }    
-  }
-  if ((e = read_block(id, b,  vol_addr + ftent.tfs_indirect2)) != EXIT_SUCCESS) {
-    free(b);
-    free(indirect);
-    return e;
-  }
-  block indirect2 = new_block();
-  for (int i = 0; i < B_SIZE/SIZEOF_INT; i++) {
-    rintle(&indirect_addr, b, i * SIZEOF_INT);
-    if ((e = read_block(id, indirect, vol_addr + indirect_addr)) != EXIT_SUCCESS) {
-      free(b);
-      free(indirect);
-      free(indirect2);
-      return e;
-    }
-    for (int j = 0; j < B_SIZE/SIZEOF_INT; i++) {
-      uint32_t indirect2_addr;
-      rintle(&indirect2_addr, indirect, INTX(j));
-      if ((e = read_block(id, indirect2, vol_addr + indirect2_addr)) != EXIT_SUCCESS) {
-	free(b);
-	free(indirect);
-	free(indirect2);
-      	return e;
+  uint32_t b_addr;   // data block adress where to put the entry
+  uint32_t bpos = LASTBYTE_POS(inode);    // relative inode pos in the data
+					  // block 
+  // Add entry to a direct block
+  if (ISDIRECT(ftent.size))
+    {
+      int isnewblock = 0;
+      uint32_t direct_idx = DIRECT_IDX(ftent.size);    // index in tfs_direct
+      // if a new block is needed, add it to tfs_direct
+      if (ftent.tfs_direct[direct_idx] == 0) {
+	isnewblock = 1;
+	e = freeblock_rm(id, vol_addr, &b_addr);
+	if (e != EXIT_SUCCESS) {
+	  free(b);
+	  return e;
+	}
+	ftent.tfs_direct[direct_idx] = b_addr;
       }
-      int pos = find_freedirent(indirect);
-      if (pos != DIR_BLOCKFULL) {
-	wintle(entry->d_ino, b, pos);
-	memcpy(&b->data[pos + SIZEOF_INT], entry->d_name,
-	       sizeof(byte)*TFS_NAME_MAX);
-	e = write_block(id, b, vol_addr + ft_inode_baddr);
+      // else read the block
+      else {
+	b_addr = ftent.tfs_direct[DIRECT_IDX(ftent.size)];
+      }
+      // read the direct block
+      block db = new_block();
+      if ((e = read_block(id, db, vol_addr + b_addr)) != EXIT_SUCCESS) {
+	if (isnewblock)
+	  freeblock_push(id, vol_addr, b_addr);
 	free(b);
-	free(indirect);
-	free(indirect2);
+	free(db);
 	return e;
-      }    
+      }
+      // write the entry
+      wintle(entry->d_ino, db, bpos);
+      memcpy(&db->data[bpos+INT_SIZE], entry->d_name, TFS_NAME_MAX);
+      if ((e = write_block(id, db, vol_addr + b_addr)) != EXIT_SUCCESS
+	  ||(e = write_block(id, b, vol_addr + ft_inode_baddr)) != EXIT_SUCCESS)
+	{
+	  if (isnewblock)     // don't lose it from the filesystem
+	    freeblock_push(id, vol_addr, b_addr);
+	  free(b);
+	  free(db);
+	  return e;
+	}
+      free(b);
+      free(db);
+      return EXIT_SUCCESS;
     }
+  // Entry must be written in IN
+  if (ISINDIRECT1(ftent.size))
+    {
+      block b_indir1 = new_block();
+      if ((e = read_block(id, b_indir1, vol_addr + ftent.tfs_indirect1))
+	  != EXIT_SUCCESS)
+	{
+	  free(b);
+	  free(b_indir1);
+	  return e;
+	}
+      uint32_t indir_b_pos = INDIRECT1_IDX(ftent.size);
+      rintle(&b_addr, b_indir1, indir_b_pos);
+      // provide new block if needed
+      if (b_addr == 0) {
+	freeblock_rm(id, vol_addr, &b_addr);
+	wintle(b_addr, b_indir1, indir_b_pos);
+	if ((e = write_block(id, b_indir1, vol_addr + b_addr) != EXIT_SUCCESS))
+	  {
+	    freeblock_push(id, vol_addr, b_addr);
+	    free(b);
+	    free(b_indir1);
+	    return e;
+	  }
+      }
+      free(b_indir1);
+      block b_data = new_block();
+      if ((e = read_block(id, b_data, vol_addr + b_addr)) != EXIT_SUCCESS) {
+	free(b);
+	free(b_data);
+	return e;
+      }
+      wintle(entry->d_ino, b_data, bpos);
+      memcpy(&b_data->data[bpos+INT_SIZE], entry->d_name, TFS_NAME_MAX);
+      // write modifications
+      if ((e = write_block(id, b_data, vol_addr + b_addr)) != EXIT_SUCCESS
+	  ||(e = write_block(id, b, vol_addr + ft_inode_baddr)) != EXIT_SUCCESS)
+	{
+	  free(b);
+	  free(b_data);
+	  return e;
+	}
+      free(b);
+      free(b_data);
+      return EXIT_SUCCESS;
+    }
+  // Indirect 2
+  if (ISINDIRECT2(ftent.size)) {
+    block b_indir1 = new_block();
+    block b_indir2;
+    uint32_t  b_indir2_addr;
+    if ((e = read_block(id, b_indir1, vol_addr + ftent.tfs_indirect2))
+	!= EXIT_SUCCESS)
+      {
+	free(b);
+	free(b_indir1);
+	return e;
+      }
+    uint32_t b_indir1_pos = INDIRECT2_IDX1(ftent.size);
+    rintle(&b_indir2_addr, b_indir1, b_indir1_pos);
+    // provide new indir2 block if needed
+    if (b_indir2_addr == 0)
+      {
+	if ((e = freeblock_rm(id, vol_addr, &b_indir2_addr)) != EXIT_SUCCESS)
+	  {
+	    free(b);
+	    free(b_indir1);
+	    return e;
+	  }
+	wintle(b_indir2_addr, b_indir1, b_indir1_pos);
+	// fail to actualize indirect1
+	if ((e = write_block(id, b_indir1, vol_addr + ftent.tfs_indirect2))
+	     != EXIT_SUCCESS) {
+	  freeblock_push(id, vol_addr, b_indir2_addr);
+	  free(b);
+	  free(b_indir1);
+	  return e;
+	}         
+      }
+    free(b_indir1); // don't need it anymore since we have recovered
+		    // b_indir2_addr, move one b_indir2
+    // read b_indir2
+    b_indir2 = new_block();
+    if ((e == read_block(id, b_indir2, vol_addr + b_indir2_addr))
+	!= EXIT_SUCCESS)
+      {
+	free(b);
+	free(b_indir2);
+	return e;
+      }
+    uint32_t b_indir2_pos = INDIRECT2_IDX2(ftent.size);
+    rintle(&b_addr, b_indir2, b_indir2_pos);
+    block b_data;
+    // provide new data block if needed
+    if (b_indir2_addr == 0) {
+      if ((e = freeblock_rm(id, vol_addr, &b_addr)) != EXIT_SUCCESS) {
+	free(b);
+	free(b_indir2);
+	return e;
+      }
+      wintle(b_addr, b_indir2, b_indir2_pos);
+      if ((e = write_block(id, b_indir2, vol_addr + b_indir2_addr))
+	  != EXIT_SUCCESS)
+	{
+	  freeblock_push(id, vol_addr, b_addr);
+	  free(b);
+	  free(b_indir2);
+	  return e;
+	}
+    }
+    free(b_indir2); // don't need it anymore, move on data block
+    b_data = new_block();
+    if ((e = read_block(id, b_data, vol_addr + b_addr)) != EXIT_SUCCESS) {
+      free(b);
+      free(b_data);
+      return e;
+    }
+    // finally write the entry !!!
+    wintle(entry->d_ino, b_data, bpos);
+    memcpy(&b_data->data[bpos+INT_SIZE], entry->d_name, TFS_NAME_MAX);
+    // write modifications in the disk
+    if ((e = write_block(id, b_data, vol_addr + b_addr)) != EXIT_SUCCESS
+	|| (e = write_block(id, b, vol_addr + ft_inode_baddr)) != EXIT_SUCCESS)
+      {
+	free(b);
+	free(b_data);
+	return e;
+      }
+    free(b);
+    free(b_data);
+    return EXIT_SUCCESS;
   }
-  free(b);
-  free(indirect);
-  free(indirect2);
-  return TFS_ERR_BIGFILE;
+  return EXIT_FAILURE;
 }
 
 
