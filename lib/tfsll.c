@@ -9,6 +9,7 @@
 #include "ll.h"
 #include "tfsll.h"
 #include "block.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -521,54 +522,79 @@ freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
 }
 
 error
-file_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size){
-    tfs_ftent ftent;
-    error e;
-    int32_t bsize;
-    
-    //read file table entry <inode>
-    if ((e = read_ftent(id, vol_addr, *inode, &ftent))!= EXIT_SUCCESS) return e;
-
-    //compare new size to old size
-    if (size == ftent.size) return EXIT_SUCCESS;
-
-    //calculate file block size
-    bsize = ((ftent.size-1) %TFS_VOLUME_BLOCK_SIZE)+1;
-
-    if (size > ftent.size){
+file_realloc (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t size){
+  tfs_ftent ftent;
+  error e;
+  int32_t bsize;
+  struct _index index;
+  
+  
+  //read file table entry <inode>
+  if ((e = read_ftent(id, vol_addr, inode, &ftent))!= EXIT_SUCCESS) return e;
+  
+  //compare new size to old size
+  if (size == ftent.size) return EXIT_SUCCESS;
+  
+  //calculate file block size
+  bsize = ((ftent.size-1) %TFS_VOLUME_BLOCK_SIZE)+1;
+  
+  //initialize index
+  index_init(id, vol_addr, inode, &index);
+  
+  if (size > ftent.size){
     //file size increase
-      while (bsize*TFS_VOLUME_BLOCK_SIZE<size){
-
-      }
+    while (bsize*TFS_VOLUME_BLOCK_SIZE<size){
+      if (fileblock_add(id, vol_addr, inode, &index)!= EXIT_SUCCESS)
+	break;
+      else
+	bsize++;
     }
-    else {
+    //update <ftent> size
+    ftent.size = (bsize*TFS_VOLUME_BLOCK_SIZE>=size
+		  ? size
+		  : bsize*TFS_VOLUME_BLOCK_SIZE);
+    //write <ftent> to disk
+    return write_ftent(id, vol_addr, inode, &ftent);
+  }
+  else {
     //file size decrease
-      while ((bsize-1)*TFS_VOLUME_BLOCK_SIZE>size){
-
-      }
+    while ((bsize-1)*TFS_VOLUME_BLOCK_SIZE>=size){
+      if (fileblock_rm(id, vol_addr, inode, &index)!= EXIT_SUCCESS)
+	break;
+      else
+	bsize--;
     }
-    return EXIT_SUCCESS;
+    //update <ftent> size
+    ftent.size = ((bsize-1)*TFS_VOLUME_BLOCK_SIZE<size
+		  ? size
+		  : (bsize-1)*TFS_VOLUME_BLOCK_SIZE);
+    //write <ftent> to disk
+    return write_ftent(id, vol_addr, inode, &ftent);
+  }
 }
 
-#define WRONG_BLOCK_FILE_ADDRESS 31
 error
 find_addr(disk_id id, uint32_t vol, uint32_t inode,
-		uint32_t b_file_addr, uint32_t* b_addr){
+	  uint32_t b_file_addr, uint32_t* b_addr){
   block b;
   tfs_ftent ftent;
   error e;
-
+  
   //read <inode> file table entry
   if ((e = read_ftent(id, vol, inode, &ftent))!=EXIT_SUCCESS) return e;
+  
+  //test if block address is reasonable
+  if (b_file_addr>((ftent.size)-1)/TFS_VOLUME_BLOCK_SIZE)
+    return B_OUTOFBOUND;
   
   //from tfs_indirect
   if (b_file_addr<TFS_DIRECT_BLOCKS_NUMBER){
     //read b_addr from file table entry
-    *b_addr = ftent.tfs_direct[*b_addr];
+    *b_addr = ftent.tfs_direct[b_file_addr];
     return EXIT_SUCCESS;
   }
-
-  b=new_block();
+  
+  b = new_block();
   //from tfs_indirect1
   b_file_addr-=TFS_DIRECT_BLOCKS_NUMBER;
   if (b_file_addr<TFS_INDIRECT1_CAPACITY){
@@ -599,7 +625,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
     return EXIT_SUCCESS;    
   }
   free(b);
-  return WRONG_BLOCK_FILE_ADDRESS;
+  return F_SIZE_CORRUPTED;
 }
 
 #define TFS_ERR_OPERATION 214

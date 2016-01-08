@@ -173,7 +173,7 @@ fileblock_rm (disk_id id, uint32_t vol, uint32_t inode, _index index);
  * @param size new file size
  */
 error
-file_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size);
+file_realloc (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t size);
 
 
 /**
@@ -211,6 +211,20 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
  */
 error
 file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
+
+
+/**
+ * @brief Finds a file block's volume address
+ *
+ * @param inode file inode
+ * @param vol partition index
+ * @param id disk id number 
+ * @param[in] b_file_addr block's file number
+ * @param[out] b_addr block's volume address
+ */
+error
+find_addr(disk_id id, uint32_t vol, uint32_t inode,
+	  uint32_t b_file_addr, uint32_t* b_addr);
 
 
 #define TFS_PATHLEAF 1

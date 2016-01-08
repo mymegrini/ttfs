@@ -32,7 +32,8 @@ static char* _errlist[] = {
   "File table free entry list corrupted",
   "File size value corrupted",
   "Empty file",
-  "Corrupted index structure"
+  "Corrupted index structure",
+  "Block file address out of bounds"
 };
 
 /**
@@ -59,3 +60,11 @@ void testerror(char* msg, error err){
     exit(err);
   }
 }
+
+/**
+ * This variable can be used to store an error in functions
+ * which do not return <error>
+ *
+ */
+
+error errnum = EXIT_SUCCESS;

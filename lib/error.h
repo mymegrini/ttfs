@@ -15,7 +15,7 @@ typedef uint8_t error;
 /**
  * Prints an errror message on error output 
  */
-extern void printerror(char *s, error err);
+void printerror(char *s, error err);
 
 /**
  * @brief This function forces an exit if an error is encountered
@@ -63,4 +63,13 @@ void testerror(char* msg, error err);
 #define F_SIZE_CORRUPTED 20 /**< File size value corrupted */
 #define F_EMPTY 21          /**< Empty file */
 #define I_CORRUPTED 22      /**< Corrupted index structure */
+#define B_OUTOFBOUND 23     /**< Block file address exceeds maximum file size */
+
+/**
+ * @brief This variable can store an error
+ *
+ */
+
+extern error errnum;
+
 #endif
