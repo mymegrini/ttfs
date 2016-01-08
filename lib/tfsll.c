@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
+
 #define LASTINT_IDX (TFS_VOLUME_BLOCK_SIZE - 1 - SIZEOF_INT)
 #define INDIRECT1_BEGIN (TFS_DIRECT_BLOCKS_NUMBER*TFS_VOLUME_BLOCK_SIZE)
 #define INDIRECT2_BEGIN (INDIRECT1_BEGIN + TFS_VOLUME_BLOCK_SIZE*INT_PER_BLOCK)
@@ -24,16 +25,11 @@
 				&& ! ISINDIRECT2(fileindex))
 #define ISDIRECT(fileindex) ((fileindex) < INDIRECT1_BEGIN)
 #define DIRECT_IDX(fileindex) ((fileindex)/TFS_VOLUME_BLOCK_SIZE)
-#define INDIRECT1_IDX(fileindex) ((fileindex)/TFS_VOLUME_BLOCK_SIZE \
-				  - TFS_DIRECT_BLOCKS_NUMBER)
-#define INDIRECT2_IDX1(fileindex) (((fileindex)/TFS_VOLUME_BLOCK_SIZE \
-				    - INDIRECT1_BEGIN)		      \
-				   /TFS_VOLUME_BLOCK_SIZE/INT_SIZE)
-#define INDIRECT2_IDX2(fileindex) (((fileindex)/TFS_VOLUME_BLOCK_SIZE \
-				    - INDIRECT1_BEGIN) \
-				   % INT_PER_BLOCK)
+#define INDIRECT1_IDX(fileindex) (((fileindex)/TFS_VOLUME_BLOCK_SIZE	\
+				   - TFS_DIRECT_BLOCKS_NUMBER)% INT_PER_BLOCK)
+#define INDIRECT2_IDX(fileindex) (((fileindex)/TFS_VOLUME_BLOCK_SIZE \
+				    - INDIRECT1_BEGIN)/ INT_PER_BLOCK)
 #define LASTBYTE_POS(fileindex) ((fileindex)%TFS_VOLUME_BLOCK_SIZE)
-
 
 #define TFS_ERR_BIGFILE 100
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +56,14 @@ typedef struct {
   uint32_t tfs_indirect2;
   uint32_t nextfreefile;
 } tfs_ftent;
+
+struct _index{
+  int32_t direct;           /**< current index of direct block (-1 empty) >*/
+  int32_t indirect1;        /**< current index in indirect1 block (-1 empty) >*/
+  int32_t indirect2;        /**< current index in indirect2 block (-1 empty) >*/
+  uint32_t indirect1_addr;   /**< current indirect1 block address >*/
+  uint32_t indirect2_addr;   /**< current indirect2 block address >*/
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
@@ -165,6 +169,230 @@ read_tfsdescription (disk_id id, uint32_t vol_addr, tfs_description * desc){
   return EXIT_SUCCESS;
 }
 
+static error
+index_init(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index){
+  error e;
+  tfs_ftent ftent;
+
+  //read file entry <inode>
+  if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+
+  //case 1: empty file
+  if(ftent.size == 0){
+    index->direct = -1;
+    index->indirect1 = -1;
+    index->indirect2 = -1;
+    return EXIT_SUCCESS;
+  }
+
+  //case 2: only direct blocks
+  if(ISDIRECT((ftent.size)-1)){
+    index->direct = DIRECT_IDX(ftent.size);
+    index->indirect1 = -1;
+    index->indirect2 = -1;
+    return EXIT_SUCCESS;
+  }
+
+  //case 3: indirect1 block
+  if(ISINDIRECT1((ftent.size)-1)){
+    index->direct = 10;
+    index->indirect1 = ftent.tfs_indirect1;
+    index->indirect2 = -1;
+    return EXIT_SUCCESS;
+  }
+
+  //case 4: indirect2 block
+  if(ISINDIRECT2((ftent.size)-1)){
+    block b = new_block();
+    index->direct = 10;
+    index->indirect1 = INDIRECT1_IDX((ftent.size)-1);
+    index->indirect2 = INDIRECT2_IDX((ftent.size)-1);
+    index->indirect2_addr = ftent.tfs_indirect2;
+    //read indirect2 to get address of current indirect1 block
+    e = read_block(id, b, vol_addr+index->indirect2_addr);
+    rintle(&(index->indirect1_addr), b, index->indirect2);
+    free(b);
+    return e;
+  }
+
+  //case 5: corrupted file (size too big)
+  return F_SIZE_CORRUPTED;
+}
+
+static error
+fileblock_add(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index)
+{
+  error e;
+  uint32_t b_addr;
+  tfs_ftent ftent;
+  block b;
+    
+  //case 1: we need to add direct block
+  if (index->direct < TFS_DIRECT_BLOCKS_NUMBER-1){
+    //obtain freeblock
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->direct++;
+    //read and update <ftent>
+    if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    ftent.tfs_direct[index->direct]= b_addr;
+    //write <ftent> to disk
+    if ((e = write_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    return EXIT_SUCCESS;
+  }
+
+  //case 2: we need to add first indirect1 block
+  if (index->direct == TFS_DIRECT_BLOCKS_NUMBER-1){
+    //obtain freeblock for indirect1 block
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->direct++;
+    index->indirect1_addr = b_addr;
+    index->indirect1 = -1; //empty indirect1 block
+    //read and update <ftent>
+    if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    ftent.tfs_indirect1= b_addr;
+    //write <ftent> to disk
+    if ((e = write_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    //relaunch function to add data block to indirect1 block (case 5)
+    return fileblock_add(id, vol_addr, inode, index);
+  }
+
+  //case 3: we need to add indirect2 block
+  if (index->indirect1 == INT_PER_BLOCK-1 && index->indirect2 == -1){
+    //obtain freeblock for indirect2
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //read and update <ftent>
+    if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    ftent.tfs_indirect2= b_addr;
+    //write <ftent> to disk
+    if ((e = write_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    //relaunch function to add first indirect1 block to indirect2 block (case 4)
+    index->indirect1++; //guarantees that we land in case 4
+    return fileblock_add(id, vol_addr, inode, index);
+  }
+
+  //case 4: we need to a add indirect1 block to indirect2 block
+  if (index->indirect1 == INT_PER_BLOCK){
+    //obtain freeblock for indirect1
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->indirect1_addr = b_addr;
+    index->indirect2++;
+    index->indirect1 = -1; //empty indirect1 block
+    //update indirect2 block
+    b = new_block();
+    if ((e = read_block(id, b, index->indirect2_addr))!=EXIT_SUCCESS) return e;
+    wintle(index->indirect1_addr, b, index->indirect2);
+    if ((e = write_block(id, b, index->indirect2_addr))!=EXIT_SUCCESS) return e;
+    free(b);
+    //relaunch function to add first data block to new indirect1 block (case 5)
+    return fileblock_add(id, vol_addr, inode, index);
+  }
+  
+  //case 5: we need to add a data block to current indirect1 block
+  if (index->indirect1 < INT_PER_BLOCK-1){
+    //obtain free block
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->indirect1++;
+    //update indirect1 block
+    b = new_block();
+    if ((e = read_block(id, b, index->indirect1_addr))!=EXIT_SUCCESS) return e;
+    wintle(b_addr, b, index->indirect1);
+    if ((e = write_block(id, b, index->indirect1_addr))!=EXIT_SUCCESS) return e;
+    free(b);
+    return EXIT_SUCCESS;
+  }  
+
+  //case 6: corrupted index
+  return I_CORRUPTED;
+}
+
+static error
+fileblock_rm(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index)
+{
+  error e;
+  tfs_ftent ftent;
+  block b;
+  uint32_t b_addr;
+
+  //case 0: file is empty
+  if(index->direct == -1) return F_EMPTY;
+    
+  //case 1: we need to remove a direct block
+  if (index->direct < TFS_DIRECT_BLOCKS_NUMBER){
+    //find direct block address
+    if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    b_addr = ftent.tfs_direct[index->direct];
+    //free direct block
+    if((e = freeblock_push(id, vol_addr, b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->direct--;
+    return EXIT_SUCCESS;
+  }
+
+  //case 2: we need to remove data block from indirect1 block
+  if (index->indirect1 > -1){
+    //read data block address from indirect1
+    b = new_block();
+    if ((e = read_block(id, b, index->indirect1_addr))!=EXIT_SUCCESS) return e;
+    rintle(&b_addr, b, index->indirect1);
+    //free data block
+    if((e = freeblock_push(id, vol_addr, index->indirect2))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->indirect1--;
+    free(b);
+    //relaunch function if current indirect1 empty (cases 3 and 5)
+    if (index->indirect1== -1) return fileblock_rm(id, vol_addr, inode, index);
+    else return EXIT_SUCCESS;
+  }
+
+  //case 3: we need to remove indirect1 block from indirect2 block
+  if (index->indirect1 == -1 && index->indirect2 > 0){
+    //free for indirect1
+    if((e = freeblock_push(id, vol_addr, index->indirect1_addr))!= EXIT_SUCCESS)
+      return e;
+    //update index
+    index->indirect2--;
+    index->indirect1+= INT_PER_BLOCK;
+    //find new indirect1 address from indirect2
+    b = new_block();
+    if ((e = read_block(id, b, index->indirect2_addr))!=EXIT_SUCCESS) return e;
+    rintle(&(index->indirect1_addr), b, index->indirect2);    
+    free(b);
+    return EXIT_SUCCESS;
+  }
+
+  //case 4: we need to remove last indirect1 block from indirect2 block
+  if (index->indirect1 == -1 && index->indirect2 == 0){
+    //free blocks indirect1 and indirect2
+    if((e = freeblock_push(id, vol_addr, index->indirect1_addr))!= EXIT_SUCCESS)
+      return e;
+    if((e = freeblock_push(id, vol_addr, index->indirect2_addr))!= EXIT_SUCCESS)
+      return e;
+    //update <index>
+    index->indirect2--;
+    index->indirect1+= INT_PER_BLOCK;
+    //find new indirect1 address from <ftent>
+    if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+    index->indirect1 = ftent.tfs_indirect1;
+    return EXIT_SUCCESS;
+  }
+  
+  //case 5: we need to remove last indirect1 block
+  if (index->indirect1 == -1 && index->direct==TFS_DIRECT_BLOCKS_NUMBER){
+    //obtain free block
+    if((e = freeblock_pop(id, vol_addr, &b_addr))!= EXIT_SUCCESS) return e;
+    //update <index>
+    index->direct--;
+    return EXIT_SUCCESS;
+  }
+
+  //case 6: corrupted index
+  return I_CORRUPTED;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +451,7 @@ freeblock_pop (disk_id id, uint32_t vol_addr, uint32_t* b_addr) {
     if (e != EXIT_SUCCESS) return e;
     
     //test if we have reached the end of the list
-    if (nextfreeb == *b_addr && desc.freeb_count >1) return V_CORRUPTED;
+    if (nextfreeb == *b_addr && desc.freeb_count >1) return V_FBL_CORRUPTED;
     else {
       //update tfs_description structure
       desc.freeb_first = nextfreeb;
@@ -280,7 +508,7 @@ freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
     *inode = tfs_d.freefile_first;
 
     //test if we have reached the end of the list
-    if (ftent.nextfreefile == *inode && tfs_d.freefile_count >1) return FT_CORRUPTED;
+    if (ftent.nextfreefile == *inode && tfs_d.freefile_count >1) return FT_FEL_CORRUPTED;
     else {
       //update <tfs_d>
       tfs_d.freeb_first = ftent.nextfreefile;
@@ -290,6 +518,19 @@ freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
       return write_tfsdescription(id, vol_addr, &tfs_d);
     }
   }
+}
+
+error
+tfs_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size){
+    tfs_ftent ftent;
+    error e;
+    int32_t alloc;
+    
+    //read file table entry <inode>
+    if ((e = read_ftent(id, vol_addr, *inode, &ftent))!= EXIT_SUCCESS) return e;
+
+    alloc = size - ftent.size;
+        
 }
 
 #define TFS_ERR_OPERATION 214
@@ -796,22 +1037,6 @@ path_follow (const char * path,  char **entry) {
   }
 }
 
-typedef struct _file{
-  disk_id id;
-  uint32_t vol;
-  uint32_t inode;
-  uint32_t size;
-  uint32_t offset;
-  uint32_t direct;
-  uint32_t indirect1;
-  uint32_t indirect2;
-  block bdirect;
-  block refdirect;
-  block bindirect1;
-  block refindirect1;
-  block bindirect2;
-  block refindirect2;
-};
 
 struct _file*
 openfile(disk_id id, uint32_t vol, uint32_t inode, uint32_t offset){

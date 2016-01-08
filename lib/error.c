@@ -26,10 +26,13 @@ static char* _errlist[] = {
   "Wrong block name",
   "Wrong value of the partition (negative)",
   "No free volume blocks remaining",
-  "Corrupted volume (data mismatch)",
+  "Volume free block list corrupted",
   "File reached maximum supported size",
   "File table full",
-  "File table corrupted"
+  "File table free entry list corrupted",
+  "File size value corrupted",
+  "Empty file",
+  "Corrupted index structure"
 };
 
 /**

@@ -112,7 +112,7 @@ freeblock_pop (disk_id id, uint32_t vol_addr, uint32_t* b_addr);
  * @param inode file inode
  * @param id disk id
  * @param vol partition number
- * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
+ * @return error
  */
 error
 freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode);
@@ -124,11 +124,21 @@ freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode);
  * @param id disk id
  * @param vol partition number
  * @param inode file inode number
- * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
+ * @return error 
  */
 error
 freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode);
 
+/**
+ * @brief Resize file <inode> to size <size>
+ *
+ * @param id disk id
+ * @param vol partition number
+ * @param inode file inode number
+ * @param size new file size
+ */
+error
+tfs_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size);
 
 /**
  * @brief Push the directory entry to the directory
