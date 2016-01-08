@@ -33,8 +33,11 @@
 #define TFS_VOLUME_FREE_FILE_COUNT_INDEX INTX(6)  /***< TFS free file count index in volume superblock */
 #define TFS_VOLUME_FIRST_FREE_FILE_INDEX INTX(7)  /***< TFS first free file index in volume superblock */
 
+#define INT_PER_BLOCK (TFS_VOLUME_BLOCK_SIZE/INT_SIZE) /***< Number of integers per block*/
 #define TFS_FILE_TABLE_INDEX 1                    /***< TFS index of the file table */
 #define TFS_DIRECT_BLOCKS_NUMBER 10               /***< TFS direct data blocks number in file table entry */
+#define TFS_INDIRECT1_CAPACITY INT_PER_BLOCK      /***< TFS file's maximum number of indirect1 blocks */
+#define TFS_INDIRECT2_CAPACITY (INT_PER_BLOCK*INT_PER_BLOCK) /***< TFS file's maximum number of indirect2 blocks */
 #define TFS_FILE_TABLE_ENTRY_SIZE INTX(6+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS file table entry size */
 #define TFS_FILE_SIZE_INDEX INTX(0)               /***< TFS file size index in file table entry */
 #define TFS_FILE_TYPE_INDEX INTX(1)               /***< TFS file type index in file table entry */
@@ -58,7 +61,6 @@
 #define TFS_DIRECTORY_ENTRY_INDEX(i) ((i)*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
 #define TFS_FILE_MAX_SIZE (B_SIZE*(TFS_DIRECT_BLOCKS_NUMBER + (B_SIZE/INT_SIZE)*(1 + (B_SIZE/INT_SIZE))))
-  
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -81,25 +83,51 @@ struct dirent {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
-* @brief Puch the block at b_addr to free blocks list
+ * @brief Push the block <b_addr> to the free blocks list
  * 
- * @param b_addr 
+ * @param b_addr block index on the volume
+ * @param id disk id
+ * @param vol partition number
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
  */
 error
-freeblock_push (const disk_id id, const uint32_t vol_addr, const uint32_t b_addr);
-
+freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr);
 
 
 /**
  * @brief Remove the block at b_addr of the free blocks list
  * 
- * @param b_addr 
+ * @param id disk id
+ * @param vol partition number
+ * @param b_addr block volume address
  * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
  */
 error
-freeblock_rm (const disk_id id, const uint32_t vol_addr, uint32_t * b_addr);
+freeblock_pop (disk_id id, uint32_t vol_addr, uint32_t* b_addr);
 
+
+/**
+ * @brief Push the file entry <inode> to the free file entry list
+ * 
+ * @param inode file inode
+ * @param id disk id
+ * @param vol partition number
+ * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
+ */
+error
+freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode);
+
+
+/**
+ * @brief Remove the file entry <inode> from the free file entry list
+ * 
+ * @param id disk id
+ * @param vol partition number
+ * @param inode file inode number
+ * @return error EXIT_SUCCESS, TFS_ERRADDR if address is not valid
+ */
+error
+freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode);
 
 
 /**
@@ -131,8 +159,9 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
  * @brief Add a data block to a file
  *
  * Add the block at b_addr to the file of inode file number 
- * @param inode 
- * @param b_addr 
+ *
+ * @param inode file inode
+ * @param b_addr block index on the volume
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if adress is not valid
  *         TFS_ERRINODE if the inode is not valid
  */
@@ -144,23 +173,26 @@ file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr);
 /**
  * @brief Remove a data block from a file
  *
- * Remove the data block at b_adrr to the file of inode file number
- * @param inode 
- * @param b_addr 
+ * Remove the data block <b_adrr> from the file <inode>
+ *
+ * @param inode file inode
+ * @param b_addr block index in the file
  * @return error EXIT_SUCCESS, TFS_ERRBLOCK if adress is not valid,
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_addr);
+file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_file_addr);
 
 
 
 /**
  * @brief Free all data blocks of a file
  *
- * Free all data block of the file of inode file number
- * @param inode 
- * @param b_addr 
+ * Free all data blocks of the <inode> file
+ *
+ * @param inode file inode
+ * @param vol partition index
+ * @param id disk id number 
  * @return error EXIT_SUCCESS, TFS_ERRINODE if the inode is not valid
  */
 error

@@ -22,7 +22,14 @@ static char* _errlist[] = {
   "New empty disk",
   "Wrong block index",
   "Wrong partition index",
-  "Partition size does not match disk size"
+  "Partition size does not match disk size",
+  "Wrong block name",
+  "Wrong value of the partition (negative)",
+  "No free volume blocks remaining",
+  "Corrupted volume (data mismatch)",
+  "File reached maximum supported size",
+  "File table full",
+  "File table corrupted"
 };
 
 /**
