@@ -76,6 +76,12 @@ struct dirent {
   char           d_name[TFS_NAME_MAX];  /**< entry name     */
 };
 
+/**
+ * @brief File index tree
+ *
+ * A structure which represents a file's data block tree
+ */
+typedef struct _index* _index;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,41 +135,6 @@ freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode);
 error
 freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode);
 
-/**
- * @brief Resize file <inode> to size <size>
- *
- * @param id disk id
- * @param vol partition number
- * @param inode file inode number
- * @param size new file size
- */
-error
-tfs_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size);
-
-/**
- * @brief Push the directory entry to the directory
- * 
- * @param dir 
- * @param ent
- * @return error EXIT_SUCCESS, TFS_FULL if the volume is full
- */
-error
-directory_pushent (const disk_id id, const uint32_t vol_addr,
-		   const uint32_t inode, const struct dirent *entry );
-
-
-
-/**
- * @brief Remove a directory entry
- *
- *  
- * @param inode 
- * @return error EXIT_SUCCESS
- */
-error
-directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
-
-
 
 /**
  * @brief Add a data block to a file
@@ -176,8 +147,7 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr);
-
+fileblock_add (disk_id id, uint32_t vol_addr, uint32_t inode, _index index);
 
 
 /**
@@ -191,8 +161,42 @@ file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr);
  *         TFS_ERRINODE if the inode is not valid
  */
 error
-file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_file_addr);
+fileblock_rm (disk_id id, uint32_t vol, uint32_t inode, _index index);
 
+
+/**
+ * @brief Change size of file <inode> to size <size>
+ *
+ * @param id disk id
+ * @param vol partition number
+ * @param inode file inode number
+ * @param size new file size
+ */
+error
+file_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size);
+
+
+/**
+ * @brief Push the directory entry to the directory
+ * 
+ * @param dir 
+ * @param ent
+ * @return error EXIT_SUCCESS, TFS_FULL if the volume is full
+ */
+error
+directory_pushent (const disk_id id, const uint32_t vol_addr,
+		   const uint32_t inode, const struct dirent *entry );
+
+
+/**
+ * @brief Remove a directory entry
+ *
+ *  
+ * @param inode 
+ * @return error EXIT_SUCCESS
+ */
+error
+directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
 
 
 /**
@@ -207,7 +211,6 @@ file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_file_addr);
  */
 error
 file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
-
 
 
 #define TFS_PATHLEAF 1
@@ -261,7 +264,6 @@ file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
  */
 error
 path_follow (const char * path, char ** entry);
-
 
 
 #endif // TFSLL_H

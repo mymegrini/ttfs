@@ -169,8 +169,12 @@ read_tfsdescription (disk_id id, uint32_t vol_addr, tfs_description * desc){
   return EXIT_SUCCESS;
 }
 
-static error
-index_init(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index){
+////////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////
+
+error
+index_init(disk_id id, uint32_t vol_addr, uint32_t inode, _index index){
   error e;
   tfs_ftent ftent;
 
@@ -219,8 +223,8 @@ index_init(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index){
   return F_SIZE_CORRUPTED;
 }
 
-static error
-fileblock_add(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index)
+error
+fileblock_add(disk_id id, uint32_t vol_addr, uint32_t inode, _index index)
 {
   error e;
   uint32_t b_addr;
@@ -309,8 +313,8 @@ fileblock_add(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* inde
   return I_CORRUPTED;
 }
 
-static error
-fileblock_rm(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index)
+error
+fileblock_rm(disk_id id, uint32_t vol_addr, uint32_t inode, _index index)
 {
   error e;
   tfs_ftent ftent;
@@ -392,10 +396,6 @@ fileblock_rm(disk_id id, uint32_t vol_addr, uint32_t inode, struct _index* index
   //case 6: corrupted index
   return I_CORRUPTED;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// PUBLIC FUNCTIONS
-////////////////////////////////////////////////////////////////////////////////
 
 error
 freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr) {
@@ -521,48 +521,105 @@ freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
 }
 
 error
-tfs_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size){
+file_realloc (disk_id id, uint32_t vol_addr, uint32_t* inode, uint32_t size){
     tfs_ftent ftent;
     error e;
-    int32_t alloc;
+    int32_t bsize;
     
     //read file table entry <inode>
     if ((e = read_ftent(id, vol_addr, *inode, &ftent))!= EXIT_SUCCESS) return e;
 
-    alloc = size - ftent.size;
-        
+    //compare new size to old size
+    if (size == ftent.size) return EXIT_SUCCESS;
+
+    //calculate file block size
+    bsize = ((ftent.size-1) %TFS_VOLUME_BLOCK_SIZE)+1;
+
+    if (size > ftent.size){
+    //file size increase
+      while (bsize*TFS_VOLUME_BLOCK_SIZE<size){
+
+      }
+    }
+    else {
+    //file size decrease
+      while ((bsize-1)*TFS_VOLUME_BLOCK_SIZE>size){
+
+      }
+    }
+    return EXIT_SUCCESS;
+}
+
+#define WRONG_BLOCK_FILE_ADDRESS 31
+error
+find_addr(disk_id id, uint32_t vol, uint32_t inode,
+		uint32_t b_file_addr, uint32_t* b_addr){
+  block b;
+  tfs_ftent ftent;
+  error e;
+
+  //read <inode> file table entry
+  if ((e = read_ftent(id, vol, inode, &ftent))!=EXIT_SUCCESS) return e;
+  
+  //from tfs_indirect
+  if (b_file_addr<TFS_DIRECT_BLOCKS_NUMBER){
+    //read b_addr from file table entry
+    *b_addr = ftent.tfs_direct[*b_addr];
+    return EXIT_SUCCESS;
+  }
+
+  b=new_block();
+  //from tfs_indirect1
+  b_file_addr-=TFS_DIRECT_BLOCKS_NUMBER;
+  if (b_file_addr<TFS_INDIRECT1_CAPACITY){
+    //read tfs_indirect1 block
+    if ((e = read_block(id, b, vol+ftent.tfs_indirect1))!=EXIT_SUCCESS)
+      {free(b); return e;}
+    //read b_addr from block
+    rintle(b_addr, b, b_file_addr);
+    free(b);
+    return EXIT_SUCCESS;
+  }
+
+  //from tfs_indirect2
+  b_file_addr-=TFS_INDIRECT1_CAPACITY;
+  if (b_file_addr<TFS_INDIRECT2_CAPACITY){
+    uint32_t indirect1_addr;
+    //read tfs_indirect2 block
+    if ((e = read_block(id, b, vol+ftent.tfs_indirect2))!=EXIT_SUCCESS)
+      {free(b); return e;}
+    //read tfs_indirect1 address from block
+    rintle(&indirect1_addr, b, b_file_addr*(TFS_VOLUME_BLOCK_SIZE/INT_SIZE));
+    //read tfs_indirect1 block
+    if ((e = read_block(id, b, indirect1_addr))!=EXIT_SUCCESS)
+      {free(b); return e;}
+    //read b_address from block
+    rintle(b_addr, b, b_file_addr%(TFS_VOLUME_BLOCK_SIZE/INT_SIZE));
+    free(b);
+    return EXIT_SUCCESS;    
+  }
+  free(b);
+  return WRONG_BLOCK_FILE_ADDRESS;
 }
 
 #define TFS_ERR_OPERATION 214
 #define DIR_BLOCKFULL -1
-/*
-int
-find_freedirent (block b) {
-  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; i++) {
-    if (b->data[TFS_DIRECTORY_ENTRY_INDEX(i) + SIZEOF_INT] == 0) {
-      // free entry
-      return TFS_DIRECTORY_ENTRY_INDEX(i);
-    }
-  }
-  return DIR_BLOCKFULL;
-}
-
 
 error
 directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
 		   const struct dirent *entry){
   tfs_description desc;
+  tfs_ftent ftent;
+  block b = new_block();
+  const uint32_t ft_inode_baddr = INO_FTBLOCK(inode);
+  
   error e = read_tfsdescription(id, vol_addr, &desc);
   if (e != EXIT_SUCCESS)
     return e;
 
-  // Read filetable entry
-  const uint32_t ft_inode_baddr = INO_FTBLOCK(inode);
-  const uint32_t inode_bpos = INO_BPOS(inode);
-  block b = new_block();
-  read_block(id, b, vol_addr + ft_inode_baddr);
-  tfs_ftent ftent;
-  read_ftent(b, inode_bpos, &ftent);
+  //read <inode> file table entry
+  if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
+  
   // It might be useless to check the type, but for now there is a test
   if (ftent.type != TFS_DIRECTORY_TYPE) {
     free(b);
@@ -571,7 +628,7 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
   // DIRECTORY FULL
   if (ftent.size == TFS_FILE_MAX_SIZE){
     free(b);
-    return TFS_FILE_FULL;
+    return F_FULL;
   }
   // actualize size in the cache for further writing
   // before incrementation, size at least one time TFS_DIRECTORY_ENTRY_SIZE
@@ -590,7 +647,7 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
       // if a new block is needed, add it to tfs_direct
       if (ftent.tfs_direct[direct_idx] == 0) {
 	isnewblock = 1;
-	e = freeblock_rm(id, vol_addr, &b_addr);
+	e = freeblock_pop(id, vol_addr, &b_addr);
 	if (e != EXIT_SUCCESS) {
 	  free(b);
 	  return e;
@@ -641,7 +698,7 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
       rintle(&b_addr, b_indir1, indir_b_pos);
       // provide new block if needed
       if (b_addr == 0) {
-	freeblock_rm(id, vol_addr, &b_addr);
+	freeblock_pop(id, vol_addr, &b_addr);
 	wintle(b_addr, b_indir1, indir_b_pos);
 	if ((e = write_block(id, b_indir1, vol_addr + b_addr) != EXIT_SUCCESS))
 	  {
@@ -684,12 +741,12 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
 	free(b_indir1);
 	return e;
       }
-    uint32_t b_indir1_pos = INDIRECT2_IDX1(ftent.size);
+    uint32_t b_indir1_pos = INDIRECT1_IDX(ftent.size);
     rintle(&b_indir2_addr, b_indir1, b_indir1_pos);
     // provide new indir2 block if needed
     if (b_indir2_addr == 0)
       {
-	if ((e = freeblock_rm(id, vol_addr, &b_indir2_addr)) != EXIT_SUCCESS)
+	if ((e = freeblock_pop(id, vol_addr, &b_indir2_addr)) != EXIT_SUCCESS)
 	  {
 	    free(b);
 	    free(b_indir1);
@@ -716,12 +773,12 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
 	free(b_indir2);
 	return e;
       }
-    uint32_t b_indir2_pos = INDIRECT2_IDX2(ftent.size);
+    uint32_t b_indir2_pos = INDIRECT2_IDX(ftent.size);
     rintle(&b_addr, b_indir2, b_indir2_pos);
     block b_data;
     // provide new data block if needed
     if (b_indir2_addr == 0) {
-      if ((e = freeblock_rm(id, vol_addr, &b_addr)) != EXIT_SUCCESS) {
+      if ((e = freeblock_pop(id, vol_addr, &b_addr)) != EXIT_SUCCESS) {
 	free(b);
 	free(b_indir2);
 	return e;
@@ -761,8 +818,6 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
   return EXIT_FAILURE;
 }
 
-
-
 error
 directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry) {
   
@@ -770,134 +825,57 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry) 
 }
 
 
-
+// Macros for path_follow
+#define PATH_STRSEP "/"
+#define PATH_FPFX "FILE://"
+#define PATH_FPFXLEN 7
+#define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
 error
-file_pushblock (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t b_addr) {
-  tfs_ftent ftent;
-  block b = new_block();
-  error e = read_block(id,b,vol_addr + INO_FTBLOCK(inode));
-  if(e != EXIT_SUCCESS){
-    free(b);
-    return e;
-  }
-  read_ftent(b,INO_BPOS(inode),&ftent);
-  int i = 0;
-  for(i=0;i<TFS_DIRECT_BLOCKS_NUMBER;i++){
-    if(ftent.tfs_direct[i] == 0){
-      ftent.tfs_direct[i] = b_addr;
-      write_ftent(b,INO_BPOS(inode),&ftent);
-      e = write_block(id,b,vol_addr + INO_FTBLOCK(inode));
-      free(b);
-      return e;
-    }
-  }
-  
-  e = read_block(id,b,vol_addr + ftent.tfs_indirect1);
-  if(e != EXIT_SUCCESS){
-    free(b);
-    return e;
-  }
-  uint32_t value;
-  int j = 0;
-  for(j=0;j<(TFS_VOLUME_BLOCK_SIZE/SIZEOF_INT);j++){
-    rintle(&value,b,j*SIZEOF_INT);
-    if(value == 0){
-      wintle(b_addr,b,j*SIZEOF_INT);
-      e = write_block(id,b,vol_addr + ftent.tfs_indirect1);
-      free(b);
-      return e;
-    }
-  }
-  
-  block b_i = new_block();
-  e = read_block(id,b,vol_addr + ftent.tfs_indirect2);
-  if(e != EXIT_SUCCESS){
-    free(b_i);
-    free(b);
-    return e;
-  }
-  uint32_t addr;
-  int k = 0;
-  for(k=0;k<(TFS_VOLUME_BLOCK_SIZE/SIZEOF_INT);k++){
-    rintle(&addr,b,k*SIZEOF_INT);
-    e = read_block(id,b_i,vol_addr + addr);
-    if(e != EXIT_SUCCESS){
-      free(b_i);
-      free(b);
-      return e;
-    }
-    int l = 0;
-    for(l=0;l<(TFS_VOLUME_BLOCK_SIZE/SIZEOF_INT);l++){
-      rintle(&value,b_i,l*SIZEOF_INT);
-      if(value == 0){
-	wintle(b_addr,b_i,l*SIZEOF_INT);
-	e = write_block(id,b_i,vol_addr + addr);
-	free(b_i);
-	free(b);
-	return e;
+path_follow (const char * path,  char **entry) {
+  static char *workpath = NULL;
+  if (path == NULL) {
+    if (workpath == NULL)
+      return TFS_ERRPATH_NOWORKINGPATH;
+    else {
+      *entry = strtok(NULL, PATH_STRSEP);
+      if (*entry == NULL) {
+	free(workpath);
+	workpath = NULL;
+	return TFS_PATHLEAF;
       }
+      else
+	return EXIT_SUCCESS;
     }
   }
-
-  free(b_i);
-  free(b);
-  return TFS_ERR_BIGFILE;
+  else {
+    if (PATH_ISVALID(path)) {
+      if (workpath != NULL)
+	free(workpath);
+      workpath = strdup(path);
+      strtok(workpath, PATH_STRSEP);
+      return EXIT_SUCCESS;
+    }
+    else
+      return TFS_ERRPATH_NOPFX;
+  }
 }
 
-#define WRONG_BLOCK_FILE_ADDRESS 31
-static error
-get_volume_addr(disk_id id, uint32_t vol, uint32_t inode,
-		uint32_t b_file_addr, uint32_t* b_addr){
-  block b = new_block();
-  tfs_ftent ftent;
-  error e;
-  
-  //read filetable block
-  if ((e = read_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
-  //read file table entry from block
-  read_ftent(b, INO_BPOS(inode), ftent);
-  
-  //from tfs_indirect
-  if (b_file_addr<TFS_DIRECT_BLOCKS_NUMBER){
-    //read b_addr from file table entry
-    b_addr = ftent->tfs_direct[b_addr];
-    free(b);
-    return EXIT_SUCCESS;
-  }
 
-  b=new_block();
-  //from tfs_indirect1
-  b_file_addr-=TFS_DIRECT_BLOCKS_NUMBER;
-  if (b_file_addr<TFS_INDIRECT1_CAPACITY){
-    //read tfs_indirect1 block
-    if ((e = read_block(id, b, vol+ftent->tfs_inditect1))!=EXIT_SUCCESS)
-      {free(b); return e;}
-    //read b_addr from block
-    rintle(b_addr, b, b_file_addr);
-    free(b);
-    return EXIT_SUCCESS;
+////////////////////////////////////////////////////////////////////////////////
+// TRASH
+////////////////////////////////////////////////////////////////////////////////
+/*
+int
+find_freedirent (block b) {
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; i++) {
+    if (b->data[TFS_DIRECTORY_ENTRY_INDEX(i) + SIZEOF_INT] == 0) {
+      // free entry
+      return TFS_DIRECTORY_ENTRY_INDEX(i);
+    }
   }
-
-  //from tfs_indirect2
-  b_file_addr-=TFS_INDIRECT1_CAPACITY;
-  if (b_file_addr<TFS_INDIRECT2_CAPACITY){
-    uint32_t indirect1_addr;
-    //read tfs_indirect2 block
-    if ((e = read_block(id, b, vol+ftent->tfs_inditect2))!=EXIT_SUCCESS)
-      {free(b); return e;}
-    //read tfs_indirect1 address from block
-    rintle(indirect1_addr, b, b_file_addr*(TFS_VOLUME_BLOCK_SIZE/INT_SIZE));
-    //read tfs_indirect1 block
-    if ((e = read_block(id, b, indirect1_addr))!=EXIT_SUCCESS)
-      {free(b); return e;}
-    //read b_address from block
-    rintle(b_addr, b, b_file_addr%(TFS_VOLUME_BLOCK_SIZE/INT_SIZE));
-    free(b);
-    return EXIT_SUCCESS;    
-  }
-  free(b);
-  return WRONG_BLOCK_FILE_ADDRESS;
+  return DIR_BLOCKFULL;
 }
+
 
 static error
 put_volume_addr(disk_id id, uint32_t vol, uint32_t inode,
@@ -962,111 +940,9 @@ put_volume_addr(disk_id id, uint32_t vol, uint32_t inode,
   return WRONG_BLOCK_FILE_ADDRESS;
 }
 
-error
-free_indirectblocks(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_file_addr){
-  
-}
-
-error
-file_rmblock(disk_id id, uint32_t vol, uint32_t inode, uint32_t b_file_addr){
-  block b = new_block();
-  tfs_ftent ftent;
-  uint32_t b_addr;
-  uint32_t b_lastaddr;
-  uint32_t b_file_lastaddr;
-  error e;
-  
-  //read filetable block
-  if ((e = read_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
-    {free(b); return e;}
-  //read file table entry from block
-  read_ftent(b, INO_BPOS(inode), ftent);
-  //calculate last file block address
-  b_file_lastaddr = (ftent.size-1)/TFS_VOLUME_BLOCK_SIZE;
-  
-  //get volume address of block to be removed
-  if((e = get_volume_addr(id,vol,inode,b_file_addr,&b_addr))!=EXIT_SUCCESS)
-    {free(b); return e;}
-  //get volume address of last file block
-  if((e = get_volume_addr(id,vol,inode,b_file_lastaddr,&b_addr))!=EXIT_SUCCESS)
-    {free(b); return e;}
-  return EXIT_SUCCESS;
-}
-
-
-
-error
-file_freeblocks (disk_id id, uint32_t vol, uint32_t inode) {
-  
-  return EXIT_SUCCESS;
-}
-
-
-// Macros for path_follow
-#define PATH_STRSEP "/"
-#define PATH_FPFX "FILE://"
-#define PATH_FPFXLEN 7
-#define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
-error
-path_follow (const char * path,  char **entry) {
-  static char *workpath = NULL;
-  if (path == NULL) {
-    if (workpath == NULL)
-      return TFS_ERRPATH_NOWORKINGPATH;
-    else {
-      *entry = strtok(NULL, PATH_STRSEP);
-      if (*entry == NULL) {
-	free(workpath);
-	workpath = NULL;
-	return TFS_PATHLEAF;
-      }
-      else
-	return EXIT_SUCCESS;
-    }
-  }
-  else {
-    if (PATH_ISVALID(path)) {
-      if (workpath != NULL)
-	free(workpath);
-      workpath = strdup(path);
-      strtok(workpath, PATH_STRSEP);
-      return EXIT_SUCCESS;
-    }
-    else
-      return TFS_ERRPATH_NOPFX;
-  }
-}
-
-
-struct _file*
-openfile(disk_id id, uint32_t vol, uint32_t inode, uint32_t offset){
-  tfs_ftent ftent;
-  block b = new_block();
-  
-  //allocate new structure
-  index* index = (index *)malloc(sizeof(index));
-  
-  //read filetable block
-  if ((e = read_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
-    {free(b); return e;}
-  //read file table entry from block
-  read_ftent(b, INO_BPOS(inode), ftent);
-
-  index->id = id;
-  index->vol = vol;
-  index->inode = inode;
-  index->size = ftent.size-1;
-  //offset too big
-  if (offset>=index->size){free(index); return NULL;}
-  index->offset = offset;
-  index->direct = DIRECT_IDX(offset);
-  index->indirect1 = INDIRECT1_IDX(offset);
-  index->indirect2 = INDIRECT2_IDX(offset);
-  index->
-}
+ */
 
 //////////////////////////////////////////////////////////////////////
 // $Log:$
 //
 
-*/
