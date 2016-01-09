@@ -1,4 +1,4 @@
-Tiny Toy File System project folder description
+Tiny Toy File System project description
 
 bin: contains executables (contains .gitignore)
 doc: contains documentation
@@ -7,8 +7,17 @@ lib: contains library source files
 obj: contains compiler-generated object files (contains .gitignore)
 src: contains source files
 
-Makefile: make command instruction tree
-setup.sh: launches 'make' command
-	  adds '$PWD/bin' folder to PATH environment variable
-	  switches to 'dev' folder where disks located
-	  > launch with 'source setup.sh'
+Makefile:
+	make command instruction tree
+setup.sh:
+	launches 'make' command
+	adds '$PWD/bin' folder to PATH environment variable
+	adds '$PWD/lib' folder to DYNAMIC LIBRARY environment variables
+
+INSTALLATION GUIDE
+	> execute shell command 'source setup.sh'
+
+Authors :
+	Victor		Fontaine
+	Mohammed Younes Megrini
+	Nicolas  	Scotto Di Perto
