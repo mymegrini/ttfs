@@ -104,8 +104,6 @@ error start_disk(char *name,disk_id *id){
     return D_OPEN_ERR;
   }
 
-  flockfile(stream); //obtaining lock on disk
-
   *id = i;
 
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
@@ -203,7 +201,6 @@ error stop_disk(disk_id id){
   
   if (fclose(_disk[id]->stream)!=0) e = D_STOP_FAIL;
   free(_disk[id]);
-
   return e;
 }
 
