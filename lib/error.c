@@ -35,7 +35,8 @@ static char* _errlist[] = {
   "Corrupted index structure",
   "Block file address out of bounds",
   "Attempt to stop disk failed",
-  "Setting permissions for disk failed"
+  "Setting permissions for disk failed",
+  "Semaphore type unrecognized"
 };
 
 /**

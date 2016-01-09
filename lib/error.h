@@ -66,6 +66,7 @@ void testerror(char* msg, error err);
 #define B_OUTOFBOUND 23     /**< Block file address exceeds maximum file size >*/
 #define D_STOP_FAIL 24      /**< Attempt to sync disk failed >*/
 #define D_PERM_FAIL 25      /**< Setting permissions for disk failed >*/
+#define S_WRONGTYPE 26      /**< Semaphore type unrecognized */
 
 /**
  * @brief This variable can store an error
