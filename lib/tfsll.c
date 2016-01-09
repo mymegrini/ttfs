@@ -32,6 +32,15 @@
 #define LASTBYTE_POS(fileindex) ((fileindex)%TFS_VOLUME_BLOCK_SIZE)
 
 #define TFS_ERR_BIGFILE 100
+
+#define SEM_FBL_T 0
+#define SEM_FEL_T 1
+#define SEM_FILE_T 2
+#define SEM_FBL_S "semb"
+#define SEM_FEL_S "semt"
+#define SEM_FILE_S "semf"
+#define SEM_NAME_LEN NAME_MAX-4
+
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +176,35 @@ read_tfsdescription (disk_id id, uint32_t vol_addr, tfs_description * desc){
   
   free(b);
   return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Creates a semaphore name using disk name
+ * @param[in] id Disk id
+ * @param[in] vol volume address
+ * @param[in] type type of semaphore (FBL, FEL, FILE)
+ * @param[out] name to store semaphone name (maximum size NAME_MAX-4)
+ * @return Returns an error if encountered
+ */
+static error
+sem_name(char* name, int type, disk_id id, uint32_t vol, uint32_t inode){
+  d_stat stat;
+  disk_stat(id, &stat);
+  
+  switch(type){
+  case SEM_FBL_T:
+    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d", SEM_FBL_S, stat->name, vol_addr);
+    return EXIT_SUCCESS;    
+  case SEM_FEL_T:
+    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d", SEM_FEL_S, stat->name, vol_addr);
+    return EXIT_SUCCESS;    
+  case SEM_FILE_T:    
+    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d-%d",
+	     SEM_FILE_S, stat->name, vol_addr, inode);
+    return EXIT_SUCCESS;
+  default:    
+    return S_WRONGTYPE;    
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -584,7 +622,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
   
   //test if block address is reasonable
   if (b_file_addr>((ftent.size)-1)/TFS_VOLUME_BLOCK_SIZE)
-    return B_OUTOFBOUND;
+    return B_OUTOFBOUNDS;
   
   //from tfs_indirect
   if (b_file_addr<TFS_DIRECT_BLOCKS_NUMBER){
