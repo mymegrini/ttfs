@@ -27,7 +27,7 @@ int tfs_rmdir(const char *path){
  * 
  * 
  */
-int tfs_rename(const char *old, const char *new){
+int tfs_rename(disk_id id, uint32_t vol_addr, const char *old, const char *new){
   return 0;
 }
 
