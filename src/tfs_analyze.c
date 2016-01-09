@@ -56,7 +56,7 @@ error tfs_analyze(char *name,int mode,int partition){
   if(mode & MODE_DISK){
     printf("\n\t\t\tDISK %s :\n\n",name);
  
-    printf("%-22s %6d blocks %10d bytes\n\n","Size of this disk :",d_s.size,d_s.size*B_SIZE);
+    printf("%-22s %6d blocks %10d bytes\n\n","Size of this disk :",d_s.size,d_s.size*D_BLOCK_SIZE);
     printf("%-22s %6d \n\n","Number of partitions :",d_s.npart);
   }
   
@@ -71,9 +71,9 @@ error tfs_analyze(char *name,int mode,int partition){
      uint32_t magic_n;
      rintle(&magic_n,b_zero,TFS_MAGIC_NUMBER_INDEX);
      if(magic_n == TFS_MAGIC_NUMBER){
-       printf("%-20d %15d %15d %13s\n",i,d_s.part[i],d_s.part[i]*B_SIZE,"tfs ");  
+       printf("%-20d %15d %15d %13s\n",i,d_s.part[i],d_s.part[i]*D_BLOCK_SIZE,"tfs ");  
      }else{
-       printf("%-20d %15d %15d %13s\n",i,d_s.part[i],d_s.part[i]*B_SIZE,"unknow");
+       printf("%-20d %15d %15d %13s\n",i,d_s.part[i],d_s.part[i]*D_BLOCK_SIZE,"unknow");
      }
    }
    free(b_zero);
@@ -89,9 +89,9 @@ error tfs_analyze(char *name,int mode,int partition){
    free(b_zero_part);
    printf("%-20s %15s %15s %15s\n","Partition Index","Size (blocks)","Size (bytes)","File System");
    if(magic_n_p == TFS_MAGIC_NUMBER)
-     printf("%-20d %15d %15d %13s\n",(partition),d_s.part[partition],d_s.part[partition]*B_SIZE,"tfs ");
+     printf("%-20d %15d %15d %13s\n",(partition),d_s.part[partition],d_s.part[partition]*D_BLOCK_SIZE,"tfs ");
    else
-     printf("%-20d %15d %15d %13s\n",(partition),d_s.part[partition],d_s.part[partition]*B_SIZE,"unknow");
+     printf("%-20d %15d %15d %13s\n",(partition),d_s.part[partition],d_s.part[partition]*D_BLOCK_SIZE,"unknow");
  }
 
  return EXIT_SUCCESS;

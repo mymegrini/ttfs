@@ -3,6 +3,12 @@
 #define STRBADCHAR (-1)
 #define UINT32TOOBIG (-10)
 
+
+#define DEF_PATH "dev/"    /**< preferred disk location */
+#define DEF_NAME "disk"    /**< default disk name */
+#define DEF_EXT ".tfs"    /**< preferred disk extension */
+#define DEF_FILENAME DEF_NAME DEF_EXT    /**< default filename "disk.tfs" */
+
 /**
  * atou cast a string to a long long int destined to
  * to be a uint32_t.
@@ -14,9 +20,6 @@
  */
 long long int
 atou ( char *s );
-
-
-
 
 /**
  * @brief This function waits for an answer from the user

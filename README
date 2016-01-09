@@ -12,7 +12,7 @@ Makefile:
 setup.sh:
 	launches 'make' command
 	adds '$PWD/bin' folder to PATH environment variable
-	adds '$PWD/lib' folder to DYNAMIC LIBRARY environment variables
+	adds '$PWD/bin' folder to DYNAMIC LIBRARY environment variables
 
 INSTALLATION GUIDE
 	> execute shell command 'source setup.sh'

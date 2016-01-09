@@ -1,14 +1,9 @@
-
 #include "ll.h"
 #include "error.h"
 #include "block.h"
 #include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
 #include <string.h>
-
-#define SIZE_INT 4
+#include <stdlib.h>
 
 #define B0_IDX_DSIZE 0    /**< index of disk size */
 #define B0_IDX_PRTCOUNT 4    /**< index of number of partition */
@@ -21,7 +16,7 @@ typedef uint32_t ad_b;    /**< address for blocks in the disk */
  */
 typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk */
-  int fd;          /**< file descriptor */
+  FILE* stream;          /**< file stream */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX+1];    /**< size of partitions, null at the creation. */
@@ -47,16 +42,13 @@ static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an ind
  * \see D_READ_ERR
  */
 error read_physical_block(disk_id id,block b,uint32_t num){
+
+  if (!DISKEXIST(id)) return D_WRONGID;
   
-  if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
-    // error message
-    return D_SEEK_ERR;
-    }
-  int r = read(_disk[id]->fd, b, B_SIZE);
-  if ( r == -1 ) {
-    // error message
+  if (fseek(_disk[id]->stream, D_BLOCK_SIZE*num, SEEK_SET) == -1 ) return D_SEEK_ERR;
+ 
+  if (fread(b, D_BLOCK_SIZE, 1, _disk[id]->stream) < D_BLOCK_SIZE)
     return D_READ_ERR;
-  }
     
   return EXIT_SUCCESS;
 }
@@ -77,20 +69,15 @@ error read_physical_block(disk_id id,block b,uint32_t num){
  * \see D_READ_ERR
  */
 error write_physical_block(disk_id id,block b,uint32_t num){
-
-  if ( num > _disk[id]->size ) {
-    // error message
-    return B_OUT_OF_DISK;
-  } else {
-    if ( lseek(_disk[id]->fd, B_SIZE*num, SEEK_SET) == -1 ) {
-      // error message
-      return D_SEEK_ERR;
-    }
-    if ( write(_disk[id]->fd, b,  B_SIZE) == -1 ) {
-      // error message
-      return D_WRITE_ERR;
-    }
-  }
+  
+  if (!DISKEXIST(id)) return D_WRONGID;
+  
+  if ( num >= _disk[id]->size ) return B_OUT_OF_DISK;
+  
+  if ( fseek(_disk[id]->stream, D_BLOCK_SIZE*num, SEEK_SET) == -1 ) return D_SEEK_ERR;
+  
+  if (fwrite(b, D_BLOCK_SIZE, 1, _disk[id]->stream) < D_BLOCK_SIZE)
+    return D_WRITE_ERR;
   
   return EXIT_SUCCESS;
 }
@@ -112,17 +99,19 @@ error start_disk(char *name,disk_id *id){
   if(i == DD_MAX) 
     return OD_FULL;
   
-  int new_fd = open(name,O_RDWR);
-  if(new_fd == -1){
+  FILE* stream = fopen(name, "r+");
+  if(stream == NULL){
     return D_OPEN_ERR;
   }
+
+  flockfile(stream); //obtaining lock on disk
 
   *id = i;
 
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
   dent->name[D_NAME_MAXLEN]=0;
   strncpy(dent->name, name, D_NAME_MAXLEN);
-  dent->fd=new_fd;
+  dent->stream=stream;
 
   _disk[i] = dent;
 
@@ -136,12 +125,12 @@ error start_disk(char *name,disk_id *id){
     return err_read;
   }
 
-  rintle(&dent->size,b_read,0*SIZE_INT);
-  rintle(&dent->npart,b_read,1*SIZE_INT);
+  rintle(&dent->size,b_read,0*INT_SIZE);
+  rintle(&dent->npart,b_read,1*INT_SIZE);
   
   int j = 0;
   for(j=0;j<dent->npart && j<D_PARTMAX;j++){
-    rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*SIZE_INT);
+    rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*INT_SIZE);
   }
   free(b_read);
   
@@ -158,7 +147,6 @@ error start_disk(char *name,disk_id *id){
 error read_block(disk_id id,block b,uint32_t num){
 
   if ( id >= DD_MAX || _disk[id] == NULL ) {
-    // error message
     return D_WRONGID;;
   }
   return read_physical_block(id, b, num);
@@ -176,7 +164,6 @@ error read_block(disk_id id,block b,uint32_t num){
 error write_block(disk_id id,block b,uint32_t num){
 
   if ( id >= DD_MAX || _disk[id] == NULL ) {
-    // error message
     return D_WRONGID;
   }
 
@@ -191,6 +178,11 @@ error write_block(disk_id id,block b,uint32_t num){
  * 
  */
 error sync_disk(disk_id id){
+
+  if ( id >= DD_MAX || _disk[id] == NULL ) {
+    return D_WRONGID;
+  }
+  
   return EXIT_SUCCESS;
 }
 
@@ -200,22 +192,19 @@ error sync_disk(disk_id id){
  * Frees all associated memory
  * 
  * 
- * 
+ * @see D_STOP_FAIL
  */
 error stop_disk(disk_id id){
-
+  error e = EXIT_SUCCESS;
+  
   if ( id >= DD_MAX || _disk[id] == NULL ) {
-    // error message
     return D_WRONGID;
   }
-
-  error e = sync_disk(id);
-  if ( e != EXIT_SUCCESS )   // mmh... should we realy stop the disk in that case ?
-    return e;
-
-  //free(_disk[id]->name);
+  
+  if (fclose(_disk[id]->stream)!=0) e = D_STOP_FAIL;
   free(_disk[id]);
-  return EXIT_SUCCESS;;
+
+  return e;
 }
 
 

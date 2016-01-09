@@ -4,10 +4,10 @@
 #include "error.h"
 #include "block.h"
 
-#define DD_MAX 100      /***< maximum number of open disk */
-#define D_PARTMAX 10    /***< maximum number of partitions in a disk */
-#define D_NAME_MAXLEN 79     /***< disk name maximum length */
-#define SIZEOF_INT 4    /**< size of an int */
+#define DD_MAX 100        /***< maximum number of open disks */
+#define D_PARTMAX 10      /***< maximum number of partitions in a disk */
+#define D_NAME_MAXLEN 79  /***< disk name maximum length */
+#define INT_SIZE 4      /**< size of an int */
 
 #define DISKEXIST(id) ( id < DD_MAX && _disk[id] != NULL )
 

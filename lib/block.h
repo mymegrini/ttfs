@@ -5,8 +5,12 @@
 #include <inttypes.h>
 #include "error.h"
 
-#define B_SIZE 1024    /***< block size */
+#define D_BLOCK_SIZE 1024    /***< block size */
 #define INT_SIZE 4
+
+#define B0_ADD_DSIZE 0    /**< Address of disk size */
+#define B0_ADD_NPART (INT_SIZE*1)    /**< Address of partition number */
+#define B0_ADD_FSTPART (B0_ADD_NPART+INT_SIZE)    /**< Address of first partition size */
 
 typedef uint8_t byte;    /**< a byte in the disk */
 typedef int16_t addr;    /**< byte address in a block */
@@ -18,7 +22,7 @@ typedef int16_t addr;    /**< byte address in a block */
  * A structure to represent blocks
  */
 struct block {
-  byte data[B_SIZE]; /**< the block contents */
+  byte data[D_BLOCK_SIZE]; /**< the block contents */
 };
 
 typedef struct block* block;   /**< a block is a pointer to a struct block */

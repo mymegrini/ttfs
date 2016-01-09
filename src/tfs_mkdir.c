@@ -16,7 +16,8 @@
 
 #include "tfs.h"
 #include "tfsll.h"
-#include "default.h"
+#include "utils.h"
+#include "block.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // OPTIONS

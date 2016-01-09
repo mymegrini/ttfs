@@ -33,7 +33,9 @@ static char* _errlist[] = {
   "File size value corrupted",
   "Empty file",
   "Corrupted index structure",
-  "Block file address out of bounds"
+  "Block file address out of bounds",
+  "Attempt to stop disk failed",
+  "Setting permissions for disk failed"
 };
 
 /**

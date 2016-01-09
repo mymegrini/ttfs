@@ -3,7 +3,6 @@
 #include "ll.h"
 #include "tfs.h"
 #include "utils.h"
-#include "default.h"
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
@@ -64,7 +63,7 @@ void init_sblock(int id, uint32_t pidx, uint32_t psize, int filecount){
   printf("Filesystem label= %s\n", (char*)&mn);
   
   testerror("init_sblock", wintle(TFS_VOLUME_BLOCK_SIZE, b, TFS_VOLUME_BLOCK_SIZE_INDEX));
-  printf("Block size= %dB\n", B_SIZE);
+  printf("Block size= %dB\n", D_BLOCK_SIZE);
   
   testerror("init_sblock", wintle(psize, b, TFS_VOLUME_BLOCK_COUNT_INDEX)); 
   printf("Volume block count= %d\n", psize);

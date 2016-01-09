@@ -1,12 +1,9 @@
 #include "ll.h"
 #include "error.h"
 #include "block.h"
-#include "block0.h"
-#include "default.h"
 #include "utils.h"
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <getopt.h>
 
@@ -137,7 +134,7 @@ part_force ( disk_id d_id, uint32_t *partsize, int nb_part, long long unsigned t
   read_block (d_id, b, 0);
   wintle( nb_part, b, B0_ADD_NPART);
   for ( int i = 0; i < nb_part; i++ )
-    wintle(partsize[i], b, B0_ADD_FSTPART+i*SIZEOF_INT);
+    wintle(partsize[i], b, B0_ADD_FSTPART+i*INT_SIZE);
   e = write_block( d_id, b, 0 );
   stop_disk( d_id );
   return e;
@@ -169,7 +166,7 @@ part_safe ( disk_id d_id, uint32_t *partsize, int nb_part, long long unsigned to
   read_block (d_id, b, 0);
   wintle( nb_part, b, B0_ADD_NPART);
   for ( int i = 0; i < nb_part; i++ )
-    wintle(partsize[i], b, B0_ADD_FSTPART+i*SIZEOF_INT);
+    wintle(partsize[i], b, B0_ADD_FSTPART+i*INT_SIZE);
   e = write_block( d_id, b, 0 );
   stop_disk( d_id );
   return e;
@@ -203,7 +200,7 @@ part_append(disk_id d_id, uint32_t *partsize, int nb_part, long long unsigned to
   
   wintle( dstat.npart + nb_part, b, B0_ADD_NPART);
   for ( int i = 0; i < nb_part; i++ )
-    wintle( partsize[i], b, B0_ADD_FSTPART + ((dstat.npart+i)*SIZEOF_INT) );
+    wintle( partsize[i], b, B0_ADD_FSTPART + ((dstat.npart+i)*INT_SIZE) );
   e = write_block( d_id, b, 0 );
   stop_disk( d_id );
 
