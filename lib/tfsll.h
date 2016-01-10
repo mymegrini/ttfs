@@ -254,7 +254,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
  *    char path[] = "FILE://disk/vol/entry1/entry2"
  *    if (path_follow(path, NULL) == TFS_ERRPATH) ...;
  * 
- * To follow the the previous path, you should now call
+ * To follow the previous path, you should now call
  * follow_path with a null path and the adress of an unitialized 
  * char*.
  * If the last call has reached a leaf, then TFS_PATHLEAF is returned
@@ -270,7 +270,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
  *     printf("Last entry %s was a leaf.\n");
  *  
  * If the working path has not been initialized by a first call
- * and you follow a path (with something likefollow_path(NULL, &entry))$
+ * and you follow a path (with something like follow_path(NULL, &entry))$
  * then error TFS_ERRPATH_NOWORKINGPATH is returned.
  *
  * About memory allocation:
