@@ -45,7 +45,7 @@ static char* _errlist[] = {
   "TFS_ERRPATH",
   "TFS_ENTRY_NOTFOUND",
   "TFS_ERRLOCK",
-  "TFS_FILENOTFOUN",
+  "File not found",
   "TFS_ERRPATH_HOST",
   "TFS_ERRPATH_PARTID",
   "TFS_FILENOTFOUND",

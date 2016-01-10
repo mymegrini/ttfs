@@ -210,10 +210,12 @@ sem_name(char* name, int type, disk_id id, uint32_t vol_addr, uint32_t inode){
   
   switch(type){
   case SEM_FBL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FBL_S, stat.name, vol_addr);
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d",
+	     SEM_FBL_S, stat.name, vol_addr);
     return e;    
   case SEM_FEL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FEL_S, stat.name, vol_addr);
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d",
+	     SEM_FEL_S, stat.name, vol_addr);
     return e;    
   case SEM_FILE_T:    
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d:%d",
@@ -1223,7 +1225,7 @@ find_inode (char *path, uint32_t *ino)
   // Not found
   closedir(parent);
   free(pathcpy);
-  return TFS_ERRPATH;  
+  return TFS_F_NOTFOUND;  
 }
 
 
