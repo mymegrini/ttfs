@@ -368,7 +368,7 @@ void rewinddir(DIR *dir){
   for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
     {
       char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
-      if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+      if (tfs_read(dir->fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
 	return ;
       else {
 	// fill buffer
