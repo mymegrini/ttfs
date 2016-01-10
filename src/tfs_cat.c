@@ -26,7 +26,7 @@ struct option options[2] = {
 
 
 void usage (char *argv0){
-  printf("Usage :\t%s name\n",argv0);
+  printf("Usage :\t%s <name>\n",argv0);
 }
 
 
@@ -42,14 +42,16 @@ void help (char *argv0) {
 error cat (char *path) {
 
   int fd = tfs_open(path,O_RDONLY);
-  char *buf;
+  char *buf = malloc(sizeof(char)*101);
   int s;
   while((s = tfs_read(fd,buf,100)) != 0){
-    if(s == -1)
+    if(s == -1){
+      free(buf);
       return ERR_TFS_READ;
+    }
     printf("%s",buf);
   }
-  
+  free(buf);
   return tfs_close(fd);
 }
 
@@ -70,7 +72,7 @@ int main(int argc, char *argv[] ){
     }
   }
   if (optind == argc) {
-    fputs("Argument path missing.", stderr);
+    fputs("Argument path missing.\n", stderr);
     usage(argv[0]);
     return PATH_MISSING;
   }
