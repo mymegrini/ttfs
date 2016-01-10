@@ -48,8 +48,8 @@ int tfs_mkdir(const char *path, mode_t mode)
     free(parent_path);
     return TFS_ERRPATH;
   }
-  const disk_id  id       = _filedes[parent->fd].id;
-  const uint32_t vol_addr = _filedes[parent->fd].vol_addr;
+  const disk_id  id       = _filedes[parent->fd]->id;
+  const uint32_t vol_addr = _filedes[parent->fd]->vol_addr;
   uint32_t ino_new;
   // Get a new inode
   e = freefile_pop(id, vol_addr, &ino_new);
@@ -73,7 +73,7 @@ int tfs_mkdir(const char *path, mode_t mode)
   wintle(ino_new, datablock, 0);
   datablock->data[INT_SIZE] = '.';
   // entry ".."
-  wintle(_filedes[parent->fd].ino, datablock, TFS_DIRECTORY_ENTRY_SIZE);
+  wintle(_filedes[parent->fd]->inode, datablock, TFS_DIRECTORY_ENTRY_SIZE);
   datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE] = '.';
   datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE + 1] = '.';
   // write data block
