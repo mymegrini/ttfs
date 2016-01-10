@@ -766,7 +766,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
 
 
 int
-file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags){
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
   return -1;
 }
 
