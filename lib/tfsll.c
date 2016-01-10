@@ -1104,9 +1104,6 @@ directory_rment (const disk_id id, const uint32_t vol_addr,
 
 
 // Macros for path_follow
-#define PATH_STRSEP "/"
-#define PATH_FPFX "FILE://"
-#define PATH_FPFXLEN 7
 #define PATH_ISVALID(p) (strncmp(p, PATH_FPFX, PATH_FPFXLEN) == 0)
 error
 path_follow (const char * path,  char **entry) {
