@@ -85,10 +85,11 @@ void testerror(char* msg, error err);
 #define TFS_BAD_FILDES 41  /**< Bad file descriptor */
 #define TFS_LOCK_FAIL 42    /**< Failed to acquire lock on file */
 #define TFS_UNLOCK_FAIL 43  /**< Failed to release lock on file */
-#define ERR_TFS_READ 44
+#define ERR_TFS_READ 44  /**< Error while reading a file */
 #define TFS_ERROPEN 45
 #define TFS_NOENTRY 46   /**< entry doesn't exist in the directory */
 #define TFS_DIRNOTEMPTY 47 /**< directory not empty */
+#define TFS_ERRWRITE 48 /**< Error while writing a file */
 /**
  * @brief This variable can store an error
  *
