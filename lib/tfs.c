@@ -16,6 +16,7 @@
 
 #define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
 #define ISFILDES(fildes) ((fildes)<TFS_FILE_MAX && _filedes[fildes])
+#define B_FILE_ADDR(offset) ((offset)/TFS_VOLUME_BLOCK_SIZE)
 
 #ifndef TFS_H
    #define PATH_STRSEP "/"
@@ -566,9 +567,34 @@ tfs_unlock (int fildes){
  * 
  * 
  * 
- */ 
+ */
+#define TFS_SEG_FAULT 100 /**< Segmentation fault >*/
+
 ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
-  return 0;
+  //test fildes
+  if (ISFILDES(fildes)) {
+    ssize_t s;
+    error e;
+    File* fd = _filedes[fildes];
+
+    //test if file open for reading
+    if ((fd->flags&O_RDONLY)||(fd->flags&O_RDWR)){
+      f_stat fstat;
+
+      //read file table entry
+      errnum= file_stat(fd->id, fd->vol_addr, fd->inode, &fstat);
+      if (errnum!=EXIT_SUCCESS) return -1;
+
+      //test offset
+      if (fd->offset<fstat.size){
+	
+	return s;
+      } else errnum= TFS_SEG_FAULT;
+      
+    }
+  } else errnum= TFS_BAD_FILDES;
+  
+  return -1;
 }
 
 /**
@@ -580,7 +606,12 @@ ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
  * 
  */
 ssize_t tfs_write(int fildes,void *buf,size_t nbytes){
-  return 0;
+  //test fildes
+  if (!ISFILDES(fildes)) return TFS_BAD_FILDES;
+  else {
+    ssize_t s;
+    return s;
+  }
 }
 
 /**
@@ -693,3 +724,5 @@ void rewinddir(DIR *dir){
 int closedir(DIR *dir){
   return tfs_close(dir->fd);
 }
+
+ 
