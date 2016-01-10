@@ -106,7 +106,7 @@ error start_disk(char *name,disk_id *id){
   char md5print[HASH_LEN];
   hashmd5(fullpath, md5print);
   // looking for existing id
-  while (i < DD_MAX)
+  for (int i = 0; i < DD_MAX; ++i)
     {
       if (_disk[i] != NULL             &&
 	  strcmp(name, _disk[i]->name) &&
