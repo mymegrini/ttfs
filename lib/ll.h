@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "error.h"
 #include "block.h"
+#include "utils.h"
 
 #define DD_MAX 100        /***< maximum number of open disks */
 #define D_PARTMAX 10      /***< maximum number of partitions in a disk */
@@ -21,6 +22,7 @@ typedef uint8_t disk_id;
  */
 typedef struct {
   char name[D_NAME_MAXLEN];      /**< name of the disk */
+  char hash[HASH_LEN];
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX];    /**< parition sizes */

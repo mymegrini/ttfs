@@ -89,6 +89,8 @@ void testerror(char* msg, error err);
 #define TFS_ERROPEN 45
 #define TFS_NOENTRY 46   /**< entry doesn't exist in the directory */
 #define TFS_DIRNOTEMPTY 47 /**< directory not empty */
+#define D_LOCK  48  /** can't lock disk when starting */
+#define D_UNLOCK 49  /** can't unlock disk at closing */
 /**
  * @brief This variable can store an error
  *
