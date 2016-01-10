@@ -21,7 +21,7 @@ bin/libll.so : obj/liberror.o obj/libblock.o obj/libll.o
 	$(CC) -shared -o $@ $^
 
 bin/libtfs.so : obj/libtfsll.o obj/libtfs.o
-	$(CC) -shared -o $@ $^ -Lbin -lll
+	$(CC) -shared -o $@ $^ -Lbin -lll -pthread
 
 bin/libutils.so : obj/libutils.o
 	$(CC) -shared -o $@ $^

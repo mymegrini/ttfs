@@ -2,6 +2,7 @@
 #define TFS_H
 #include <sys/types.h>
 #include "tfsll.h"
+#include <fcntl.h>
 
 typedef struct _DIR DIR;
 

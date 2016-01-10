@@ -242,6 +242,16 @@ error
 find_addr(disk_id id, uint32_t vol, uint32_t inode,
 	  uint32_t b_file_addr, uint32_t* b_addr);
 
+/**
+ * @brief This function returns a file descriptor for use in subsequent system calls
+ * @param[in] id disk id
+ * @param[in] vol_addr volume address
+ * @param[in] inode file number
+ * @param[in] flags specifies access modes
+ * @return Returns 0 on success or -1 if an error occured
+ */
+int
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags);
 
 #define TFS_PATHLEAF 1
 #define TFS_ERRPATH_NOPFX 104
