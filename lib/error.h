@@ -82,7 +82,7 @@ void testerror(char* msg, error err);
 #define TFS_FILENOTFOUND 38
 #define TFS_ERRPATH_NODISK 39
 #define TFS_EXISTINGENTRY 40
-
+#define TFS_ERROPEN 41
 /**
  * @brief This variable can store an error
  *
