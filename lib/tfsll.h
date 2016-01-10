@@ -76,6 +76,7 @@
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
 
+
 /**
  * @brief Directory entry
  *
@@ -114,16 +115,6 @@ file* _filedes[TFS_FILE_MAX];
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @brief Push the block <b_addr> to the free blocks list
- * 
- * @param b_addr block index on the volume
- * @param id disk id
- * @param vol partition number
- * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
- */
-error
-freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr);
 
 
 /**
@@ -222,7 +213,8 @@ directory_pushent (const disk_id id, const uint32_t vol_addr,
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
+directory_rment (const disk_id id, const uint32_t vol_addr,
+		 const uint32_t inode, char *name);
 
 
 /**
@@ -327,7 +319,22 @@ path_follow (const char * path, char ** entry);
  */
 error
 path_split (char *path, char **last_element);
+
+
+/**
+ * @brief Recover filenumber from a valid path. 
+ *
+ *  
+ * @param path 
+ * @param ino 
+ * @return error
+ */
+error
+tfs_fileno (char *path, uint32_t *ino);
+
 #endif // TFSLL_H
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // $Log:$
 //

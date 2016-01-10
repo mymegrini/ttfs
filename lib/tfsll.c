@@ -8,6 +8,7 @@
 
 #include "ll.h"
 #include "tfsll.h"
+#include "tfs.h"
 #include "block.h"
 #include "tfs.h"
 #include <stdlib.h>
@@ -52,6 +53,9 @@
 #define TFS_ERR_OPERATION 214
 #define DIR_BLOCKFULL -1
 #define TFS_ERRPATH     220
+#define TFS_ENTRY_NOTFOUND 118
+#define TFS_ERRLOCK 115
+#define TFS_FILENOTFOUN 221
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +71,20 @@ typedef struct {
   uint32_t freefile_first;
 } tfs_description;
 
+
+struct _index{
+  int32_t direct;           /**< current index of direct block (-1 empty) >*/
+  int32_t indirect1;        /**< current index in indirect1 block (-1 empty) >*/
+  int32_t indirect2;        /**< current index in indirect2 block (-1 empty) >*/
+  uint32_t indirect1_addr;   /**< current indirect1 block address >*/
+  uint32_t indirect2_addr;   /**< current indirect2 block address >*/
+};
+
+/**
+ * @brief File table entry structure
+ *
+ * 
+ */
 typedef struct {
   uint32_t size;
   uint32_t type;
@@ -77,13 +95,7 @@ typedef struct {
   uint32_t nextfreefile;
 } tfs_ftent;
 
-struct _index{
-  int32_t direct;           /**< current index of direct block (-1 empty) >*/
-  int32_t indirect1;        /**< current index in indirect1 block (-1 empty) >*/
-  int32_t indirect2;        /**< current index in indirect2 block (-1 empty) >*/
-  uint32_t indirect1_addr;   /**< current indirect1 block address >*/
-  uint32_t indirect2_addr;   /**< current indirect2 block address >*/
-};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
@@ -94,7 +106,9 @@ struct _index{
 #define INO_BPOS(inode) ((inode) % NENTBYBLOCK)
 
 static error
-read_ftent(disk_id id, uint32_t vol_addr, uint32_t inode, tfs_ftent * ftent) {
+read_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
+	   tfs_ftent * ftent)
+{
   error e;
   block b = new_block();
   uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*INO_BPOS(inode); 
@@ -117,7 +131,9 @@ read_ftent(disk_id id, uint32_t vol_addr, uint32_t inode, tfs_ftent * ftent) {
 }
 
 static error
-write_ftent(disk_id id, uint32_t vol_addr, uint32_t inode, const tfs_ftent* ftent) {
+write_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
+	    const tfs_ftent* ftent)
+{
   error e;
   block b = new_block();
   uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*INO_BPOS(inode); 
@@ -1016,18 +1032,19 @@ directory_pushent (disk_id, uint32_t vol_addr, uint32_t inode,
 
 
 error
-directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
+directory_rment (const disk_id id, const uint32_t vol_addr,
+		 const uint32_t inode, char *name)
 {
   if (strcmp(name, ".") == 0 || strcmp(name, ".."))
     return TFS_SYSDIR;
   error     e;
   tfs_ftent ftent;
-  if ((e = read_ftent(id, inode, &ftent)) != EXIT_SUCCESS)
+  if ((e = read_ftent(id, vol_addr, inode, &ftent)) != EXIT_SUCCESS)
     return e;
   // open file for reading
   int fd = file_open(id, vol_addr, inode);
   // lock file
-  if (file_lock(fildes) != 0)
+  if (tfs_lock(fd) != 0)
     return TFS_ERRLOCK;
   
   char buf[TFS_DIRECTORY_ENTRY_SIZE];
@@ -1038,7 +1055,7 @@ directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
       tfs_lseek(fd, INT_SIZE, SEEK_CUR);
       // read the name
       if ((e = tfs_read(fd, buf, TFS_NAME_MAX)) != EXIT_SUCCESS) {
-	file_unlock(fd);
+	tfs_unlock(fd);
 	tfs_close(fd);
 	return e;
       }
@@ -1056,12 +1073,12 @@ directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
 	  // overwrite entry by last one
 	  tfs_lseek(fd, -TFS_DIRECTORY_ENTRY_SIZE, SEEK_END);
 	  if (tfs_read(fd, buf, TFS_NAME_MAX) == -1) {
-	    file_unlock(fd);
+	    tfs_unlock(fd);
 	    tfs_close(fd);
 	    return -1;
 	  }
-	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_INDEX);
-	  file_unlock(fd);
+	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_SIZE);
+	  tfs_lock(fd);
 	  tfs_close(fd);
 	  return e;
 	}
@@ -1128,6 +1145,62 @@ path_split (char *path, char **leaf)
   *leaf = NULL;
   return TFS_ERRPATH;
 }
+
+
+error
+tfs_fileno (char *path, uint32_t *ino, int flags)
+{
+  char *last_el;
+  error e = path_split(path, &last_el);
+  if (e != EXIT_SUCCESS)
+    return e;
+  char *token;
+  // token : disk
+  if ((path_follow(NULL, &token)) != EXIT_SUCCESS)
+    return TFS_ERRPATH_NODISK;
+  if (ISHOST(token))
+    return TFS_ERRPATH_HOST;
+  disk_id id;
+  if ((e = start_disk(token, &id)) != EXIT_SUCCESS)
+    return e;
+  // token : part index
+ if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
+    stop_disk(id);
+    return e;
+  }
+  // conversion to uint32_t
+  long long int partid = atou(token);
+  if (partid < 0) {
+    stop_disk(id);
+    return TFS_ERRPATH_PARTID;
+  }
+  // recover volume adress
+  uint32_t vol_addr;
+  if ((e = p_index(id, partid, &vol_addr)) != EXIT_SUCCESS) {
+    stop_disk(id);
+    return e;
+  }
+  DIR *parent = opendir(path);
+  if (parent == NULL) {
+    stop_disk(id);
+    return TFS_ERRPATH;
+  }
+  struct dirent *ent;
+  // look for the last element
+  while ((ent = readdir(parent)) != NULL)
+    // found
+    if (strcmp(ent->d_name, last_el) == 0) {
+      *ino = ent->d_ino;
+      closedir(parent);
+      stop_disk(id);
+      return EXIT_SUCCESS;
+    }
+  // Not found
+  *ino = _filedes[parent->fd].ino;
+  closedir(parent);
+  return TFS_FILENOTFOUND;  
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // TRASH
@@ -1214,3 +1287,5 @@ put_volume_addr(disk_id id, uint32_t vol, uint32_t inode,
 // $Log:$
 //
 
+
+  
