@@ -3,25 +3,18 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include <semaphore.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
-#define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
-////////////////////////////////////////////////////////////////////////////////
-// ERRORS
-////////////////////////////////////////////////////////////////////////////////
-#define TFS_ERRPATH_NODISK  215
-#define TFS_ERRPATH_HOST    216
-#define TFS_ERRPATH_PARTID  217
-#define TFS_ERRLOCK         300
-#define TFS_ERRPATH         201
 
+#define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
+
 struct _DIR {
   int             fd;
   uint32_t        ino;
@@ -29,6 +22,7 @@ struct _DIR {
   uint32_t        b_offset;
   struct dirent   buf[32];
 };
+
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,8 +48,8 @@ int tfs_mkdir(const char *path, mode_t mode)
     free(parent_path);
     return TFS_ERRPATH;
   }
-  const disk_id  id       = _filedes[parent->fd].id;
-  const uint32_t vol_addr = _filedes[parent->fd].vol_addr;
+  const disk_id  id       = _filedes[parent->fd]->id;
+  const uint32_t vol_addr = _filedes[parent->fd]->vol_addr;
   uint32_t ino_new;
   // Get a new inode
   e = freefile_pop(id, vol_addr, &ino_new);
@@ -79,7 +73,7 @@ int tfs_mkdir(const char *path, mode_t mode)
   wintle(ino_new, datablock, 0);
   datablock->data[INT_SIZE] = '.';
   // entry ".."
-  wintle(_filedes[parent->fd].ino, datablock, TFS_DIRECTORY_ENTRY_SIZE);
+  wintle(_filedes[parent->fd]->inode, datablock, TFS_DIRECTORY_ENTRY_SIZE);
   datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE] = '.';
   datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE + 1] = '.';
   // write data block
@@ -124,6 +118,29 @@ int tfs_open(const char *name,int oflag, ...){
   return 0;
 }
 
+
+/**
+ * 
+ *
+ * 
+ * 
+ */
+int
+tfs_lock (int fildes){
+  return sem_wait(_filedes[fildes]->sem);
+}
+
+/**
+ * 
+ *
+ * 
+ * 
+ */
+int
+tfs_unlock (int fildes){
+  return sem_post(_filedes[fildes]->sem);
+}
+
 /**
  * 
  * 
@@ -131,7 +148,7 @@ int tfs_open(const char *name,int oflag, ...){
  * 
  * 
  * 
- */uint32_t 
+ */ 
 ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
   return 0;
 }

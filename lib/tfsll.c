@@ -1161,43 +1161,54 @@ path_split (char *path, char **leaf)
   *leaf = NULL;
   return TFS_ERRPATH;
 }
-
-
 error
 find_inode (char *path, uint32_t *ino)
 {
   char *last_el;
-  error e = path_split(path, &last_el);
-  if (e != EXIT_SUCCESS)
+  char *pathcpy = strdup(path);
+  error e = path_split(pathcpy, &last_el);
+  if (e != EXIT_SUCCESS) {
+    free(pathcpy);
     return e;
+  }
   char *token;
   // token : disk
-  if ((path_follow(NULL, &token)) != EXIT_SUCCESS)
+  if ((path_follow(NULL, &token)) != EXIT_SUCCESS) {
+    free(pathcpy);
     return TFS_ERRPATH_NODISK;
-  if (ISHOST(token))
+  }
+  if (ISHOST(token)) {
+    free(pathcpy);
     return TFS_ERRPATH_HOST;
+  }
   disk_id id;
-  if ((e = start_disk(token, &id)) != EXIT_SUCCESS)
+  if ((e = start_disk(token, &id)) != EXIT_SUCCESS) {
+    free(pathcpy);
     return e;
+  }
   // token : part index
- if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
+  if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
+    free(pathcpy);
     stop_disk(id);
     return e;
   }
   // conversion to uint32_t
   long long int partid = atou(token);
   if (partid < 0) {
+    free(pathcpy);
     stop_disk(id);
     return TFS_ERRPATH_PARTID;
   }
   // recover volume adress
   uint32_t vol_addr;
   if ((e = p_index(id, partid, &vol_addr)) != EXIT_SUCCESS) {
+    free(pathcpy);
     stop_disk(id);
     return e;
   }
-  DIR *parent = opendir(path);
+  struct _DIR *parent = opendir(path);
   if (parent == NULL) {
+    free(pathcpy);
     stop_disk(id);
     return TFS_ERRPATH;
   }
@@ -1206,15 +1217,16 @@ find_inode (char *path, uint32_t *ino)
   while ((ent = readdir(parent)) != NULL)
     // found
     if (strcmp(ent->d_name, last_el) == 0) {
+      free(pathcpy);
       *ino = ent->d_ino;
       closedir(parent);
       stop_disk(id);
       return EXIT_SUCCESS;
     }
   // Not found
-  *ino = _filedes[parent->fd].ino;
   closedir(parent);
-  return TFS_FILENOTFOUND;  
+  free(pathcpy);
+  return TFS_ERRPATH;  
 }
 
 
