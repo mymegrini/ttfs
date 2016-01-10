@@ -305,6 +305,19 @@ error
 path_follow (const char * path, char ** entry);
 
 
+/**
+ * @brief Split a path between parent directory path and last element.
+ * 
+ * After successfull execution, path is modified to contain the parent directory
+ * path, last_element point to the last_element of the path.
+ * Also test if path is prefixed, you can then just call path_follow with a NULL
+ * path to follow the path without testing prefix.
+ * @param path 
+ * @param leaf 
+ * @return error
+ */
+error
+path_split (char *path, char **last_element);
 #endif // TFSLL_H
 ////////////////////////////////////////////////////////////////////////////////
 // $Log:$

@@ -35,8 +35,6 @@
 				    - INDIRECT1_BEGIN)/ INT_PER_BLOCK)
 #define LASTBYTE_POS(fileindex) ((fileindex)%TFS_VOLUME_BLOCK_SIZE)
 
-#define TFS_ERR_BIGFILE 100
-
 #define SEM_FBL_T 0
 #define SEM_FEL_T 1
 #define SEM_FILE_T 2
@@ -45,6 +43,14 @@
 #define SEM_FILE_S "semf"
 #define SEM_NAME_LEN NAME_MAX-5
 
+////////////////////////////////////////////////////////////////////////////////
+// ERRORS
+////////////////////////////////////////////////////////////////////////////////
+#define TFS_ERR_BIGFILE 100
+#define TFS_SYSDIR      101
+#define TFS_ERR_OPERATION 214
+#define DIR_BLOCKFULL -1
+#define TFS_ERRPATH     220
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -770,8 +776,6 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
   return -1;
 }
 
-#define TFS_ERR_OPERATION 214
-#define DIR_BLOCKFULL -1
 
 error
 directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
@@ -986,10 +990,69 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
   return EXIT_FAILURE;
 }
 
+
+/*
 error
-directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry) {
+directory_pushent (disk_id, uint32_t vol_addr, uint32_t inode,
+		   uint32_t e_ino, uint32_t e_name)
+{
   
-  return EXIT_SUCCESS;
+}
+*/
+
+
+error
+directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
+{
+  if (strcmp(name, ".") == 0 || strcmp(name, ".."))
+    return TFS_SYSDIR;
+  error     e;
+  tfs_ftent ftent;
+  if ((e = read_ftent(id, inode, &ftent)) != EXIT_SUCCESS)
+    return e;
+  // open file for reading
+  int fd = file_open(id, vol_addr, inode);
+  // lock file
+  if (file_lock(fildes) != 0)
+    return TFS_ERRLOCK;
+  
+  char buf[TFS_DIRECTORY_ENTRY_SIZE];
+  for (int findpos = 0; findpos < ftent.size;
+       findpos += TFS_DIRECTORY_ENTRY_SIZE)
+    {
+      // positionning to read the name
+      tfs_lseek(fd, INT_SIZE, SEEK_CUR);
+      // read the name
+      if ((e = tfs_read(fd, buf, TFS_NAME_MAX)) != EXIT_SUCCESS) {
+	file_unlock(fd);
+	tfs_close(fd);
+	return e;
+      }
+      // entry found
+      if (strncmp(name, buf, TFS_NAME_MAX) == 0)
+	{
+	  // prevent fragmentation
+	  if (findpos + TFS_DIRECTORY_ENTRY_SIZE == ftent.size)
+	    {
+	      tfs_close(fd);
+	      e = file_realloc(id, vol_addr, inode,
+			       ftent.size - TFS_DIRECTORY_ENTRY_SIZE);
+	      return e;
+	    }
+	  // overwrite entry by last one
+	  tfs_lseek(fd, -TFS_DIRECTORY_ENTRY_SIZE, SEEK_END);
+	  if (tfs_read(fd, buf, TFS_NAME_MAX) == -1) {
+	    file_unlock(fd);
+	    tfs_close(fd);
+	    return -1;
+	  }
+	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_INDEX);
+	  file_unlock(fd);
+	  tfs_close(fd);
+	  return e;
+	}
+    }
+  return TFS_ENTRY_NOTFOUND;
 }
 
 
@@ -1028,6 +1091,29 @@ path_follow (const char * path,  char **entry) {
   }
 }
 
+
+
+error
+path_split (char *path, char **leaf)
+{
+  error e;
+  if ((e = path_follow(path, NULL)) != EXIT_SUCCESS)
+    return e;
+  int path_len = strlen(path);
+  int i;
+  for (i = path_len - 1; path[i] == '/'; i--)
+    path[i] = '\0';
+  for (i = path_len; i >= PATH_FPFXLEN; i--)
+    if (path[i] == '/') {
+      path[i] = '\0';
+      *leaf = &path[i+1];
+      // reinitiniaize path_follow for next call
+      path_follow (path, NULL);
+      return EXIT_SUCCESS;
+    }
+  *leaf = NULL;
+  return TFS_ERRPATH;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // TRASH
