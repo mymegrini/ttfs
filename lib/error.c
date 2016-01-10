@@ -37,7 +37,19 @@ static char* _errlist[] = {
   "Attempt to stop disk failed",
   "Setting permissions for disk failed",
   "Semaphore type unrecognized",
-  "Maximum number of open files reached"
+  "Maximum number of open files reached",
+  "TFS_ERR_BIGFILE",
+  "TFS_SYSDIR",
+  "TFS_ERR_OPERATION",
+  "DIR_BLOCKFULL",
+  "TFS_ERRPATH",
+  "TFS_ENTRY_NOTFOUND",
+  "TFS_ERRLOCK",
+  "TFS_FILENOTFOUN",
+  "TFS_ERRPATH_HOST",
+  "TFS_ERRPATH_PARTID",
+  "TFS_FILENOTFOUND",
+  "TFS_ERRPATH_NODISK"
 };
 
 /**
