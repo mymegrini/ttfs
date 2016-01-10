@@ -96,7 +96,7 @@ int tfs_mkdir(const char *path, mode_t mode)
   // NEED A CHECK
   rintle((uint32_t *)new_entry_buf, (block)&(_filedes[fd]->inode), 0);
   rintle((uint32_t *)&new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE],
-	 (block)&(filedes[parent->ino]), 0);
+	 (block)&(_filedes[parent->ino]), 0);
   //////////////////////////////////////////////////////////////////////////////
   new_entry_buf[INT_SIZE                               ] = '.';
   new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE    ] = '.';
@@ -166,7 +166,7 @@ int tfs_rmdir(const char *path){
     closedir(parent);
     return TFS_NOENTRY;
   }
-  else directory_pushent(const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry)
+  //  else directory_pushent(const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry)
   
   return 0;
 }
