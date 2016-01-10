@@ -10,6 +10,7 @@
 #include "tfsll.h"
 #include "tfs.h"
 #include "block.h"
+#include "tfs.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -96,13 +97,13 @@ struct _index{
 #define INO_BPOS(inode) ((inode) % NENTBYBLOCK)
 
 static error
-read_ftent(disk_id id, uint32_t vol, uint32_t inode, tfs_ftent * ftent) {
+read_ftent(disk_id id, uint32_t vol_addr, uint32_t inode, tfs_ftent * ftent) {
   error e;
   block b = new_block();
   uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*INO_BPOS(inode); 
   
   //read filetable block
-  if ((e = read_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
+  if ((e = read_block(id,b,vol_addr+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
     {free(b); return e;}
 
   //transfer block data to ftent structure
@@ -119,13 +120,13 @@ read_ftent(disk_id id, uint32_t vol, uint32_t inode, tfs_ftent * ftent) {
 }
 
 static error
-write_ftent(disk_id id, uint32_t vol, uint32_t inode, const tfs_ftent* ftent) {
+write_ftent(disk_id id, uint32_t vol_addr, uint32_t inode, const tfs_ftent* ftent) {
   error e;
   block b = new_block();
   uint32_t entry_pos = TFS_FILE_TABLE_ENTRY_SIZE*INO_BPOS(inode); 
 
   //read filetable block
-  if ((e = read_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
+  if ((e = read_block(id,b,vol_addr+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
     {free(b); return e;}
   
   //transfer ftent data to block
@@ -138,7 +139,7 @@ write_ftent(disk_id id, uint32_t vol, uint32_t inode, const tfs_ftent* ftent) {
   wintle(ftent->tfs_indirect2, b, entry_pos + TFS_INDIRECT2_INDEX);
 
   //write block back to disk
-  if ((e = write_block(id,b,vol+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
+  if ((e = write_block(id,b,vol_addr+INO_FTBLOCK(inode)))!=EXIT_SUCCESS)
     {free(b); return e;}
   
   free(b);
@@ -201,16 +202,16 @@ read_tfsdescription (disk_id id, uint32_t vol_addr, tfs_description * desc){
  * @return Returns an error if encountered
  */
 static error
-sem_name(char* name, int type, disk_id id, uint32_t vol, uint32_t inode){
+sem_name(char* name, int type, disk_id id, uint32_t vol_addr, uint32_t inode){
   d_stat stat;
   error e = disk_stat(id, &stat);
   
   switch(type){
   case SEM_FBL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FBL_S, stat.name, vol);
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FBL_S, stat.name, vol_addr);
     return e;    
   case SEM_FEL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FEL_S, stat.name, vol);
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FEL_S, stat.name, vol_addr);
     return e;    
   case SEM_FILE_T:    
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d:%d",
@@ -710,14 +711,14 @@ file_realloc (disk_id id, uint32_t vol_addr, uint32_t inode, uint32_t size){
 }
 
 error
-find_addr(disk_id id, uint32_t vol, uint32_t inode,
+find_addr(disk_id id, uint32_t vol_addr, uint32_t inode,
 	  uint32_t b_file_addr, uint32_t* b_addr){
   block b;
   tfs_ftent ftent;
   error e;
   
   //read <inode> file table entry
-  if ((e = read_ftent(id, vol, inode, &ftent))!=EXIT_SUCCESS) return e;
+  if ((e = read_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
   
   //test if block address is reasonable
   if (b_file_addr>((ftent.size)-1)/TFS_VOLUME_BLOCK_SIZE)
@@ -735,7 +736,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
   b_file_addr-=TFS_DIRECT_BLOCKS_NUMBER;
   if (b_file_addr<TFS_INDIRECT1_CAPACITY){
     //read tfs_indirect1 block
-    if ((e = read_block(id, b, vol+ftent.tfs_indirect1))!=EXIT_SUCCESS)
+    if ((e = read_block(id, b, vol_addr+ftent.tfs_indirect1))!=EXIT_SUCCESS)
       {free(b); return e;}
     //read b_addr from block
     rintle(b_addr, b, b_file_addr);
@@ -748,7 +749,7 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
   if (b_file_addr<TFS_INDIRECT2_CAPACITY){
     uint32_t indirect1_addr;
     //read tfs_indirect2 block
-    if ((e = read_block(id, b, vol+ftent.tfs_indirect2))!=EXIT_SUCCESS)
+    if ((e = read_block(id, b, vol_addr+ftent.tfs_indirect2))!=EXIT_SUCCESS)
       {free(b); return e;}
     //read tfs_indirect1 address from block
     rintle(&indirect1_addr, b, b_file_addr*(TFS_VOLUME_BLOCK_SIZE/INT_SIZE));
@@ -768,9 +769,28 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
 int
 file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
   int fd;
+  tfs_ftent ftent;
+  error e = read_ftent(id, vol, inode, &ftent);
 
-  while (fd < TFS_FILE_MAX && _filedes[fd]* != NULL) fd++;
+  if (e != EXIT_SUCCESS) {errnum = e; return -1}
+  else {
+    //fill structure
+    file* file = (file*) malloc(sizeof(file));
+    file->id = id;
+    file->vol = vol_addr;
+    file->inode = inode;
     
+    //find available file descriptor
+    while (fd < TFS_FILE_MAX && _filedes[fd] != NULL) fd++;
+    if (fd == TFS_FILE_MAX){
+      errnum = TFS_MAX_FILE;
+      return -1;
+    }
+    
+    //register structure and return file descriptor
+    _filedes[fd] = &file;
+    return fd;  
+  }
 }
 
 

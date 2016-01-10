@@ -93,9 +93,9 @@ struct dirent {
  */
 typedef struct _index* _index;
 
-typedef struct {
+typedef struct{
   disk_id id;
-  uint32_t vol;
+  uint32_t vol_addr;
   uint32_t inode;
   sem_t* sem;
   uint32_t offset;
@@ -108,7 +108,7 @@ typedef struct {
 // VARIABLES
 ////////////////////////////////////////////////////////////////////////////////
 
-file _filedes[TFS_FILE_MAX];
+file* _filedes[TFS_FILE_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
