@@ -24,6 +24,13 @@ typedef struct _DIR DIR;
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Remove a regular file from a tfs volume
+ *  
+ * @param path 
+ * @return int
+ */
+int tfs_rm(const char *path);
 
 /**
  * @brief This function attempts to create a directory named <path>

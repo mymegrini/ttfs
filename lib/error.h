@@ -93,7 +93,7 @@ void testerror(char* msg, error err);
 #define TFS_ERRWRITE 49 /**< Error while writing a file */
 #define D_LOCK  50  /** can't lock disk when starting */
 #define D_UNLOCK 51  /** can't unlock disk at closing */
-
+#define TFS_NOTSUPPORTED 52 /** operation not supported yet */
 /**
  * @brief This variable can store an error
  *
