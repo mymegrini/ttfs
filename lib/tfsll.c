@@ -80,6 +80,23 @@ struct _index{
   uint32_t indirect2_addr;   /**< current indirect2 block address >*/
 };
 
+/**
+ * @brief File table entry structure
+ *
+ * 
+ */
+typedef struct {
+  uint32_t size;
+  uint32_t type;
+  uint32_t subtype;
+  uint32_t tfs_direct[TFS_DIRECT_BLOCKS_NUMBER];
+  uint32_t tfs_indirect1;
+  uint32_t tfs_indirect2;
+  uint32_t nextfreefile;
+} tfs_ftent;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +105,7 @@ struct _index{
 #define INO_FTBLOCK(inode) (1 + ((inode)/NENTBYBLOCK))
 #define INO_BPOS(inode) ((inode) % NENTBYBLOCK)
 
-error
+static error
 read_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
 	   tfs_ftent * ftent)
 {
@@ -113,7 +130,7 @@ read_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
   return EXIT_SUCCESS;
 }
 
-error
+static error
 write_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
 	    const tfs_ftent* ftent)
 {
