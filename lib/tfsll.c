@@ -11,6 +11,7 @@
 #include "tfs.h"
 #include "block.h"
 #include "tfs.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -94,7 +95,6 @@ typedef struct {
   uint32_t tfs_indirect2;
   uint32_t nextfreefile;
 } tfs_ftent;
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ sem_name(char* name, int type, disk_id id, uint32_t vol_addr, uint32_t inode){
     return e;    
   case SEM_FILE_T:    
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d:%d",
-	     SEM_FILE_S, stat.name, vol, inode);
+	     SEM_FILE_S, stat.name, vol_addr, inode);
     return e;
   default:    
     return S_WRONGTYPE;    
@@ -800,23 +800,24 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
     finode = inode;
     //read file entry
     e = read_ftent(id, vol_addr, finode, &ftent);    
-    if (e != EXIT_SUCCESS) {errnum = e; return -1}
+    if (e != EXIT_SUCCESS) {errnum = e; return -1;}
   }
-     
+  
   //find available file descriptor
   while (fd < TFS_FILE_MAX && _filedes[fd] != NULL) fd++;
   if (fd == TFS_FILE_MAX){
     errnum = TFS_MAX_FILE;
     return -1;
   } else {
+    File* file;
     //get file semaphore
     char name[SEM_NAME_LEN];
     sem_t* sem;      
     sem_name(name, SEM_FILE_T, id, vol_addr, finode);
     sem = sem_open(name, O_CREAT,
-			 S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+		   S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
     //fill structure
-    file* file; = (file*) malloc(sizeof(file));
+    file = (File*)malloc(sizeof(File));
     file->id = id;
     file->vol_addr = vol_addr;
     file->inode = finode;
@@ -827,7 +828,7 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
     file->subtype = ftent.subtype;
     
     //register structure and return file descriptor
-    _filedes[fd] = &file;
+    _filedes[fd] = file;
     return fd;  
   }
 }
@@ -1068,7 +1069,7 @@ directory_rment (const disk_id id, const uint32_t vol_addr,
   if ((e = read_ftent(id, vol_addr, inode, &ftent)) != EXIT_SUCCESS)
     return e;
   // open file for reading
-  int fd = file_open(id, vol_addr, inode);
+  int fd = file_open(id, vol_addr, inode, 0, 0, 0);
   // lock file
   if (tfs_lock(fd) != 0)
     return TFS_ERRLOCK;
@@ -1174,7 +1175,7 @@ path_split (char *path, char **leaf)
 
 
 error
-tfs_fileno (char *path, uint32_t *ino, int flags)
+tfs_fileno (char *path, uint32_t *ino)
 {
   char *last_el;
   error e = path_split(path, &last_el);

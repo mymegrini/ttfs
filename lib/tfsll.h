@@ -59,8 +59,8 @@
 #define TFS_DIRECTORY_ENTRIES_PER_BLOCK			\
   (TFS_VOLUME_BLOCK_SIZE/TFS_DIRECTORY_ENTRY_SIZE)/*** Number of directory entries per block */
 
-#define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX) /** TFS directory entry size */
-#define TFS_NAME_MAX (TFS_DIRECTORY_ENTRY_SIZE-INTX(1)-1) /** TFS directory entry name maximum length */
+#define TFS_NAME_MAX 27                           /** TFS directory entry name maximum length */
+#define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX+1) /** TFS directory entry size */
 #define TFS_DIRECTORY_ENTRY_INDEX(i) ((i)*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
 #define TFS_FILE_MAX_SIZE (TFS_VOLUME_BLOCK_SIZE			\
@@ -103,18 +103,28 @@ typedef struct{
   int flags;
   int type;
   int subtype;
-} file;
+} File;
 
 ////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
 ////////////////////////////////////////////////////////////////////////////////
 
-file* _filedes[TFS_FILE_MAX];
+File* _filedes[TFS_FILE_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Push the block <b_addr> to the free blocks list
+ * 
+ * @param b_addr block index on the volume
+ * @param id disk id
+ * @param vol partition number
+ * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
+ */
+error
+freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr);
 
 
 /**
