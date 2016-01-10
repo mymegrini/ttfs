@@ -77,6 +77,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @brief File table entry structure
+ *
+ * 
+ */
+typedef struct {
+  uint32_t size;
+  uint32_t type;
+  uint32_t subtype;
+  uint32_t tfs_direct[TFS_DIRECT_BLOCKS_NUMBER];
+  uint32_t tfs_indirect1;
+  uint32_t tfs_indirect2;
+  uint32_t nextfreefile;
+} tfs_ftent;
+
+
+/**
  * @brief Directory entry
  *
  * A directory entry contains a file number and a name.
@@ -113,6 +129,22 @@ file* _filedes[TFS_FILE_MAX];
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * @brief Read a file table entry
+ *
+ *  
+ * @param id 
+ * @param vol_addr 
+ * @param inode 
+ * @param ftent 
+ * @return error
+ */
+error
+read_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
+	   tfs_ftent * ftent);
+
 
 /**
  * @brief Push the block <b_addr> to the free blocks list
@@ -328,7 +360,22 @@ path_follow (const char * path, char ** entry);
  */
 error
 path_split (char *path, char **last_element);
+
+
+/**
+ * @brief Recover filenumber from a valid path. 
+ *
+ *  
+ * @param path 
+ * @param ino 
+ * @return error
+ */
+error
+tfs_fileno (char *path, uint32_t *ino);
+
 #endif // TFSLL_H
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // $Log:$
 //

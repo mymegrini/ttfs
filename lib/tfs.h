@@ -138,14 +138,4 @@ void rewinddir(DIR *dirp);
  */
 int closedir(DIR *dirp);
 
-/**
- * @brief Recover filenumber from a valid path. 
- *
- *  
- * @param path 
- * @param ino 
- * @return error
- */
-error
-tfs_fileno (char *path, uint32_t *ino);
 #endif
