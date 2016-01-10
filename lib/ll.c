@@ -102,7 +102,7 @@ error start_disk(char *name,disk_id *id){
   int i = 0;
   // md5
   char fullpath[PATH_MAX+D_NAME_MAXLEN+1];
-  getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN);
+  if (getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN)) return D_GETWD_FAIL;
   strcat(fullpath, name);
   char md5print[HASH_LEN];
   hashmd5(fullpath, md5print);

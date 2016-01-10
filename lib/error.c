@@ -55,9 +55,14 @@ static char* _errlist[] = {
   "Failed to acquire lock on file",
   "Failed to release lock on file",
   "ERR_TFS_READ",
+  "TFS_ERROPEN",
   "TFS_NOENTRY",
   "TFS_DIRNOTEMPTY",
-  "Access mode bits not found"
+  "Access mode bits not found",
+  "Error while writing a file",
+  "Can't lock disk when starting",
+  "Can't unlock disk at closing",
+  "Failed to read current working directory"
 };
 
 /**
