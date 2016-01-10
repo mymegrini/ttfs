@@ -38,6 +38,7 @@ void testerror(char* msg, error err);
  * FT : File Table
  * FBL: Free Block List
  * FEL: Free Entry List 
+ * TFS: Toy File System
  >*/
 
 #define EXIT_SUCCESS 0      /**< Successful execution >*/
@@ -63,10 +64,11 @@ void testerror(char* msg, error err);
 #define F_SIZE_CORRUPTED 20 /**< File size value corrupted >*/
 #define F_EMPTY 21          /**< Empty file >*/
 #define I_CORRUPTED 22      /**< Corrupted index structure >*/
-#define B_OUTOFBOUNDS 23     /**< Block file address exceeds maximum file size >*/
+#define B_OUTOFBOUNDS 23    /**< Block file address exceeds maximum file size >*/
 #define D_STOP_FAIL 24      /**< Attempt to sync disk failed >*/
 #define D_PERM_FAIL 25      /**< Setting permissions for disk failed >*/
 #define S_WRONGTYPE 26      /**< Semaphore type unrecognized */
+#define TFS_MAX_FILE 27     /**< Maximum number of open files reached */
 
 /**
  * @brief This variable can store an error
