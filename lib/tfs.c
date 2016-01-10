@@ -207,9 +207,12 @@ int tfs_rmdir(const char *path){
  * 
  * 
  */
-int tfs_rename(const char *old, const char *new){
+int tfs_rename(const char *path, const char *newname){
+  
   return 0;
 }
+
+
 
 /**
  * 
@@ -358,8 +361,23 @@ struct dirent *readdir(DIR *dir){
  * 
  * 
  */
-void rewinddir(DIR *dirp){
-  
+void rewinddir(DIR *dir){
+  tfs_lseek(dir->fd, 0, SEEK_SET);
+  dir->b_offset = 0;
+  dir->b_size   = 0;
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
+    {
+      char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
+      if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+	return ;
+      else {
+	// fill buffer
+	rintle(&dir->buf[i].d_ino, (block)entry_buf, 0);
+	strncpy(dir->buf[i].d_name, &entry_buf[INT_SIZE], TFS_NAME_MAX);
+	dir->b_size++;
+      }      
+    }
+  return ;
 }
 
 /**
@@ -367,8 +385,8 @@ void rewinddir(DIR *dirp){
  * 
  * 
  */
-int closedir(DIR *dirp){
-  return 0;
+int closedir(DIR *dir){
+  return tfs_close(dir->fd);
 }
 
 

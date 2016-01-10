@@ -22,7 +22,7 @@ atou ( char *s ) {
   uint32_t val = 0;
   int count = 0;
   uint32_t below_max = (UINT32_MAX - 1) / 10;
-  while ( isdigit(*s) ) {
+  while ( count < size && isdigit(*s) ) {
     if (val > below_max)
       return UINT32TOOBIG;
     val = val*10 + ( *s++ - '0' );
