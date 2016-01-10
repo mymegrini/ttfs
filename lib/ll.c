@@ -21,7 +21,7 @@ typedef uint32_t ad_b;    /**< address for blocks in the disk */
 typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk     */
   char hash[HASH_LEN];            /** md5 generated from path */
-  FILE* stream;          /**< file stream */
+  int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX+1];    /**< size of partitions, null at the creation. */
@@ -50,11 +50,11 @@ error read_physical_block(disk_id id,block b,uint32_t num){
 
   if (!DISKEXIST(id)) return D_WRONGID;
   
-  if (fseek(_disk[id]->stream, D_BLOCK_SIZE*num, SEEK_SET) == -1 ) return D_SEEK_ERR;
- 
-  if (fread(b, D_BLOCK_SIZE, 1, _disk[id]->stream) < D_BLOCK_SIZE)
+  if (lseek(_disk[id]->fd, D_BLOCK_SIZE*num, SEEK_SET) == -1 )
+    return D_SEEK_ERR;
+  if (read(_disk[id]->fd, b, D_BLOCK_SIZE) < D_BLOCK_SIZE)
     return D_READ_ERR;
-    
+
   return EXIT_SUCCESS;
 }
 
@@ -79,9 +79,10 @@ error write_physical_block(disk_id id,block b,uint32_t num){
   
   if ( num >= _disk[id]->size ) return B_OUT_OF_DISK;
   
-  if ( fseek(_disk[id]->stream, D_BLOCK_SIZE*num, SEEK_SET) == -1 ) return D_SEEK_ERR;
+  if ( lseek(_disk[id]->fd, D_BLOCK_SIZE*num, SEEK_SET) == -1 )
+    return D_SEEK_ERR;
   
-  if (fwrite(b, D_BLOCK_SIZE, 1, _disk[id]->stream) < D_BLOCK_SIZE)
+  if (write(_disk[id]->fd, b, D_BLOCK_SIZE) < D_BLOCK_SIZE)
     return D_WRITE_ERR;
   
   return EXIT_SUCCESS;
@@ -122,21 +123,19 @@ error start_disk(char *name,disk_id *id){
   if(i == DD_MAX) 
     return OD_FULL;
   
-  FILE* stream = fopen(name, "r+");
-  if(stream == NULL){
+  int fd = open(name, O_RDWR);
+  if(fd == -1){
     return D_OPEN_ERR;
   }
-  if (flock(fileno(stream), LOCK_SH) == -1)
+  if (flock(fd, LOCK_EX) == -1)
     return D_LOCK;
-  
   *id = i;
-  
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
   dent->name[D_NAME_MAXLEN]=0;
+  dent->fd = fd;
   strncpy(dent->name, name, D_NAME_MAXLEN);
 
   
-  dent->stream=stream;
 
   _disk[i] = dent;
 
@@ -226,9 +225,10 @@ error stop_disk(disk_id id){
   if ( id >= DD_MAX || _disk[id] == NULL ) {
     return D_WRONGID;
   }
-  if (flock(fileno(_disk[id]->stream), LOCK_SH) == -1)
+  if (flock(_disk[id]->fd, LOCK_SH) == -1)
     return D_LOCK;
-  if (fclose(_disk[id]->stream)!=0) e = D_STOP_FAIL;
+  if (close(_disk[id]->fd) !=0 )
+    e = D_STOP_FAIL;
   free(_disk[id]);
   return e;
 }
