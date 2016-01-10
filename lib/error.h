@@ -76,20 +76,21 @@ void testerror(char* msg, error err);
 #define TFS_ERRPATH 32
 #define TFS_ENTRY_NOTFOUND 33
 #define TFS_ERRLOCK 34
-#define TFS_FILENOTFOUN 35
+#define TFS_F_NOTFOUND 35   /**< File not found */
 #define TFS_ERRPATH_HOST 36
 #define TFS_ERRPATH_PARTID 37
 #define TFS_FILENOTFOUND 38
 #define TFS_ERRPATH_NODISK 39
 #define TFS_EXISTINGENTRY 40
-#define TFS_BAD_FILDES 41  /**< Bad file descriptor */
+#define TFS_BAD_FILDES 41   /**< Bad file descriptor */
 #define TFS_LOCK_FAIL 42    /**< Failed to acquire lock on file */
 #define TFS_UNLOCK_FAIL 43  /**< Failed to release lock on file */
 #define ERR_TFS_READ 44  /**< Error while reading a file */
 #define TFS_ERROPEN 45
-#define TFS_NOENTRY 46   /**< entry doesn't exist in the directory */
-#define TFS_DIRNOTEMPTY 47 /**< directory not empty */
-#define TFS_ERRWRITE 48 /**< Error while writing a file */
+#define TFS_NOENTRY 46      /**< entry doesn't exist in the directory */
+#define TFS_DIRNOTEMPTY 47  /**< directory not empty */
+#define TFS_O_NOACCESS 48   /**< Access mode bits not found */
+#define TFS_ERRWRITE 49 /**< Error while writing a file */
 /**
  * @brief This variable can store an error
  *
