@@ -32,16 +32,15 @@ error tfs_analyze(char *name,int mode,int partition){
   
   error err_start = start_disk(name,&id);
   if(err_start != EXIT_SUCCESS){
-    //error message
-    fprintf(stderr,"Error start : %d\n",err_start);
+    printerror("Error start",err_start);
+    printf("%s\n",name);
     return err_start;
   }
 
   d_stat d_s;
   error err_d_stat = disk_stat(id,&d_s);
   if(err_d_stat != EXIT_SUCCESS){
-    //error message
-    fprintf(stderr,"Error disk stat : %d\n",err_d_stat);
+    printerror("Error disk stat",err_d_stat);
     return err_d_stat;
   }
 
@@ -153,7 +152,7 @@ Usage: %s [-p <partition>] [-l] [name]\n\n\
       strncat(name, ".tfs", D_NAME_MAXLEN-strlen(name));
     }
   } else 
-    strncpy(name, DEF_NAME, 9);
+    strncpy(name, DEF_FILENAME, 9);
 
   return tfs_analyze(name,mode,partition);
 }
