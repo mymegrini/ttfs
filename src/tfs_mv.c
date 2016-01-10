@@ -38,7 +38,36 @@ void help (char *argv0) {
 	 argv0,
 	 OPT_HELP, OPT_HELP_LONG);
 }
+/*
+error mv (char *source, char *dest){
+ 
+  error e;
+  char *entry_s;
+  char *entry_d;
 
+  if((e = path_follow(source, NULL)) == TFS_ERRPATH_NOPFX){
+    fprintf(stderr,"Error: the path %s is not prefixed by FILE://\n",source);
+    return e;
+  }
+  if((e = path_follow(NULL,&entry_s)) == TFS_ERRPATH_NOWORKINGPATH){
+    fprintf(stderr,"Error: wrong path %s\n",source);
+    return e;
+  } 
+  if((e = path_follow(dest, NULL)) == TFS_ERRPATH_NOPFX){
+    fprintf(stderr,"Error: the path %s is not prefixed by FILE://\n",dest);
+    return e;
+  }
+  if((e = path_follow(NULL,&entry_d)) == TFS_ERRPATH_NOWORKINGPATH){
+    fprintf(stderr,"Error: wrong path %s\n",dest);
+    return e;
+  }
+  
+  if((e = tfs_rename(source,dest)) != EXIT_SUCCESS)
+    return e;
+  
+  return EXIT_SUCCESS;
+}
+*/
 error mv (char *source, char *dest){
 
   char *entry_s;
