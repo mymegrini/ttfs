@@ -122,7 +122,6 @@ int main(int argc, char* argv[]){
     };
     c = getopt_long(argc, argv, "s:o",
                  long_options, &index);
-    
     if (c==-1) break;
 
     switch (c) {
