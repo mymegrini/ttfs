@@ -26,13 +26,13 @@ struct option options[2] = {
 
 
 void usage (char *argv0){
-  printf("Usage :\t%s source destination\n",argv0);
+  printf("Usage :\t%s <source> <destination>\n",argv0);
 }
 
 
 void help (char *argv0) {
   usage(argv0);
-  printf("%s move source to destination.\n"
+  printf("%s - move source to destination.\n"
 	 "Options :\n"
 	 "-%c\t--%s\tPrint this message.\n",
 	 argv0,
@@ -55,39 +55,40 @@ error mv (char *source, char *dest){
   uint32_t vol_addr_s,vol_addr_d;
  
   if((e = path_follow(source, NULL)) == TFS_ERRPATH_NOPFX){
-    fprintf(stderr,"Error: the path is not prefixed by FILE://\n");
+    fprintf(stderr,"Error: the path %s is not prefixed by FILE://\n",source);
     return e;
   }
   if((e = path_follow(NULL,&entry_s)) == TFS_ERRPATH_NOWORKINGPATH){
-    fprintf(stderr,"Error: wrong path %s",source);
+    fprintf(stderr,"Error: wrong path %s\n",source);
     return e;
   }
   name_disk_s = entry_s;
-  strcat(name_disk_s,".tfs");
-  if((e = start_disk(name_disk_s,&id_s)) != EXIT_SUCCESS)
-    return e;
-
+  if((e = start_disk(name_disk_s,&id_s)) != EXIT_SUCCESS){
+    fprintf(stderr,"Error while opening disk %s\n",name_disk_s);
+    //return e;
+  }
   if((e = path_follow(NULL,&entry_s)) == TFS_ERRPATH_NOWORKINGPATH){
-    fprintf(stderr,"Error: wrong path %s",source);
+    fprintf(stderr,"Error: wrong path %s\n",source);
     return e;
   }  
   vol_addr_s = atou(entry_s); 
 
- if((e = path_follow(dest, NULL)) == TFS_ERRPATH_NOPFX){
-    fprintf(stderr,"Error: the path is not prefixed by FILE://\n");
+  if((e = path_follow(dest, NULL)) == TFS_ERRPATH_NOPFX){
+    fprintf(stderr,"Error: the path %s is not prefixed by FILE://\n",dest);
     return e;
   }
   if((e = path_follow(NULL,&entry_d)) == TFS_ERRPATH_NOWORKINGPATH){
-    fprintf(stderr,"Error: wrong path %s",dest);
+    fprintf(stderr,"Error: wrong path %s\n",dest);
     return e;
   }
   name_disk_d = entry_d;
-  strcat(name_disk_d,".tfs");
-  if((e = start_disk(name_disk_d,&id_d)) != EXIT_SUCCESS)
+  //strcat(name_disk_d,".tfs");
+  if((e = start_disk(name_disk_d,&id_d)) != EXIT_SUCCESS){
+    fprintf(stderr,"Error while opening disk %s\n",name_disk_d);
     return e;
-
+  }
   if((e = path_follow(NULL,&entry_d)) == TFS_ERRPATH_NOWORKINGPATH){
-    fprintf(stderr,"Error: wrong path %s",dest);
+    fprintf(stderr,"Error: wrong path %s\n",dest);
     return e;
   }  
   vol_addr_d = atou(entry_d);
@@ -114,12 +115,17 @@ error mv (char *source, char *dest){
   ino_file = (*dirent).d_ino;
   
   (*dirent).d_ino = ino_file;
-  if((e = directory_pushent(id_d,vol_addr_d,ino_d,dirent)) != EXIT_SUCCESS)
+  if((e = directory_pushent(id_d,vol_addr_d,ino_d,dirent)) != EXIT_SUCCESS){
+    closedir(dir_s);
     return e;
+  }
 
-  if((e = directory_rment(id_s,vol_addr_s,ino_s,name_disk_s)) != EXIT_SUCCESS)
+  if((e = directory_rment(id_s,vol_addr_s,ino_s,name_disk_s)) != EXIT_SUCCESS){
+    closedir(dir_s);
     return e;
+  }
   
+  closedir(dir_s);
   
   return EXIT_SUCCESS;
 } 
@@ -142,12 +148,12 @@ int main (int argc, char *argv[] ){
     }
   }
   if (optind == argc) {
-    fputs("Argument path missing.", stderr);
+    fputs("Argument path missing.\n", stderr);
     usage(argv[0]);
     return PATH_MISSING;
   }
-  source = argv[optind-1];
-  dest = argv[optind-1];
+  source = argv[argc-2];
+  dest = argv[argc-1];
 
   return mv(source,dest);
 }

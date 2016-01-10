@@ -1,9 +1,11 @@
 #include "tfs.h"
 #include "tfsll.h"
+#include "ll.h"
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <semaphore.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -215,14 +217,107 @@ int tfs_rename(const char *path, const char *newname){
 
 
 /**
- * 
- * 
- * 
- * 
+ * @param oflag O_RDONLY|O_WRONLY|O_RDWR [O_CREAT|O_APPEND|O_TRUNC]
  * 
  */
-int tfs_open(const char *name,int oflag, ...){
-  return 0;
+int tfs_open(const char *name, int oflag, ...){
+  if ((oflag&O_RDONLY)||(oflag&O_WRONLY)||(oflag&O_RDWR)){
+    uint32_t inode;
+    char* path = strdup(name);
+    char* fname;
+    char* elem;
+    disk_id id;
+    uint32_t vol_addr;
+    int fd;
+    
+    //find file inode
+    errnum = find_inode(path, &inode);
+    
+    //case 1: create new file
+    if (errnum == TFS_F_NOTFOUND && (oflag|O_CREAT)){
+      uint32_t dino;
+      struct dirent entry;
+      
+      //obtaining name and parent path
+      if ((errnum = path_split(path, &fname))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      
+      //test for failure
+      if ((errnum= find_inode(path, &dino))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      
+      //get disk id
+      if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      strcat(elem, DEF_EXT);
+      if ((errnum = start_disk(elem, &id))!=EXIT_SUCCESS)
+	{free(path);return -1;}      
+      
+      //get volume address
+      if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
+	{free(path);return -1;}      
+      if (atou(elem)<0)
+	{free(path);return -1;}
+      if ((errnum = p_index(id, atou(elem), &vol_addr))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      
+      //open new file
+      if ((fd = file_open(id, vol_addr, 0, oflag, TFS_REGULAR_TYPE, 0))==-1)
+	{free(path);return -1;}
+      
+      //store new file entry in <dino> directory
+      entry.d_ino = _filedes[fd]->inode;
+      if (strlen(fname)>TFS_NAME_MAX) fname[TFS_NAME_MAX]=0;
+      strcpy(entry.d_name, fname);
+      if ((errnum = directory_pushent(id, vol_addr, dino, &entry))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      
+      //return file descriptor
+      return fd;      
+    }
+    
+    //case 2: file does not exist
+    if (errnum == TFS_F_NOTFOUND) {free(path);return -1;}
+    
+    //case 3: file exists
+    if (errnum == EXIT_SUCCESS){      
+      //obtaining name and parent path
+      if ((errnum = path_split(path, &fname))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      
+      //get disk id
+      if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
+	{free(path);return -1;}
+      strcat(elem, DEF_EXT);
+      if ((errnum = start_disk(elem, &id))!=EXIT_SUCCESS)
+	{free(path);return -1;}      
+      
+      //get volume address
+      if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
+	{free(path);return -1;}      
+      if (atou(elem)<0)
+	{free(path);return -1;}
+      if ((errnum = p_index(id, atou(elem), &vol_addr))!=EXIT_SUCCESS)
+	{free(path);return -1;}  
+      
+      //open file      
+      if ((fd = file_open(id, vol_addr, inode, oflag, 0, 0))==-1)
+	{free(path);return -1;}
+      
+      //truncate file if necessary
+      if (((oflag&O_WRONLY)||(oflag&O_RDWR))&&(oflag&O_TRUNC)){
+	if ((errnum = file_realloc(id, vol_addr, inode, 0))!=EXIT_SUCCESS)
+	  {free(path);return -1;}
+      }
+      
+      //return file descriptor
+      return fd;      
+    }
+    return -1;
+  } else {
+    errnum = TFS_O_NOACCESS;
+    return -1;
+  }
 }
 
 
@@ -388,8 +483,3 @@ void rewinddir(DIR *dir){
 int closedir(DIR *dir){
   return tfs_close(dir->fd);
 }
-
-
-
-
-

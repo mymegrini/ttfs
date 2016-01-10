@@ -84,7 +84,7 @@
  */
 struct dirent {
   uint32_t       d_ino;       /**< file number    */
-  char           d_name[TFS_NAME_MAX];  /**< entry name     */
+  char           d_name[TFS_NAME_MAX+1];  /**< entry name     */
 };
 
 /**
