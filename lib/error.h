@@ -82,7 +82,12 @@ void testerror(char* msg, error err);
 #define TFS_FILENOTFOUND 38
 #define TFS_ERRPATH_NODISK 39
 #define TFS_EXISTINGENTRY 40
-#define TFS_ERROPEN 41
+#define TFS_BAD_FILDES 41  /**< Bad file descriptor */
+#define TFS_LOCK_FAIL 42    /**< Failed to acquire lock on file */
+#define TFS_UNLOCK_FAIL 43  /**< Failed to release lock on file */
+#define ERR_TFS_READ 44
+#define TFS_ERROPEN 45
+
 /**
  * @brief This variable can store an error
  *
