@@ -25,6 +25,7 @@ typedef struct {
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX+1];    /**< size of partitions, null at the creation. */
+  time_t time; /**< disk session start time */
 } disk_ent;
 
 static disk_ent* _disk[DD_MAX];    /**< opened disks. A disk_id refers to an index in this array */
@@ -134,7 +135,7 @@ error start_disk(char *name,disk_id *id){
   dent->name[D_NAME_MAXLEN]=0;
   dent->fd = fd;
   strncpy(dent->name, name, D_NAME_MAXLEN);
-
+  dent->time = time(NULL);
   
 
   _disk[i] = dent;
@@ -249,6 +250,7 @@ error disk_stat(disk_id id, d_stat* stat){
     strncpy(stat->hash, _disk[id]->hash, HASH_LEN);
     stat->size = _disk[id]->size;
     stat->npart = _disk[id]->npart;
+    stat->time = _disk[id]->time;
     for (n=0; n<stat->npart; n++){
       stat->part[n] = _disk[id]->part[n];
     }

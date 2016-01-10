@@ -4,6 +4,7 @@
 #include "error.h"
 #include "block.h"
 #include "utils.h"
+#include <time.h>
 
 #define DD_MAX 100        /***< maximum number of open disks */
 #define D_PARTMAX 10      /***< maximum number of partitions in a disk */
@@ -26,6 +27,7 @@ typedef struct {
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
   uint32_t part[D_PARTMAX];    /**< parition sizes */
+  time_t time;
 } d_stat;
 
 /**
