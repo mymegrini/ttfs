@@ -76,21 +76,6 @@
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @brief File table entry structure
- *
- * 
- */
-typedef struct {
-  uint32_t size;
-  uint32_t type;
-  uint32_t subtype;
-  uint32_t tfs_direct[TFS_DIRECT_BLOCKS_NUMBER];
-  uint32_t tfs_indirect1;
-  uint32_t tfs_indirect2;
-  uint32_t nextfreefile;
-} tfs_ftent;
-
 
 /**
  * @brief Directory entry
@@ -130,32 +115,6 @@ file* _filedes[TFS_FILE_MAX];
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-
-/**
- * @brief Read a file table entry
- *
- *  
- * @param id 
- * @param vol_addr 
- * @param inode 
- * @param ftent 
- * @return error
- */
-error
-read_ftent(const disk_id id, const uint32_t vol_addr, const uint32_t inode,
-	   tfs_ftent * ftent);
-
-
-/**
- * @brief Push the block <b_addr> to the free blocks list
- * 
- * @param b_addr block index on the volume
- * @param id disk id
- * @param vol partition number
- * @return error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid
- */
-error
-freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr);
 
 
 /**
