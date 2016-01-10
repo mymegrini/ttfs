@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <semaphore.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -77,6 +76,15 @@ struct _index{
   int32_t indirect2;        /**< current index in indirect2 block (-1 empty) >*/
   uint32_t indirect1_addr;   /**< current indirect1 block address >*/
   uint32_t indirect2_addr;   /**< current indirect2 block address >*/
+};
+
+struct file {
+  disk_id id;
+  uint32_t vol;
+  uint32_t inode;
+  sem_t* sem;
+  uint32_t offset;
+  int flags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -754,6 +762,12 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
   }
   free(b);
   return F_SIZE_CORRUPTED;
+}
+
+
+int
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
+  return -1;
 }
 
 #define TFS_ERR_OPERATION 214

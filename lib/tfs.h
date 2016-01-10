@@ -38,6 +38,24 @@ int tfs_rename(const char *old, const char *new);
 int tfs_open(const char *name,int oflag, ...);
 
 /**
+ * @brief Gives calling process exclusive control over file
+ *
+ * @param fildes file descriptor
+ * @return 0 on success, -1 on failure (errnum set)
+ */
+int
+tfs_lock (int fildes);
+
+/**
+ * @brief Relinquishes exclusive control over file
+ *
+ * @param fildes file descriptor
+ * @return 0 on success, -1 on failure (errnum set)
+ */
+int
+tfs_unlock (int fildes);
+
+/**
  * @brief This function attempts to read up to <nbytes> bytes from file descriptor
  * <fildes> into the buffer starting at <buf>
  * @param[in] fildes file desctiptor

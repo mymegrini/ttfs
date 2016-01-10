@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include "error.h"
 #include "ll.h"
+#include <semaphore.h>
 //#include "block.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,8 @@
 			     )						\
 			   )
 
+#define TFS_FILE_MAX 400                          /** TFS directory maximum number of open files */
+
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +93,13 @@ struct dirent {
  */
 typedef struct _index* _index;
 
+typedef struct file* file;
+
+////////////////////////////////////////////////////////////////////////////////
+// VARIABLES
+////////////////////////////////////////////////////////////////////////////////
+
+file _filedes[TFS_FILE_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
@@ -218,36 +228,6 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
  */
 error
 file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
-
-/**
- * @brief Opens a file and returns a file descriptor
- *
- * @param inode file inode
- * @param vol partition index
- * @param id disk id number 
- * @param[in] b_file_addr block's file number
- * @return b_addr block's volume address
- */
-int
-file_open (disk_id id, uint32_t vol_addr, uint32_t inode);
-
-/**
- * @brief Gives calling process exclusive control over file
- *
- * @param fildes file descriptor
- * @return 0 on success, -1 on failure (errnum set)
- */
-int
-file_lock (int fildes);
-
-/**
- * @brief Relinquishes exclusive control over file
- *
- * @param fildes file descriptor
- * @return 0 on success, -1 on failure (errnum set)
- */
-int
-file_unlock (int fildes);
 
 /**
  * @brief Finds a file block's volume address
