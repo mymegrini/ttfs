@@ -57,6 +57,10 @@
 #define TFS_ENTRY_NOTFOUND 118
 #define TFS_ERRLOCK 115
 #define TFS_FILENOTFOUN 221
+#define TFS_ERRPATH_HOST 222
+#define TFS_ERRPATH_PARTID 223
+#define TFS_FILENOTFOUND 224
+#define TFS_ERRPATH_NODISK 225
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,7 +788,7 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
 	   int type, int subtype){
   tfs_ftent ftent;
   error e;
-  int fd;
+  int fd = 0;
   uint32_t finode;
   
   if(flags&O_CREAT){ //create new file entry
@@ -1175,7 +1179,7 @@ path_split (char *path, char **leaf)
 
 
 error
-tfs_fileno (char *path, uint32_t *ino)
+find_inode (char *path, uint32_t *ino)
 {
   char *last_el;
   error e = path_split(path, &last_el);
