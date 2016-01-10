@@ -343,7 +343,7 @@ path_split (char *path, char **last_element);
  * @return error
  */
 error
-tfs_fileno (char *path, uint32_t *ino);
+find_inode (char *path, uint32_t *ino);
 
 #endif // TFSLL_H
 
