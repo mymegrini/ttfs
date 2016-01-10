@@ -764,25 +764,51 @@ find_addr(disk_id id, uint32_t vol_addr, uint32_t inode,
 
 
 int
-file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
-  int fd;
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
+	   int type, int subtype){
   tfs_ftent ftent;
-  error e = read_ftent(id, vol, inode, &ftent);
-
-  if (e != EXIT_SUCCESS) {errnum = e; return -1}
-  else {
+  error e;
+  int fd;
+  uint32_t finode;
+  
+  if(flags&O_CREAT){ //create new file entry
+    //get free file entry
+    freefile_pop(id, vol_addr, &finode);
+    //fill file entry
+    ftent.size = 0;
+    ftent.type = type;
+    ftent.subtype = type;
+    //write file entry
+    write_ftent(id, vol_addr, finode, &ftent);
+  } else {
+    finode = inode;
+    //read file entry
+    e = read_ftent(id, vol_addr, finode, &ftent);    
+    if (e != EXIT_SUCCESS) {errnum = e; return -1}
+  }
+     
+  //find available file descriptor
+  while (fd < TFS_FILE_MAX && _filedes[fd] != NULL) fd++;
+  if (fd == TFS_FILE_MAX){
+    errnum = TFS_MAX_FILE;
+    return -1;
+  } else {
+    //get file semaphore
+    char name[SEM_NAME_LEN];
+    sem_t* sem;      
+    sem_name(name, SEM_FILE_T, id, vol_addr, finode);
+    sem = sem_open(name, O_CREAT,
+			 S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
     //fill structure
-    file* file = (file*) malloc(sizeof(file));
+    file* file; = (file*) malloc(sizeof(file));
     file->id = id;
-    file->vol = vol_addr;
-    file->inode = inode;
-    
-    //find available file descriptor
-    while (fd < TFS_FILE_MAX && _filedes[fd] != NULL) fd++;
-    if (fd == TFS_FILE_MAX){
-      errnum = TFS_MAX_FILE;
-      return -1;
-    }
+    file->vol_addr = vol_addr;
+    file->inode = finode;
+    file->sem = sem;
+    file->offset = 0;
+    file->flags = flags;
+    file->type = ftent.type;
+    file->subtype = ftent.subtype;
     
     //register structure and return file descriptor
     _filedes[fd] = &file;

@@ -59,8 +59,8 @@
 #define TFS_DIRECTORY_ENTRIES_PER_BLOCK			\
   (TFS_VOLUME_BLOCK_SIZE/TFS_DIRECTORY_ENTRY_SIZE)/*** Number of directory entries per block */
 
-#define TFS_NAME_MAX 28                           /** TFS directory entry name maximum length */
 #define TFS_DIRECTORY_ENTRY_SIZE (INTX(1)+TFS_NAME_MAX) /** TFS directory entry size */
+#define TFS_NAME_MAX (TFS_DIRECTORY_ENTRY_SIZE-INTX(1)-1) /** TFS directory entry name maximum length */
 #define TFS_DIRECTORY_ENTRY_INDEX(i) ((i)*TFS_DIRECTORY_ENTRY_SIZE) /** TFS directory entry file index */
 
 #define TFS_FILE_MAX_SIZE (TFS_VOLUME_BLOCK_SIZE			\
@@ -256,10 +256,13 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
  * @param[in] id disk id
  * @param[in] vol_addr volume address
  * @param[in] inode file number
+ * @param[in] flags opening mode
+ * @param[in] 
  * @return Returns 0 on success or -1 if an error occured
  */
 int
-file_open (disk_id id, uint32_t vol_addr, uint32_t inode);
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
+	   int type, int subtype);
 
 #define TFS_PATHLEAF 1
 #define TFS_ERRPATH_NOPFX 104
