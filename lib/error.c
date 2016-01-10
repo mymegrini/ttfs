@@ -54,7 +54,10 @@ static char* _errlist[] = {
   "Bad file descriptor",
   "Failed to acquire lock on file",
   "Failed to release lock on file",
-  "ERR_TFS_READ"
+  "ERR_TFS_READ",
+  "TFS_NOENTRY",
+  "TFS_DIRNOTEMPTY",
+  "Access mode bits not found"
 };
 
 /**

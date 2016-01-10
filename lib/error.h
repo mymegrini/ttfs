@@ -87,8 +87,9 @@ void testerror(char* msg, error err);
 #define TFS_UNLOCK_FAIL 43  /**< Failed to release lock on file */
 #define ERR_TFS_READ 44
 #define TFS_ERROPEN 45
-
-
+#define TFS_NOENTRY 46      /**< entry doesn't exist in the directory */
+#define TFS_DIRNOTEMPTY 47  /**< directory not empty */
+#define TFS_O_NOACCESS 48   /**< Access mode bits not found */
 /**
  * @brief This variable can store an error
  *
