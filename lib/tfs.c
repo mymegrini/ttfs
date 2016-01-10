@@ -5,6 +5,7 @@
 #include <string.h>
 #include <semaphore.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -38,6 +39,7 @@ find_entry (DIR *dir, char *name)
       return ent;
   return NULL;    
 }
+
 /**
  * 
  * 
@@ -78,7 +80,7 @@ int tfs_mkdir(const char *path, mode_t mode)
     closedir(parent);
     return TFS_EXISTINGENTRY;
   }
-  // create entry
+  // create directory content
   const disk_id  id       = _filedes[parent->fd]->id;
   const uint32_t vol_addr = _filedes[parent->fd]->vol_addr;
   int fd = file_open(id, vol_addr, 0, O_CREAT, TFS_DIRECTORY_TYPE, 0);
@@ -86,13 +88,33 @@ int tfs_mkdir(const char *path, mode_t mode)
     free(parent_path);
     return TFS_ERROPEN;
   }
-
+  char new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE*2];
+  // fill entry with 0
+  memset(new_entry_buf, 0, TFS_DIRECTORY_ENTRY_SIZE*2);
+  
   //////////////////////////////////////////////////////////////////////////////
   // NEED A CHECK
-  char new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
   rintle((uint32_t *)new_entry_buf, (block)&(_filedes[fd]->inode), 0);
+  rintle((uint32_t *)&new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE],
+	 (block)&(filedes[parent->ino]), 0);
   //////////////////////////////////////////////////////////////////////////////
-
+  new_entry_buf[INT_SIZE                               ] = '.';
+  new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE    ] = '.';
+  new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + 1 + INT_SIZE] = '.';
+  e = tfs_write(fd, new_entry_buf, TFS_DIRECTORY_ENTRY_SIZE);
+  // upon error, remove created file
+  if (e != EXIT_SUCCESS) {
+    freefile_push(id, vol_addr, _filedes[fd]->inode);
+    tfs_close(fd);
+    closedir(parent);
+    free(parent_path);
+    return e;
+  }
+  close(fd);
+  // add entry to parent directory
+  // fill name part with 0
+  memset(&new_entry_buf[INT_SIZE], 0, TFS_NAME_MAX);
+  // copy entry name
   strncpy(&new_entry_buf[INT_SIZE], last_el, TFS_NAME_MAX);
   e = tfs_write(fd, new_entry_buf, TFS_DIRECTORY_ENTRY_SIZE);
   // upon error, remove created file
@@ -111,6 +133,40 @@ int tfs_mkdir(const char *path, mode_t mode)
  * 
  */
 int tfs_rmdir(const char *path){
+  error e;
+  char *parent_path = strdup(path);
+  char *last_el;
+  if ((e = path_split(parent_path, &last_el)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // TEST HOST
+  char *disk;
+  if ((e = path_follow(NULL, &disk)) == TFS_PATHLEAF) {
+    free(parent_path);
+    return TFS_ERRPATH;
+  }
+  // HOST CASE
+  if (ISHOST(disk)) {
+    e = rmdir(&path[PATH_FPFXLEN+4]);
+    free(parent_path);
+    return e;
+  }
+  // TFS CASE
+  // open directory
+  DIR *parent = opendir(parent_path);
+  if (parent == NULL) {
+    free(parent_path);
+    return TFS_ERRPATH;
+  }
+  // look for the existing entry
+  struct dirent *ent;
+  if ((ent = find_entry(parent, last_el)) == NULL) {
+    free(parent_path);
+    closedir(parent);
+    return TFS_NOENTRY;
+  }
+  else directory_pushent(const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry)
   
   return 0;
 }
