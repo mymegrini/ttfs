@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
+#define ISFILDES(fildes) ((filedes)<TFS_FILE_MAX && _fildes[fildes])
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -127,7 +128,10 @@ int tfs_open(const char *name,int oflag, ...){
  */
 int
 tfs_lock (int fildes){
-  return sem_wait(_filedes[fildes]->sem);
+  if (ISFILDES(fildes)) {
+    if (sem_wait(_filedes[fildes]->sem)) return TFS_LOCK_FAIL;
+    else return EXIT_SUCCESS;
+  } else return TFS_BAD_FILDES;
 }
 
 /**
@@ -138,7 +142,10 @@ tfs_lock (int fildes){
  */
 int
 tfs_unlock (int fildes){
-  return sem_post(_filedes[fildes]->sem);
+  if (ISFILDES(fildes)) {
+    if (sem_post(_filedes[fildes]->sem)) return TFS_UNLOCK_FAIL;
+    else return EXIT_SUCCESS;
+  } else return TFS_BAD_FILDES;
 }
 
 /**

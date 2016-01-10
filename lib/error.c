@@ -49,7 +49,10 @@ static char* _errlist[] = {
   "TFS_ERRPATH_HOST",
   "TFS_ERRPATH_PARTID",
   "TFS_FILENOTFOUND",
-  "TFS_ERRPATH_NODISK"
+  "TFS_ERRPATH_NODISK",
+  "Bad file descriptor",
+  "Failed to acquire lock on file",
+  "Failed to release lock on file"
 };
 
 /**
