@@ -27,7 +27,15 @@ struct _DIR {
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-
+static struct entry*
+find_entry (DIR *dir, char *name)
+{
+  struct entry* ent;
+  while ((ent = readdir(dir)) != NULL)
+    if (strncmp(ent->d_name, name, TFS_NAME_MAX) == 0)
+      return ent;
+  return NULL;    
+}
 /**
  * 
  * 
@@ -43,14 +51,39 @@ int tfs_mkdir(const char *path, mode_t mode)
     free(parent_path);
     return e;
   }
+  // TEST HOST
+  char *disk;
+  if ((e = path_follow(NULL, &disk)) == TFS_PATHLEAF) {
+    free(parent_path);
+    return TFS_ERRPATH;
+  }
+  // HOST CASE
+  if (ISHOST(disk)) {
+    e = mkdir(&path[PATH_FPFXLEN+4], mode);
+    free(parent_path);
+    return e;
+  }
+  // TFS CASE
+  // open directory
   DIR *parent = opendir(parent_path);
   if (parent == NULL) {
     free(parent_path);
     return TFS_ERRPATH;
   }
+  // look for a possible existing entry
+  if (find_entry(parent, last_el) != NULL) {
+    free(parent_path);
+    closedir(parent);
+    return TFS_EXISTINGENTRY;
+  }
+  // create entry
   const disk_id  id       = _filedes[parent->fd]->id;
   const uint32_t vol_addr = _filedes[parent->fd]->vol_addr;
   uint32_t ino_new;
+  int fd = file_open(id, vol_addr, 0, O_CREAT, TFS_DIRECTORY_TYPE, 0);
+  if (fd == -1) {
+    return 
+  }
   // Get a new inode
   e = freefile_pop(id, vol_addr, &ino_new);
   if (e != EXIT_SUCCESS) {
@@ -94,6 +127,7 @@ int tfs_mkdir(const char *path, mode_t mode)
  * 
  */
 int tfs_rmdir(const char *path){
+  
   return 0;
 }
 
