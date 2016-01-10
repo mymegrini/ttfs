@@ -105,6 +105,12 @@ typedef struct{
   int subtype;
 } File;
 
+typedef struct{
+  uint32_t size;
+  uint32_t type;
+  uint32_t subtype;
+} f_stat;
+
 ////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +256,7 @@ file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
  * @param[out] b_addr block's volume address
  */
 error
-find_addr(disk_id id, uint32_t vol, uint32_t inode,
+find_addr(disk_id id, uint32_t vol_addr, uint32_t inode,
 	  uint32_t b_file_addr, uint32_t* b_addr);
 
 /**
@@ -344,6 +350,11 @@ path_split (char *path, char **last_element);
  */
 error
 find_inode (char *path, uint32_t *ino);
+
+
+error
+file_stat (disk_id id, uint32_t vol_addr, uint32_t inode, f_stat* stat);
+
 
 #endif // TFSLL_H
 

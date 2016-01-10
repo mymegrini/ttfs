@@ -1229,6 +1229,21 @@ find_inode (char *path, uint32_t *ino)
 }
 
 
+
+error
+file_stat (disk_id id, uint32_t vol_addr, uint32_t inode, f_stat* stat){
+  tfs_ftent ftent;
+  error e;
+  
+  //read file entry
+  if ((e= read_ftent(id, vol_addr, inode, &ftent)) != EXIT_SUCCESS) return e;
+  stat->size = ftent.size;
+  stat->type = ftent.type;
+  stat->subtype = ftent.subtype;
+  return EXIT_SUCCESS;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // TRASH
 ////////////////////////////////////////////////////////////////////////////////

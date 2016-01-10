@@ -13,6 +13,7 @@
 
 #define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
 #define ISFILDES(fildes) ((fildes)<TFS_FILE_MAX && _filedes[fildes])
+#define B_FILE_ADDR(offset) ((offset)/TFS_VOLUME_BLOCK_SIZE)
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -286,7 +287,10 @@ tfs_unlock (int fildes){
  * 
  */ 
 ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
-  return 0;
+  //test fildes
+  if (!ISFILDES(fildes)) return TFS_BAD_FILDES;
+  else {
+    File* fd = _filedes+fildes;
 }
 
 /**
@@ -298,7 +302,11 @@ ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
  * 
  */
 ssize_t tfs_write(int fildes,void *buf,size_t nbytes){
-  return 0;
+  //test fildes
+  if (!ISFILDES(fildes)) return TFS_BAD_FILDES;
+  else {
+  
+  ssize_t s;
 }
 
 /**
@@ -358,3 +366,5 @@ void rewinddir(DIR *dirp){
 int closedir(DIR *dirp){
   return 0;
 }
+
+ 
