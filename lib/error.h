@@ -69,6 +69,18 @@ void testerror(char* msg, error err);
 #define D_PERM_FAIL 25      /**< Setting permissions for disk failed >*/
 #define S_WRONGTYPE 26      /**< Semaphore type unrecognized */
 #define TFS_MAX_FILE 27     /**< Maximum number of open files reached */
+#define TFS_ERR_BIGFILE 28
+#define TFS_SYSDIR 29
+#define TFS_ERR_OPERATION 30
+#define DIR_BLOCKFULL 31
+#define TFS_ERRPATH 32
+#define TFS_ENTRY_NOTFOUND 33
+#define TFS_ERRLOCK 34
+#define TFS_FILENOTFOUN 35
+#define TFS_ERRPATH_HOST 36
+#define TFS_ERRPATH_PARTID 37
+#define TFS_FILENOTFOUND 38
+#define TFS_ERRPATH_NODISK 39
 
 /**
  * @brief This variable can store an error
