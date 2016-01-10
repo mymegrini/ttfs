@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall --pedantic -O3 #-std=c11
+CFLAGS = -Wall --pedantic -O3 -std=gnu11
 VPATH = src:lib
 
 EXEC = $(patsubst src/%.c, bin/%, $(wildcard src/*.c))
