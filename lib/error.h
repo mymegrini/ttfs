@@ -88,6 +88,7 @@ void testerror(char* msg, error err);
 #define ERR_TFS_READ 44
 #define TFS_ERROPEN 45
 #define TFS_NOENTRY 46   /**< entry doesn't exist in the directory */
+#define TFS_DIRNOTEMPTY 47 /**< directory not empty */
 /**
  * @brief This variable can store an error
  *
