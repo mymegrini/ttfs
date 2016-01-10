@@ -53,7 +53,8 @@ static char* _errlist[] = {
   "TFS_EXISTINGENTRY",
   "Bad file descriptor",
   "Failed to acquire lock on file",
-  "Failed to release lock on file"
+  "Failed to release lock on file",
+  "ERR_TFS_READ"
 };
 
 /**
