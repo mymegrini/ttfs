@@ -14,14 +14,17 @@
 #define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
 #define ISFILDES(fildes) ((fildes)<TFS_FILE_MAX && _filedes[fildes])
 
+#ifndef B_SIZE
+   #define B_SIZE 1024
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
 
 struct _DIR {
   int             fd;
-  uint32_t        f_offset;
   uint32_t        b_offset;
+  uint32_t        b_size;
   struct dirent   buf[32];
 };
 
@@ -300,7 +303,28 @@ off_t tfs_lseek(int fildes,off_t offset,int whence){
  * 
  */
 DIR *opendir(const char *filename){
-  return NULL;
+  int fd = tfs_open(filename, O_RDWR);
+  if (fd == -1) {
+    errnum = TFS_ERROPEN;
+    return NULL;
+  }
+  DIR *dir = (DIR *) malloc(sizeof(DIR));
+  dir->fd       = fd;
+  dir->b_offset = 0;
+  dir->b_size   = 0;
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
+    {
+      char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
+      if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+	return dir;
+      else {
+	// fill buffer
+	rintle(&dir->buf[i].d_ino, (block)entry_buf, 0);
+	strncpy(dir->buf[i].d_name, &entry_buf[INT_SIZE], TFS_NAME_MAX);
+	dir->b_size++;
+      }      
+    }
+  return dir;
 }
 
 /**
@@ -308,8 +332,25 @@ DIR *opendir(const char *filename){
  * 
  * 
  */
-struct dirent *readdir(DIR *dirp){
-  return NULL;
+struct dirent *readdir(DIR *dir){
+  // end of the buffer
+  if (dir->b_offset == dir->b_size) {
+    char entry_buff[TFS_DIRECTORY_ENTRY_SIZE];
+    // END OF THE DIRECTORY
+    if (tfs_read(dir->fd, entry_buff, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+      return NULL;
+    // NOT THE END, LOAD BUFFER
+    dir->b_size   = 0;
+    dir->b_offset = 0;
+    do
+      {
+	rintle(&dir->buf[dir->b_size].d_ino, (block)entry_buff, 0);
+	strncpy(dir->buf[dir->b_size].d_name, &entry_buff[INT_SIZE], TFS_NAME_MAX);
+	++dir->b_size;
+      }
+    while (tfs_read(dir->fd, entry_buff, TFS_DIRECTORY_ENTRY_SIZE) != 0);
+  }
+  return &dir->buf[dir->b_offset++];
 }
 
 /**
