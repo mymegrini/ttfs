@@ -213,7 +213,8 @@ directory_pushent (const disk_id id, const uint32_t vol_addr,
  * @return error EXIT_SUCCESS
  */
 error
-directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
+directory_rment (const disk_id id, const uint32_t vol_addr,
+		 const uint32_t inode, char *name);
 
 
 /**

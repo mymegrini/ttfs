@@ -8,6 +8,7 @@
 
 #include "ll.h"
 #include "tfsll.h"
+#include "tfs.h"
 #include "block.h"
 #include <stdlib.h>
 #include <stdint.h>
@@ -51,6 +52,8 @@
 #define TFS_ERR_OPERATION 214
 #define DIR_BLOCKFULL -1
 #define TFS_ERRPATH     220
+#define TFS_ENTRY_NOTFOUND 118
+#define TFS_ERRLOCK 115
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -1002,18 +1005,19 @@ directory_pushent (disk_id, uint32_t vol_addr, uint32_t inode,
 
 
 error
-directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
+directory_rment (const disk_id id, const uint32_t vol_addr,
+		 const uint32_t inode, char *name)
 {
   if (strcmp(name, ".") == 0 || strcmp(name, ".."))
     return TFS_SYSDIR;
   error     e;
   tfs_ftent ftent;
-  if ((e = read_ftent(id, inode, &ftent)) != EXIT_SUCCESS)
+  if ((e = read_ftent(id, vol_addr, inode, &ftent)) != EXIT_SUCCESS)
     return e;
   // open file for reading
   int fd = file_open(id, vol_addr, inode);
   // lock file
-  if (file_lock(fildes) != 0)
+  if (tfs_lock(fd) != 0)
     return TFS_ERRLOCK;
   
   char buf[TFS_DIRECTORY_ENTRY_SIZE];
@@ -1024,7 +1028,7 @@ directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
       tfs_lseek(fd, INT_SIZE, SEEK_CUR);
       // read the name
       if ((e = tfs_read(fd, buf, TFS_NAME_MAX)) != EXIT_SUCCESS) {
-	file_unlock(fd);
+	tfs_unlock(fd);
 	tfs_close(fd);
 	return e;
       }
@@ -1042,12 +1046,12 @@ directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
 	  // overwrite entry by last one
 	  tfs_lseek(fd, -TFS_DIRECTORY_ENTRY_SIZE, SEEK_END);
 	  if (tfs_read(fd, buf, TFS_NAME_MAX) == -1) {
-	    file_unlock(fd);
+	    tfs_unlock(fd);
 	    tfs_close(fd);
 	    return -1;
 	  }
-	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_INDEX);
-	  file_unlock(fd);
+	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_SIZE);
+	  tfs_lock(fd);
 	  tfs_close(fd);
 	  return e;
 	}
