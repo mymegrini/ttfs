@@ -3,25 +3,18 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include <semaphore.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
-#define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
-////////////////////////////////////////////////////////////////////////////////
-// ERRORS
-////////////////////////////////////////////////////////////////////////////////
-#define TFS_ERRPATH_NODISK  215
-#define TFS_ERRPATH_HOST    216
-#define TFS_ERRPATH_PARTID  217
-#define TFS_ERRLOCK         300
-#define TFS_ERRPATH         201
 
+#define DIRECTORY_SIZEMIN (2*TFS_DIRECTORY_ENTRY_SIZE)
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
+
 struct _DIR {
   int             fd;
   uint32_t        ino;
@@ -29,6 +22,7 @@ struct _DIR {
   uint32_t        b_offset;
   struct dirent   buf[32];
 };
+
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +118,29 @@ int tfs_open(const char *name,int oflag, ...){
   return 0;
 }
 
+
+/**
+ * 
+ *
+ * 
+ * 
+ */
+int
+tfs_lock (int fildes){
+  return sem_wait(_filedes[fildes]->sem);
+}
+
+/**
+ * 
+ *
+ * 
+ * 
+ */
+int
+tfs_unlock (int fildes){
+  return sem_post(_filedes[fildes]->sem);
+}
+
 /**
  * 
  * 
@@ -131,7 +148,7 @@ int tfs_open(const char *name,int oflag, ...){
  * 
  * 
  * 
- */uint32_t 
+ */ 
 ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
   return 0;
 }
