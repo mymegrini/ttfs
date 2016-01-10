@@ -50,6 +50,7 @@ static char* _errlist[] = {
   "TFS_ERRPATH_PARTID",
   "TFS_FILENOTFOUND",
   "TFS_ERRPATH_NODISK",
+  "TFS_EXISTINGENTRY",
   "Bad file descriptor",
   "Failed to acquire lock on file",
   "Failed to release lock on file"
