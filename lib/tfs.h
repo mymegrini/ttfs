@@ -27,7 +27,7 @@ int tfs_rmdir(const char *path);
  * @param[in] new specifies new pathname
  * @return Returns 0 on success or -1 if an error occured
  */
-int tfs_rename(disk_id id, uint32_t vol_addr, const char *old, const char *new);
+int tfs_rename(const char *old, const char *new);
 
 /**
  * @brief This function returns a file descriptor for use in subsequent system calls
