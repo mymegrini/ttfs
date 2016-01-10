@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include "error.h"
 #include "ll.h"
+#include <semaphore.h>
 //#include "block.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,8 @@
 			     )						\
 			   )
 
+#define TFS_FILE_MAX 400                          /** TFS directory maximum number of open files */
+
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +93,22 @@ struct dirent {
  */
 typedef struct _index* _index;
 
+typedef struct {
+  disk_id id;
+  uint32_t vol;
+  uint32_t inode;
+  sem_t* sem;
+  uint32_t offset;
+  int flags;
+  int type;
+  int subtype;
+} file;
+
+////////////////////////////////////////////////////////////////////////////////
+// VARIABLES
+////////////////////////////////////////////////////////////////////////////////
+
+file _filedes[TFS_FILE_MAX];
 
 ////////////////////////////////////////////////////////////////////////////////
 // FUNCTIONS
@@ -219,7 +238,6 @@ directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry);
 error
 file_freeblocks (disk_id id, uint32_t vol, uint32_t inode);
 
-
 /**
  * @brief Finds a file block's volume address
  *
@@ -233,6 +251,15 @@ error
 find_addr(disk_id id, uint32_t vol, uint32_t inode,
 	  uint32_t b_file_addr, uint32_t* b_addr);
 
+/**
+ * @brief This function returns a file descriptor for use in subsequent system calls
+ * @param[in] id disk id
+ * @param[in] vol_addr volume address
+ * @param[in] inode file number
+ * @return Returns 0 on success or -1 if an error occured
+ */
+int
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode);
 
 #define TFS_PATHLEAF 1
 #define TFS_ERRPATH_NOPFX 104
@@ -287,6 +314,19 @@ error
 path_follow (const char * path, char ** entry);
 
 
+/**
+ * @brief Split a path between parent directory path and last element.
+ * 
+ * After successfull execution, path is modified to contain the parent directory
+ * path, last_element point to the last_element of the path.
+ * Also test if path is prefixed, you can then just call path_follow with a NULL
+ * path to follow the path without testing prefix.
+ * @param path 
+ * @param leaf 
+ * @return error
+ */
+error
+path_split (char *path, char **last_element);
 #endif // TFSLL_H
 ////////////////////////////////////////////////////////////////////////////////
 // $Log:$

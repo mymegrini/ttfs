@@ -2,8 +2,9 @@
 #define TFS_H
 #include <sys/types.h>
 #include "tfsll.h"
+#include <fcntl.h>
 
-typedef struct _DIR *DIR;
+typedef struct _DIR DIR;
 
 /**
  * @brief This function attempts to create a directory named <path>
@@ -36,6 +37,24 @@ int tfs_rename(disk_id id, uint32_t vol_addr, const char *old, const char *new);
  * @return Returns 0 on success or -1 if an error occured
  */
 int tfs_open(const char *name,int oflag, ...);
+
+/**
+ * @brief Gives calling process exclusive control over file
+ *
+ * @param fildes file descriptor
+ * @return 0 on success, -1 on failure (errnum set)
+ */
+int
+tfs_lock (int fildes);
+
+/**
+ * @brief Relinquishes exclusive control over file
+ *
+ * @param fildes file descriptor
+ * @return 0 on success, -1 on failure (errnum set)
+ */
+int
+tfs_unlock (int fildes);
 
 /**
  * @brief This function attempts to read up to <nbytes> bytes from file descriptor

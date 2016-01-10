@@ -12,6 +12,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -31,16 +35,22 @@
 				    - INDIRECT1_BEGIN)/ INT_PER_BLOCK)
 #define LASTBYTE_POS(fileindex) ((fileindex)%TFS_VOLUME_BLOCK_SIZE)
 
-#define TFS_ERR_BIGFILE 100
-
 #define SEM_FBL_T 0
 #define SEM_FEL_T 1
 #define SEM_FILE_T 2
 #define SEM_FBL_S "semb"
 #define SEM_FEL_S "semt"
 #define SEM_FILE_S "semf"
-#define SEM_NAME_LEN NAME_MAX-4
+#define SEM_NAME_LEN NAME_MAX-5
 
+////////////////////////////////////////////////////////////////////////////////
+// ERRORS
+////////////////////////////////////////////////////////////////////////////////
+#define TFS_ERR_BIGFILE 100
+#define TFS_SYSDIR      101
+#define TFS_ERR_OPERATION 214
+#define DIR_BLOCKFULL -1
+#define TFS_ERRPATH     220
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,25 +193,26 @@ read_tfsdescription (disk_id id, uint32_t vol_addr, tfs_description * desc){
  * @param[in] id Disk id
  * @param[in] vol volume address
  * @param[in] type type of semaphore (FBL, FEL, FILE)
+ * @param[in] inode file inode (ignored except for type FILE)
  * @param[out] name to store semaphone name (maximum size NAME_MAX-4)
  * @return Returns an error if encountered
  */
 static error
 sem_name(char* name, int type, disk_id id, uint32_t vol, uint32_t inode){
   d_stat stat;
-  disk_stat(id, &stat);
+  error e = disk_stat(id, &stat);
   
   switch(type){
   case SEM_FBL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d", SEM_FBL_S, stat->name, vol_addr);
-    return EXIT_SUCCESS;    
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FBL_S, stat.name, vol);
+    return e;    
   case SEM_FEL_T:
-    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d", SEM_FEL_S, stat->name, vol_addr);
-    return EXIT_SUCCESS;    
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d", SEM_FEL_S, stat.name, vol);
+    return e;    
   case SEM_FILE_T:    
-    snprintf(name, SEM_NAME_LEN, "/%s-%s-%d-%d",
-	     SEM_FILE_S, stat->name, vol_addr, inode);
-    return EXIT_SUCCESS;
+    snprintf(name, SEM_NAME_LEN, "/%s-%s:%d:%d",
+	     SEM_FILE_S, stat.name, vol, inode);
+    return e;
   default:    
     return S_WRONGTYPE;    
   }
@@ -439,12 +450,19 @@ error
 freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr) {
   tfs_description tfs_d;
   error e;
+  
+  //get semaphore
+  char name[SEM_NAME_LEN];
+  sem_name(name, SEM_FBL_T, id, vol_addr, 0);
+  sem_t* sem = sem_open(name, O_CREAT,
+			S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+  sem_wait(sem);
 
   //read volume superblock
   if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS) return e;
   else {
     block b= new_block();
-    
+        
     //fill appropriate TFS_VOLUME_NEXT_FREE_BLOCK_INDEX value in <b>
     if (tfs_d.freeb_count == 0)
       wintle(b_addr, b, TFS_VOLUME_NEXT_FREE_BLOCK_INDEX);
@@ -452,14 +470,25 @@ freeblock_push (disk_id id, uint32_t vol_addr, uint32_t b_addr) {
       wintle(tfs_d.freeb_first, b, TFS_VOLUME_NEXT_FREE_BLOCK_INDEX);
     
     //write <b> in <b_addr> volume block
-    if ((e = write_block(id, b, vol_addr + b_addr))!=EXIT_SUCCESS)
-      {free(b); return e;}
+    if ((e = write_block(id, b, vol_addr + b_addr))!=EXIT_SUCCESS){
+      free(b);
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return e;
+    }
     free(b);
     
     //update <tfs_d> and write it to disk
     tfs_d.freeb_first = b_addr;
     tfs_d.freeb_count++;
-    return write_tfsdescription(id, vol_addr, &tfs_d);
+    e= write_tfsdescription(id, vol_addr, &tfs_d);
+    
+    //free semaphore
+    sem_post(sem);
+    sem_close(sem);
+
+    return e;
   }
 }
 
@@ -467,6 +496,14 @@ error
 freeblock_pop (disk_id id, uint32_t vol_addr, uint32_t* b_addr) {
   tfs_description desc;
   error e;
+    
+  //get semaphore
+  char name[SEM_NAME_LEN];
+  sem_name(name, SEM_FBL_T, id, vol_addr, 0);
+  sem_t* sem = sem_open(name, O_CREAT,
+			S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+  sem_wait(sem);
+    
   //read volume superblock
   if ((e = read_tfsdescription(id, vol_addr, &desc))!= EXIT_SUCCESS) return e;
 
@@ -478,23 +515,36 @@ freeblock_pop (disk_id id, uint32_t vol_addr, uint32_t* b_addr) {
     
     //read first free volume block
     e = read_block(id, b, vol_addr + desc.freeb_first);
-    if (e != EXIT_SUCCESS) {free(b); return e;}
+    if (e != EXIT_SUCCESS) {
+      free(b);      
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return e;
+    }
     
     //store block address in <b_addr>
     *b_addr = desc.freeb_first;
     
     //determine next free block index
-    e = rintle(&nextfreeb, b, TFS_VOLUME_NEXT_FREE_BLOCK_INDEX);
+    rintle(&nextfreeb, b, TFS_VOLUME_NEXT_FREE_BLOCK_INDEX);
     free(b);
-    if (e != EXIT_SUCCESS) return e;
     
     //test if we have reached the end of the list
-    if (nextfreeb == *b_addr && desc.freeb_count >1) return V_FBL_CORRUPTED;
-    else {
+    if (nextfreeb == *b_addr && desc.freeb_count >1){
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return V_FBL_CORRUPTED;
+    } else {
       //update tfs_description structure
       desc.freeb_first = nextfreeb;
       desc.freeb_count--;
       
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+    
       //update superblock on disk
       return write_tfsdescription(id, vol_addr, &desc);
     }
@@ -506,9 +556,20 @@ freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode){
   tfs_description tfs_d;
   error e;
 
+  //get semaphore
+  char name[SEM_NAME_LEN];
+  sem_name(name, SEM_FEL_T, id, vol_addr, 0);
+  sem_t* sem = sem_open(name, O_CREAT,
+			S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+  sem_wait(sem);
+  
   //read volume superblock
-  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS) return e;
-  else {
+  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS){      
+    //free semaphore
+    sem_post(sem);
+    sem_close(sem);
+    return e;
+  } else {
     tfs_ftent ftent;
     
     //fill appropriate TFS_NEXT_FREE_FILE_ENTRY_INDEX value in <ftent>
@@ -516,12 +577,21 @@ freefile_push (disk_id id, uint32_t vol_addr, uint32_t inode){
     else ftent.nextfreefile = tfs_d.freefile_first;
 
     //write <ftent> to <inode> file table entry    
-    if ((e = write_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS) return e;
-
+    if ((e = write_ftent(id, vol_addr, inode, &ftent))!=EXIT_SUCCESS){            
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return e;
+    }
     //update <tfs_d> and write it to disk
     tfs_d.freefile_first = inode;
     tfs_d.freefile_count++;
-    return write_tfsdescription(id, vol_addr, &tfs_d);    
+    e = write_tfsdescription(id, vol_addr, &tfs_d);
+    
+    //free semaphore
+    sem_post(sem);
+    sem_close(sem);
+    return e;
   }
 }
 
@@ -529,9 +599,21 @@ error
 freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
   tfs_description tfs_d;
   error e;
+  
+  //get semaphore
+  char name[SEM_NAME_LEN];
+  sem_name(name, SEM_FEL_T, id, vol_addr, 0);
+  sem_t* sem = sem_open(name, O_CREAT,
+			S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+  sem_wait(sem);
 
   //read volume superblock
-  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS) return e;
+  if ((e = read_tfsdescription(id, vol_addr, &tfs_d))!=EXIT_SUCCESS){      
+    //free semaphore
+    sem_post(sem);
+    sem_close(sem);
+    return e;
+  }
   
   //test if file table is full
   if (tfs_d.freefile_count == 0) return FT_FULL;
@@ -540,20 +622,34 @@ freefile_pop (disk_id id, uint32_t vol_addr, uint32_t* inode){
 
     //read first free file table entry
     e = read_ftent(id, vol_addr, tfs_d.freefile_first, &ftent);
-    if (e != EXIT_SUCCESS) return e;
+    if (e != EXIT_SUCCESS) {      
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return e;
+    }
 
     //store first freefile address in <inode>
     *inode = tfs_d.freefile_first;
 
     //test if we have reached the end of the list
-    if (ftent.nextfreefile == *inode && tfs_d.freefile_count >1) return FT_FEL_CORRUPTED;
-    else {
+    if (ftent.nextfreefile == *inode && tfs_d.freefile_count >1){      
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return FT_FEL_CORRUPTED;
+    } else {
       //update <tfs_d>
       tfs_d.freeb_first = ftent.nextfreefile;
       tfs_d.freeb_count--;
 
       //update superblock on disk
-      return write_tfsdescription(id, vol_addr, &tfs_d);
+      e= write_tfsdescription(id, vol_addr, &tfs_d);
+      
+      //free semaphore
+      sem_post(sem);
+      sem_close(sem);
+      return e;
     }
   }
 }
@@ -665,8 +761,15 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
   return F_SIZE_CORRUPTED;
 }
 
-#define TFS_ERR_OPERATION 214
-#define DIR_BLOCKFULL -1
+
+int
+file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
+  int fd;
+
+  while (fd < TFS_FILE_MAX && _filedes[fd]* != NULL) fd++;
+    
+}
+
 
 error
 directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
@@ -881,10 +984,69 @@ directory_pushent (disk_id id, uint32_t vol_addr, uint32_t inode,
   return EXIT_FAILURE;
 }
 
+
+/*
 error
-directory_rment (disk_id id, uint32_t vol, const struct dirent *restrict entry) {
+directory_pushent (disk_id, uint32_t vol_addr, uint32_t inode,
+		   uint32_t e_ino, uint32_t e_name)
+{
   
-  return EXIT_SUCCESS;
+}
+*/
+
+
+error
+directory_rment (disk_id id, uint32_t vol_addr, uint32_t inode, char *name)
+{
+  if (strcmp(name, ".") == 0 || strcmp(name, ".."))
+    return TFS_SYSDIR;
+  error     e;
+  tfs_ftent ftent;
+  if ((e = read_ftent(id, inode, &ftent)) != EXIT_SUCCESS)
+    return e;
+  // open file for reading
+  int fd = file_open(id, vol_addr, inode);
+  // lock file
+  if (file_lock(fildes) != 0)
+    return TFS_ERRLOCK;
+  
+  char buf[TFS_DIRECTORY_ENTRY_SIZE];
+  for (int findpos = 0; findpos < ftent.size;
+       findpos += TFS_DIRECTORY_ENTRY_SIZE)
+    {
+      // positionning to read the name
+      tfs_lseek(fd, INT_SIZE, SEEK_CUR);
+      // read the name
+      if ((e = tfs_read(fd, buf, TFS_NAME_MAX)) != EXIT_SUCCESS) {
+	file_unlock(fd);
+	tfs_close(fd);
+	return e;
+      }
+      // entry found
+      if (strncmp(name, buf, TFS_NAME_MAX) == 0)
+	{
+	  // prevent fragmentation
+	  if (findpos + TFS_DIRECTORY_ENTRY_SIZE == ftent.size)
+	    {
+	      tfs_close(fd);
+	      e = file_realloc(id, vol_addr, inode,
+			       ftent.size - TFS_DIRECTORY_ENTRY_SIZE);
+	      return e;
+	    }
+	  // overwrite entry by last one
+	  tfs_lseek(fd, -TFS_DIRECTORY_ENTRY_SIZE, SEEK_END);
+	  if (tfs_read(fd, buf, TFS_NAME_MAX) == -1) {
+	    file_unlock(fd);
+	    tfs_close(fd);
+	    return -1;
+	  }
+	  e = tfs_write(fd, buf, TFS_DIRECTORY_ENTRY_INDEX);
+	  file_unlock(fd);
+	  tfs_close(fd);
+	  return e;
+	}
+    }
+  return TFS_ENTRY_NOTFOUND;
 }
 
 
@@ -923,6 +1085,29 @@ path_follow (const char * path,  char **entry) {
   }
 }
 
+
+
+error
+path_split (char *path, char **leaf)
+{
+  error e;
+  if ((e = path_follow(path, NULL)) != EXIT_SUCCESS)
+    return e;
+  int path_len = strlen(path);
+  int i;
+  for (i = path_len - 1; path[i] == '/'; i--)
+    path[i] = '\0';
+  for (i = path_len; i >= PATH_FPFXLEN; i--)
+    if (path[i] == '/') {
+      path[i] = '\0';
+      *leaf = &path[i+1];
+      // reinitiniaize path_follow for next call
+      path_follow (path, NULL);
+      return EXIT_SUCCESS;
+    }
+  *leaf = NULL;
+  return TFS_ERRPATH;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // TRASH
