@@ -20,7 +20,6 @@
 
 struct _DIR {
   int             fd;
-  uint32_t        ino;
   uint32_t        f_offset;
   uint32_t        b_offset;
   struct dirent   buf[32];
@@ -40,6 +39,17 @@ find_entry (DIR *dir, char *name)
   return NULL;    
 }
 
+static int dir_isempty(DIR *dir)
+{
+  struct dirent *ent;
+  while ((ent = readdir(dir)) != NULL)
+    {
+      if (strncmp(ent->d_name, ".", TFS_NAME_MAX) != 0 &&
+	  strncmp(ent->d_name, "..", TFS_NAME_MAX) != 0)
+	return 0;
+    }
+  return 1;  // empty directory
+}
 /**
  * 
  * 
@@ -96,7 +106,7 @@ int tfs_mkdir(const char *path, mode_t mode)
   // NEED A CHECK
   rintle((uint32_t *)new_entry_buf, (block)&(_filedes[fd]->inode), 0);
   rintle((uint32_t *)&new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE],
-	 (block)&(_filedes[parent->ino]), 0);
+	 (block)&(_filedes[parent->fd]->inode), 0);
   //////////////////////////////////////////////////////////////////////////////
   new_entry_buf[INT_SIZE                               ] = '.';
   new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE    ] = '.';
@@ -154,21 +164,38 @@ int tfs_rmdir(const char *path){
   }
   // TFS CASE
   // open directory
-  DIR *parent = opendir(parent_path);
-  if (parent == NULL) {
+  DIR *dir = opendir(path);
+  if (!dir_isempty(dir)) {
     free(parent_path);
-    return TFS_ERRPATH;
+    closedir(dir);
+    return TFS_DIRNOTEMPTY;
   }
-  // look for the existing entry
-  struct dirent *ent;
-  if ((ent = find_entry(parent, last_el)) == NULL) {
-    free(parent_path);
-    closedir(parent);
-    return TFS_NOENTRY;
-  }
-  //  else directory_pushent(const disk_id id, const uint32_t vol_addr, const uint32_t inode, const struct dirent *entry)
   
-  return 0;
+  // ino for file suppression
+  uint32_t rmino    = _filedes[dir->fd]->inode;
+  disk_id  d_id     = _filedes[dir->fd]->id;
+  uint32_t vol_addr = _filedes[dir->fd]->vol_addr;
+  closedir(dir);
+  uint32_t parentino;
+  // find parent inode before trying to delete file
+  if ((e = find_inode(parent_path, &parentino)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // remove file content
+  if ((e = file_realloc(d_id, vol_addr, rmino, 0)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // liberate inode
+  if ((e = freefile_push(d_id, vol_addr, rmino)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // remove parent entry
+  e = directory_rment(d_id, vol_addr, parentino, last_el);
+  free(parent_path);
+  return e;
 }
 
 /**
