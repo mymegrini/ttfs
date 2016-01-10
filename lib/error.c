@@ -36,7 +36,8 @@ static char* _errlist[] = {
   "Block file address out of bounds",
   "Attempt to stop disk failed",
   "Setting permissions for disk failed",
-  "Semaphore type unrecognized"
+  "Semaphore type unrecognized",
+  "Maximum number of open files reached"
 };
 
 /**

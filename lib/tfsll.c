@@ -87,15 +87,6 @@ struct _index{
   uint32_t indirect2_addr;   /**< current indirect2 block address >*/
 };
 
-struct file {
-  disk_id id;
-  uint32_t vol;
-  uint32_t inode;
-  sem_t* sem;
-  uint32_t offset;
-  int flags;
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
@@ -776,7 +767,10 @@ find_addr(disk_id id, uint32_t vol, uint32_t inode,
 
 int
 file_open (disk_id id, uint32_t vol_addr, uint32_t inode){
-  return -1;
+  int fd;
+
+  while (fd < TFS_FILE_MAX && _filedes[fd]* != NULL) fd++;
+    
 }
 
 

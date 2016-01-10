@@ -93,7 +93,16 @@ struct dirent {
  */
 typedef struct _index* _index;
 
-typedef struct file* file;
+typedef struct {
+  disk_id id;
+  uint32_t vol;
+  uint32_t inode;
+  sem_t* sem;
+  uint32_t offset;
+  int flags;
+  int type;
+  int subtype;
+} file;
 
 ////////////////////////////////////////////////////////////////////////////////
 // VARIABLES
