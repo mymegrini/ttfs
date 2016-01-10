@@ -209,9 +209,67 @@ int tfs_rmdir(const char *path){
  * 
  * 
  */
-int tfs_rename(const char *path, const char *newname){
-  
-  return 0;
+int tfs_rename(const char *oldpath, const char *newpath)
+{
+  char *opar_p = strdup(oldpath);
+  char *ol_el;
+  error e;
+  if ((e = path_split(opar_p, &ol_el)) != EXIT_SUCCESS) {
+    free(opar_p);
+    return e;
+  }
+  char *npar_p = strdup(newpath);
+  char *nl_el;
+  if ((e = path_split(npar_p, &nl_el)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }  
+  // reach old path and recover old ino
+  uint32_t oino;
+  if ((e = find_inode(oldpath, &oino)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e; 
+  }
+  // reach old path parent dir and recover old parent ino
+  uint32_t opar_ino;
+  if ((e = find_inode(opar_p, &opar_ino)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e; 
+  }
+  // reach new parent_directory to get disk id, vol addr & old ino
+  DIR *npar = opendir(npar_p);
+  if (npar == NULL) {
+    free(opar_p);
+    free(npar_p);
+    return -1; // opendir set errnum
+  }
+  disk_id  id          = _filedes[npar->fd]->id;
+  uint32_t vol_addr    = _filedes[npar->fd]->vol_addr;
+  uint32_t npar_ino    = _filedes[npar->fd]->inode;
+  closedir(npar);
+  // construct new entry for new parent
+  struct dirent ent;
+  ent.d_ino = oino;
+  strncpy(ent.d_name, nl_el, TFS_NAME_MAX);
+  // push new entry in new parent
+  e = directory_pushent(id, vol_addr, npar_ino, &ent);
+  if (e != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }
+  // remove entry from old parent
+  e = directory_rment(id, vol_addr, opar_ino, ol_el);
+  if (e != EXIT_SUCCESS) {
+    directory_rment(id, vol_addr, opar_ino, ol_el);
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }
+  return EXIT_SUCCESS;
 }
 
 
