@@ -6,6 +6,8 @@
 #include <string.h>
 #include <semaphore.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -15,15 +17,17 @@
 #define ISFILDES(fildes) ((fildes)<TFS_FILE_MAX && _filedes[fildes])
 #define B_FILE_ADDR(offset) ((offset)/TFS_VOLUME_BLOCK_SIZE)
 
+#ifndef B_SIZE
+   #define B_SIZE 1024
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
 ////////////////////////////////////////////////////////////////////////////////
 
 struct _DIR {
   int             fd;
-  uint32_t        ino;
-  uint32_t        f_offset;
   uint32_t        b_offset;
+  uint32_t        b_size;
   struct dirent   buf[32];
 };
 
@@ -31,14 +35,26 @@ struct _DIR {
 // FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static struct entry*
+static struct dirent*
 find_entry (DIR *dir, char *name)
 {
-  struct entry* ent;
+  struct dirent* ent;
   while ((ent = readdir(dir)) != NULL)
     if (strncmp(ent->d_name, name, TFS_NAME_MAX) == 0)
       return ent;
   return NULL;    
+}
+
+static int dir_isempty(DIR *dir)
+{
+  struct dirent *ent;
+  while ((ent = readdir(dir)) != NULL)
+    {
+      if (strncmp(ent->d_name, ".", TFS_NAME_MAX) != 0 &&
+	  strncmp(ent->d_name, "..", TFS_NAME_MAX) != 0)
+	return 0;
+    }
+  return 1;  // empty directory
 }
 /**
  * 
@@ -80,49 +96,51 @@ int tfs_mkdir(const char *path, mode_t mode)
     closedir(parent);
     return TFS_EXISTINGENTRY;
   }
-  // create entry
+  // create directory content
   const disk_id  id       = _filedes[parent->fd]->id;
   const uint32_t vol_addr = _filedes[parent->fd]->vol_addr;
-  uint32_t ino_new;
   int fd = file_open(id, vol_addr, 0, O_CREAT, TFS_DIRECTORY_TYPE, 0);
   if (fd == -1) {
-    return 
+    free(parent_path);
+    return TFS_ERROPEN;
   }
-  // Get a new inode
-  e = freefile_pop(id, vol_addr, &ino_new);
+  char new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE*2];
+  // fill entry with 0
+  memset(new_entry_buf, 0, TFS_DIRECTORY_ENTRY_SIZE*2);
+  
+  //////////////////////////////////////////////////////////////////////////////
+  // NEED A CHECK
+  rintle((uint32_t *)new_entry_buf, (block)&(_filedes[fd]->inode), 0);
+  rintle((uint32_t *)&new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE],
+	 (block)&(_filedes[parent->fd]->inode), 0);
+  //////////////////////////////////////////////////////////////////////////////
+  new_entry_buf[INT_SIZE                               ] = '.';
+  new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE    ] = '.';
+  new_entry_buf[TFS_DIRECTORY_ENTRY_SIZE + 1 + INT_SIZE] = '.';
+  e = tfs_write(fd, new_entry_buf, TFS_DIRECTORY_ENTRY_SIZE);
+  // upon error, remove created file
   if (e != EXIT_SUCCESS) {
+    freefile_push(id, vol_addr, _filedes[fd]->inode);
+    tfs_close(fd);
     closedir(parent);
     free(parent_path);
     return e;
   }
-  uint32_t datablock_addr;
-  // Get a data block
-  e = freeblock_pop(id, vol_addr,
-		    &datablock_addr);
-  if (e != EXIT_SUCCESS) {
-    closedir(parent);
-    freefile_push(id, vol_addr, ino_new);
-    free(parent_path);
-    return e;
-  }
-  block datablock = new_block();
-  // Write entry "."
-  wintle(ino_new, datablock, 0);
-  datablock->data[INT_SIZE] = '.';
-  // entry ".."
-  wintle(_filedes[parent->fd]->inode, datablock, TFS_DIRECTORY_ENTRY_SIZE);
-  datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE] = '.';
-  datablock->data[TFS_DIRECTORY_ENTRY_SIZE + INT_SIZE + 1] = '.';
-  // write data block
-  e = write_block(id, datablock, vol_addr + datablock_addr);
-  if (e != EXIT_SUCCESS) {
-    closedir(parent);
-    freeblock_push(id, vol_addr, datablock_addr);
-    freefile_push(id, vol_addr, ino_new);
-    free(parent_path);
-  }
-  /* TODO:  */
-  return 0;
+  close(fd);
+  // add entry to parent directory
+  // fill name part with 0
+  memset(&new_entry_buf[INT_SIZE], 0, TFS_NAME_MAX);
+  // copy entry name
+  strncpy(&new_entry_buf[INT_SIZE], last_el, TFS_NAME_MAX);
+  e = tfs_write(fd, new_entry_buf, TFS_DIRECTORY_ENTRY_SIZE);
+  // upon error, remove created file
+  if (e != EXIT_SUCCESS)
+    freefile_push(id, vol_addr, _filedes[fd]->inode);
+  // close
+  tfs_close(fd);
+  closedir(parent);
+  free(parent_path);
+  return e;
 }
 
 /**
@@ -131,8 +149,59 @@ int tfs_mkdir(const char *path, mode_t mode)
  * 
  */
 int tfs_rmdir(const char *path){
+  error e;
+  char *parent_path = strdup(path);
+  char *last_el;
+  if ((e = path_split(parent_path, &last_el)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // TEST HOST
+  char *disk;
+  if ((e = path_follow(NULL, &disk)) == TFS_PATHLEAF) {
+    free(parent_path);
+    return TFS_ERRPATH;
+  }
+  // HOST CASE
+  if (ISHOST(disk)) {
+    e = rmdir(&path[PATH_FPFXLEN+4]);
+    free(parent_path);
+    return e;
+  }
+  // TFS CASE
+  // open directory
+  DIR *dir = opendir(path);
+  if (!dir_isempty(dir)) {
+    free(parent_path);
+    closedir(dir);
+    return TFS_DIRNOTEMPTY;
+  }
   
-  return 0;
+  // ino for file suppression
+  uint32_t rmino    = _filedes[dir->fd]->inode;
+  disk_id  d_id     = _filedes[dir->fd]->id;
+  uint32_t vol_addr = _filedes[dir->fd]->vol_addr;
+  closedir(dir);
+  uint32_t parentino;
+  // find parent inode before trying to delete file
+  if ((e = find_inode(parent_path, &parentino)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // remove file content
+  if ((e = file_realloc(d_id, vol_addr, rmino, 0)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // liberate inode
+  if ((e = freefile_push(d_id, vol_addr, rmino)) != EXIT_SUCCESS) {
+    free(parent_path);
+    return e;
+  }
+  // remove parent entry
+  e = directory_rment(d_id, vol_addr, parentino, last_el);
+  free(parent_path);
+  return e;
 }
 
 /**
@@ -141,9 +210,70 @@ int tfs_rmdir(const char *path){
  * 
  * 
  */
-int tfs_rename(const char *old, const char *new){
-  return 0;
+int tfs_rename(const char *oldpath, const char *newpath)
+{
+  char *opar_p = strdup(oldpath);
+  char *ol_el;
+  error e;
+  if ((e = path_split(opar_p, &ol_el)) != EXIT_SUCCESS) {
+    free(opar_p);
+    return e;
+  }
+  char *npar_p = strdup(newpath);
+  char *nl_el;
+  if ((e = path_split(npar_p, &nl_el)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }  
+  // reach old path and recover old ino
+  uint32_t oino;
+  if ((e = find_inode(oldpath, &oino)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e; 
+  }
+  // reach old path parent dir and recover old parent ino
+  uint32_t opar_ino;
+  if ((e = find_inode(opar_p, &opar_ino)) != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e; 
+  }
+  // reach new parent_directory to get disk id, vol addr & old ino
+  DIR *npar = opendir(npar_p);
+  if (npar == NULL) {
+    free(opar_p);
+    free(npar_p);
+    return -1; // opendir set errnum
+  }
+  disk_id  id          = _filedes[npar->fd]->id;
+  uint32_t vol_addr    = _filedes[npar->fd]->vol_addr;
+  uint32_t npar_ino    = _filedes[npar->fd]->inode;
+  closedir(npar);
+  // construct new entry for new parent
+  struct dirent ent;
+  ent.d_ino = oino;
+  strncpy(ent.d_name, nl_el, TFS_NAME_MAX);
+  // push new entry in new parent
+  e = directory_pushent(id, vol_addr, npar_ino, &ent);
+  if (e != EXIT_SUCCESS) {
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }
+  // remove entry from old parent
+  e = directory_rment(id, vol_addr, opar_ino, ol_el);
+  if (e != EXIT_SUCCESS) {
+    directory_rment(id, vol_addr, opar_ino, ol_el);
+    free(opar_p);
+    free(npar_p);
+    return e;
+  }
+  return EXIT_SUCCESS;
 }
+
+
 
 /**
  * @param oflag O_RDONLY|O_WRONLY|O_RDWR [O_CREAT|O_APPEND|O_TRUNC]
@@ -337,7 +467,28 @@ off_t tfs_lseek(int fildes,off_t offset,int whence){
  * 
  */
 DIR *opendir(const char *filename){
-  return NULL;
+  int fd = tfs_open(filename, O_RDWR);
+  if (fd == -1) {
+    errnum = TFS_ERROPEN;
+    return NULL;
+  }
+  DIR *dir = (DIR *) malloc(sizeof(DIR));
+  dir->fd       = fd;
+  dir->b_offset = 0;
+  dir->b_size   = 0;
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
+    {
+      char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
+      if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+	return dir;
+      else {
+	// fill buffer
+	rintle(&dir->buf[i].d_ino, (block)entry_buf, 0);
+	strncpy(dir->buf[i].d_name, &entry_buf[INT_SIZE], TFS_NAME_MAX);
+	dir->b_size++;
+      }      
+    }
+  return dir;
 }
 
 /**
@@ -345,8 +496,25 @@ DIR *opendir(const char *filename){
  * 
  * 
  */
-struct dirent *readdir(DIR *dirp){
-  return NULL;
+struct dirent *readdir(DIR *dir){
+  // end of the buffer
+  if (dir->b_offset == dir->b_size) {
+    char entry_buff[TFS_DIRECTORY_ENTRY_SIZE];
+    // END OF THE DIRECTORY
+    if (tfs_read(dir->fd, entry_buff, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+      return NULL;
+    // NOT THE END, LOAD BUFFER
+    dir->b_size   = 0;
+    dir->b_offset = 0;
+    do
+      {
+	rintle(&dir->buf[dir->b_size].d_ino, (block)entry_buff, 0);
+	strncpy(dir->buf[dir->b_size].d_name, &entry_buff[INT_SIZE], TFS_NAME_MAX);
+	++dir->b_size;
+      }
+    while (tfs_read(dir->fd, entry_buff, TFS_DIRECTORY_ENTRY_SIZE) != 0);
+  }
+  return &dir->buf[dir->b_offset++];
 }
 
 /**
@@ -354,8 +522,23 @@ struct dirent *readdir(DIR *dirp){
  * 
  * 
  */
-void rewinddir(DIR *dirp){
-  
+void rewinddir(DIR *dir){
+  tfs_lseek(dir->fd, 0, SEEK_SET);
+  dir->b_offset = 0;
+  dir->b_size   = 0;
+  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
+    {
+      char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
+      if (tfs_read(dir->fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+	return ;
+      else {
+	// fill buffer
+	rintle(&dir->buf[i].d_ino, (block)entry_buf, 0);
+	strncpy(dir->buf[i].d_name, &entry_buf[INT_SIZE], TFS_NAME_MAX);
+	dir->b_size++;
+      }      
+    }
+  return ;
 }
 
 /**
@@ -363,8 +546,8 @@ void rewinddir(DIR *dirp){
  * 
  * 
  */
-int closedir(DIR *dirp){
-  return 0;
+int closedir(DIR *dir){
+  return tfs_close(dir->fd);
 }
 
  

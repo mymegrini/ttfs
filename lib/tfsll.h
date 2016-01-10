@@ -349,7 +349,7 @@ path_split (char *path, char **last_element);
  * @return error
  */
 error
-find_inode (char *path, uint32_t *ino);
+find_inode (const char *path, uint32_t *ino);
 
 
 error

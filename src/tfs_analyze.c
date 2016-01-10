@@ -13,7 +13,10 @@
 #define MODE_PART 2 /***< Mode analyze partition */
 #define MODE_LONG 4 /***< Mode analyze long */
 
-#define DEF_NAME "disk.tfs"   /***< default disk name */
+#ifndef DEF_NAME
+   #define DEF_NAME "disk.tfs"   /***< default disk name */
+#endif
+
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 /**

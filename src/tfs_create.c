@@ -3,10 +3,14 @@
 #include "utils.h"
 #include <string.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <sys/stat.h>
-#include <unistd.h>
+
 
 #define F_OWR 1    /***< flag for overwrite option */
 #define D_NAME_MAXLEN 79     /***< disk name maximum length */
@@ -54,39 +58,35 @@ void usage(char* argv0, FILE* out){
  * @see EXIT_SUCCESS
  */
 void create_disk(char* name, int size, char* argv0){
-  FILE* disk;
+  int disk;
   block b = new_block();   // block filled with 0 bytes
-  
-  if ((disk = fopen(name,"r"))== NULL){
+
+  if ((disk = open(name,O_WRONLY|O_CREAT|O_TRUNC,S_IRUSR|S_IWUSR))==-1){
     printerror(argv0, D_OPEN_ERR);
     exit(D_OPEN_ERR);
-  } else {
-    if (chmod(name, S_IRUSR|S_IWUSR)==-1){
-      printerror(argv0, D_PERM_FAIL);
-      exit(D_PERM_FAIL);
-    }
-    if (fseek(disk, (size-1)*D_BLOCK_SIZE, SEEK_SET)==-1){
+  } else {    
+    if (lseek(disk, (size-1)*D_BLOCK_SIZE, SEEK_SET)==-1){
       printerror(argv0, D_SEEK_ERR);
       exit(D_SEEK_ERR);
     }    
-    if (fwrite(b, D_BLOCK_SIZE, 1, disk)==-1){
-      printerror(argv0, D_WRITE_ERR);
-      exit(D_WRITE_ERR);
+    if (write(disk, b, D_BLOCK_SIZE)==-1){
+      printerror(argv0, D_OPEN_ERR);
+      exit(D_OPEN_ERR);
     }
     
     wintle(size, b, 0);
     wintle(0, b, 4);
     
-    if (fseek(disk, 0, SEEK_SET)==-1){
+    if (lseek(disk, 0, SEEK_SET)==-1){
       printerror(argv0, D_SEEK_ERR);
       exit(D_SEEK_ERR);
     }
-    if (fwrite(b, D_BLOCK_SIZE, 1, disk)==-1){
-      printerror(argv0, D_WRITE_ERR);
-      exit(D_WRITE_ERR);
+    if (write(disk, b, D_BLOCK_SIZE)==-1){
+      printerror(argv0, D_OPEN_ERR);
+      exit(D_OPEN_ERR);
     }    
     free(b);  //free block
-    fclose(disk);
+    close(disk);
     printf("%s: %dB\n",name,size*D_BLOCK_SIZE);
     exit(EXIT_SUCCESS);
   }

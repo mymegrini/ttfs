@@ -1161,7 +1161,7 @@ path_split (char *path, char **leaf)
   return TFS_ERRPATH;
 }
 error
-find_inode (char *path, uint32_t *ino)
+find_inode (const char *path, uint32_t *ino)
 {
   char *last_el;
   char *pathcpy = strdup(path);

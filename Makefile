@@ -9,7 +9,7 @@ HEADERS = $(wildcard lib/*.h) $(wildcard src/*.h)
 OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c)) \
 $(patsubst lib/%.c, obj/lib%.o, $(wildcard lib/*.c))
 
-LIBLINK = -lll -ltfs -lutils
+LIBLINK = -lll -ltfs -lutils -lcrypt
 
 all : lib exe
 

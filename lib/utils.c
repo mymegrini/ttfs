@@ -6,7 +6,6 @@
 
 #define STRBADCHAR (-1)
 #define UINT32TOOBIG (-10)
-
 /**
  * atou cast a string to a long long int destined to
  * to be a uint32_t.
@@ -22,7 +21,7 @@ atou ( char *s ) {
   uint32_t val = 0;
   int count = 0;
   uint32_t below_max = (UINT32_MAX - 1) / 10;
-  while ( isdigit(*s) ) {
+  while ( count < size && isdigit(*s) ) {
     if (val > below_max)
       return UINT32TOOBIG;
     val = val*10 + ( *s++ - '0' );
@@ -30,7 +29,6 @@ atou ( char *s ) {
   }
   return (count==size)?val:STRBADCHAR;
 }
-
 
 
 #define YES 1
@@ -59,3 +57,21 @@ int answer(char* prompt){
   }
 }
 
+
+#define _XOPEN_RESOURCE
+#include <unistd.h>
+#include <string.h>
+#include <crypt.h>
+#include <stdlib.h>
+
+#define _MD5_SALT "$1$TFS"
+
+void hashmd5(char *str, char *hash) {
+    char *md5 = crypt(str, _MD5_SALT);
+    for (int i = 0; i < 33; i++)
+      {
+	char hex[] = {0,0,0};
+	sprintf(hex, "%x", md5[i]);
+	strcat(hash, hex);
+      }
+}
