@@ -211,15 +211,15 @@ sem_name(char* name, int type, disk_id id, uint32_t vol_addr, uint32_t inode){
   switch(type){
   case SEM_FBL_T:
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d",
-	     SEM_FBL_S, stat.name, vol_addr);
+	     SEM_FBL_S, stat.hash, vol_addr);
     return e;    
   case SEM_FEL_T:
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d",
-	     SEM_FEL_S, stat.name, vol_addr);
+	     SEM_FEL_S, stat.hash, vol_addr);
     return e;    
   case SEM_FILE_T:    
     snprintf(name, SEM_NAME_LEN, "/%s-%s:%d:%d",
-	     SEM_FILE_S, stat.name, vol_addr, inode);
+	     SEM_FILE_S, stat.hash, vol_addr, inode);
     return e;
   default:    
     return S_WRONGTYPE;    
@@ -778,6 +778,9 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
   error e;
   int fd = 0;
   uint32_t finode;
+  d_stat dstat;
+  int p = 1;
+  int vol = 0;
   
   if(flags&O_CREAT){ //create new file entry
     //get free file entry
@@ -786,6 +789,11 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
     ftent.size = 0;
     ftent.type = type;
     ftent.subtype = type;
+    //get volume size
+    disk_stat(id, &dstat);
+    while(p<vol_addr) p+=dstat.part[vol++];    
+    ftent.size = (subtype==TFS_DISK_SUBTYPE ? dstat.part[vol] : 0);
+    
     //write file entry
     write_ftent(id, vol_addr, finode, &ftent);
   } else {

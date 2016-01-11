@@ -141,7 +141,8 @@ cp(char *argv0, char *oldpath, char *newpath)
 	  if (ishost2)
 	    {
 	      char *hostpath2 = newpath + PATH_FPFXLEN + 4;
-	      int newfd = open(hostpath, O_WRONLY | O_CREAT | O_TRUNC);
+	      int newfd = open(hostpath, O_WRONLY | O_CREAT | O_TRUNC,
+			       S_IRUSR|S_IWUSR);
 	      if (newfd == -1) {
 		fprintf(stderr, "Can't open file %s on HOST.\n", hostpath);
 		usage(argv0);
@@ -221,7 +222,8 @@ cp(char *argv0, char *oldpath, char *newpath)
 	  if (ishost2)
 	    {
 	      char *hostpath2 = newpath + PATH_FPFXLEN + 4;
-	      int newfd = open(hostpath2, O_WRONLY | O_CREAT | O_TRUNC);
+	      int newfd = open(hostpath2, O_WRONLY | O_CREAT | O_TRUNC
+			       , S_IRUSR|S_IWUSR);
 	      if (newfd == -1) {
 		fprintf(stderr, "Can't open file %s on HOST.\n", hostpath2);
 		exit(-1);

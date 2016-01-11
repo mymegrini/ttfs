@@ -9,6 +9,8 @@
  * outputs
  */
 
+
+
 static char* _errlist[] = {
   "SUCCESS",
   "Bad command format",
@@ -38,31 +40,36 @@ static char* _errlist[] = {
   "Setting permissions for disk failed",
   "Semaphore type unrecognized",
   "Maximum number of open files reached",
-  "TFS_ERR_BIGFILE",
-  "TFS_SYSDIR",
-  "TFS_ERR_OPERATION",
-  "DIR_BLOCKFULL",
-  "TFS_ERRPATH",
-  "TFS_ENTRY_NOTFOUND",
-  "TFS_ERRLOCK",
+  "Big file error",
+  "System directory",
+  "Operation error",
+  "Directory block full",
+  "Path error",
+  "Entry not found",
+  "Lock error",
   "File not found",
-  "TFS_ERRPATH_HOST",
-  "TFS_ERRPATH_PARTID",
-  "TFS_FILENOTFOUND",
-  "TFS_ERRPATH_NODISK",
-  "TFS_EXISTINGENTRY",
+  "Path error : HOST",
+  "Volume id missing from path",
+  "File not found",
+  "Disk missing from path",
+  "Entry already exists",
   "Bad file descriptor",
   "Failed to acquire lock on file",
   "Failed to release lock on file",
-  "ERR_TFS_READ",
-  "TFS_ERROPEN",
-  "TFS_NOENTRY",
-  "TFS_DIRNOTEMPTY",
+  "Error while reading a file",
+  "Open error",
+  "Entry doesn't exist in the directory",
+  "Directory not empty",
   "Access mode bits not found",
   "Error while writing a file",
   "Can't lock disk when starting",
   "Can't unlock disk at closing",
-  "Failed to read current working directory"
+  "Failed to read current working directory",
+  "Operation not supported yet",
+  "Segmentation fault",
+  "Unrecognized subtype",
+  "Unrecognized file type",
+  "Invalid seek mode"
 };
 
 /**
