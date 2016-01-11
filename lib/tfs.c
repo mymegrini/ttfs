@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -417,12 +418,15 @@ tfs_unlock (int fildes){
  * 
  */
 #define TFS_SEG_FAULT 100 /**< Segmentation fault >*/
+#define TFS_WRONGSUBTYPE 101 /**< Unrecognized subtype */
+#define TFS_WRONGTYPE 102 /**< Unrecognized file type */
+
+#define MIN(a,b) ((a)>(b)?(a):(b))
 
 ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
   //test fildes
   if (ISFILDES(fildes)) {
-    ssize_t s;
-    error e;
+    ssize_t s = -1;
     File* fd = _filedes[fildes];
 
     //test if file open for reading
@@ -435,8 +439,92 @@ ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
 
       //test offset
       if (fd->offset<fstat.size){
-	
-	return s;
+	char* buffer = (char*) buf;
+	if (fstat.type == TFS_PSEUDO_TYPE){
+	  //read pseudo type files
+	  
+	  if (fd->type==TFS_PSEUDO_TYPE && fstat.subtype==TFS_DATE_SUBTYPE){
+	    int b;
+	    time_t t = time(NULL);
+	    char* time;
+	    
+	    //read disk statistics
+	    d_stat dstat;	    
+	    errnum= disk_stat(fd->id, &dstat);
+	    if (errnum!= EXIT_SUCCESS) return -1;
+	    //calculate runtime
+	    t-=dstat.time;
+	    time = (char*)t;
+	    for (b=0; b<sizeof(time_t) && b<nbytes; b++) buffer[b] = time[b];
+	    s = b;
+	    return s;
+	  }
+
+	  if (fd->type==TFS_PSEUDO_TYPE && fstat.subtype==TFS_DISK_SUBTYPE){
+	    block b = new_block();
+	    uint32_t b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	    size_t n;
+	    s = 0;
+	    //update nbytes according to available size
+	    nbytes = MIN(nbytes,fstat.size-fd->offset);
+
+	    while (nbytes-s>0){
+	      //read data block b_addr=b_file_addr
+	      errnum= read_block(fd->id, b, b_file_addr);
+	      if (errnum!=EXIT_SUCCESS){free(b); return -1;}
+	      //determine number of bytes to be written
+	      n = MIN(nbytes-s,TFS_VOLUME_BLOCK_SIZE-(fd->offset%TFS_VOLUME_BLOCK_SIZE));
+	      //copy bytes to buffer
+	      strncpy(buffer+s, (char*)b+(fd->offset%TFS_VOLUME_BLOCK_SIZE), n);
+	      fd->offset+=n;
+	      s+=n;
+	      b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	    }
+	    free(b);
+	    return s;
+	  }
+	  errnum= TFS_WRONGSUBTYPE;
+	} else {
+	  //read regular files and directories
+	  if (fstat.type==TFS_REGULAR_TYPE || fstat.type==TFS_DIRECTORY_TYPE){
+	    uint32_t b_addr;
+	    block b = new_block();
+	    uint32_t b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	    size_t n;
+	    s = 0;
+	    
+	    //lock file
+	    errnum= tfs_lock(fildes);
+	    if (errnum!=EXIT_SUCCESS) return -1;
+	    
+	    //update file table entry
+	    errnum= file_stat(fd->id, fd->vol_addr, fd->inode, &fstat);
+	    if (errnum!=EXIT_SUCCESS) return -1;
+	    
+	    nbytes = MIN(nbytes,fstat.size-fd->offset);
+	    
+	    while (nbytes-s>0){
+	      //find current data block address
+	      find_addr(fd->id, fd->vol_addr, fd->inode, b_file_addr, &b_addr);
+	      //read data block b_addr=b_file_addr
+	      errnum= read_block(fd->id, b, b_addr);
+	      if (errnum!=EXIT_SUCCESS){free(b); tfs_unlock(fildes); return -1;}
+	      //determine number of bytes to be written
+	      n = MIN(nbytes-s,TFS_VOLUME_BLOCK_SIZE-(fd->offset%TFS_VOLUME_BLOCK_SIZE));
+	      //copy bytes to buffer
+	      strncpy(buffer+s, (char*)b+(fd->offset%TFS_VOLUME_BLOCK_SIZE), n);
+	      fd->offset+=n;
+	      s+=n;
+	      b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	    }
+	    free(b);
+	    //unlock file
+	    errnum= tfs_unlock(fildes);
+	    if (errnum!=EXIT_SUCCESS) return -1;
+	    return s;
+	  }
+	  else errnum= TFS_WRONGTYPE;
+	}
       } else errnum= TFS_SEG_FAULT;
       
     }
@@ -453,14 +541,113 @@ ssize_t tfs_read(int fildes,void *buf,size_t nbytes){
  * 
  * 
  */
-ssize_t tfs_write(int fildes,void *buf,size_t nbytes){
-  //test fildes
-  if (!ISFILDES(fildes)) return TFS_BAD_FILDES;
-  else {
-    ssize_t s;
-    return s;
-  }
+ssize_t tfs_write(int fildes,void *buf,size_t nbytes){  //test fildes
+  if (ISFILDES(fildes)) {
+    ssize_t s = -1;
+    File* fd = _filedes[fildes];
+
+    //test if file open for writing
+    if ((fd->flags&O_WRONLY)||(fd->flags&O_RDWR)){
+      f_stat fstat;
+
+      //read file table entry
+      errnum= file_stat(fd->id, fd->vol_addr, fd->inode, &fstat);
+      if (errnum!=EXIT_SUCCESS) return -1;
+
+      //case 1: non pseudo type files
+      if (fd->type!=TFS_PSEUDO_TYPE){
+	char* buffer = (char*) buf;
+	uint32_t b_addr;
+	block b;
+	uint32_t b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	size_t n;
+	s = 0;
+	
+	//lock file
+	errnum= tfs_lock(fildes);
+	if (errnum!=EXIT_SUCCESS) return -1;
+	
+	//update table entry
+	errnum= file_stat(fd->id, fd->vol_addr, fd->inode, &fstat);
+	if (errnum!=EXIT_SUCCESS) {tfs_unlock(fildes); return -1;}
+
+	//change file size if necessary
+	if(fd->offset+nbytes>fstat.size) {
+	  
+	  file_realloc(fd->id, fd->vol_addr, fd->inode, fd->offset+nbytes);
+
+	  //update table entry
+	  errnum= file_stat(fd->id, fd->vol_addr, fd->inode, &fstat);
+	  if (errnum!=EXIT_SUCCESS) {tfs_unlock(fildes); return -1;}
+
+	  //update nbytes
+	  nbytes = MIN(nbytes, fstat.size-fd->offset);
+	}
+
+	b = new_block();
+	while (nbytes-s>0){
+	  //find current data block address
+	  find_addr(fd->id, fd->vol_addr, fd->inode, b_file_addr, &b_addr);
+	  //read data block
+	  errnum= read_block(fd->id, b, b_addr);
+	  if (errnum!=EXIT_SUCCESS){free(b); tfs_unlock(fildes); return -1;}
+	  //determine number of bytes to be written
+	  n = MIN(nbytes-s,TFS_VOLUME_BLOCK_SIZE-(fd->offset%TFS_VOLUME_BLOCK_SIZE));
+	  //copy bytes to block
+	  strncpy((char*)b+(fd->offset%TFS_VOLUME_BLOCK_SIZE), buffer+s, n);
+	  //write data block
+	  errnum= write_block(fd->id, b, b_addr);
+	  if (errnum!=EXIT_SUCCESS){free(b); tfs_unlock(fildes); return -1;}
+	  //update offset values
+	  fd->offset+=n;
+	  s+=n;
+	  b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	}
+	free(b);
+	  
+	//unlock file
+	errnum= tfs_unlock(fildes);
+	if (errnum!=EXIT_SUCCESS) return -1;
+	return s;
+      }
+      
+      // case 2: disk subtype file
+      if (fd->subtype==TFS_DISK_SUBTYPE){
+	char* buffer = (char*) buf;
+	block b;
+	uint32_t b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	size_t n;
+	s = 0;
+
+	b = new_block();
+	while (nbytes-s>0){
+	  //read data block
+	  errnum= read_block(fd->id, b, b_file_addr);
+	  if (errnum!=EXIT_SUCCESS){free(b); tfs_unlock(fildes); return -1;}
+	  //determine number of bytes to be written
+	  n = MIN(nbytes-s,TFS_VOLUME_BLOCK_SIZE-(fd->offset%TFS_VOLUME_BLOCK_SIZE));
+	  //copy bytes to block
+	  strncpy((char*)b+(fd->offset%TFS_VOLUME_BLOCK_SIZE), buffer+s, n);
+	  //write data block
+	  errnum= write_block(fd->id, b, b_file_addr);
+	  if (errnum!=EXIT_SUCCESS){free(b); tfs_unlock(fildes); return -1;}
+	  //update offset values
+	  fd->offset+=n;
+	  s+=n;
+	  b_file_addr = fd->offset/TFS_VOLUME_BLOCK_SIZE;
+	}
+	free(b);
+	return s;	
+      }
+      //case 3: unauthorized write type
+      errnum= TFS_SEG_FAULT;
+    }
+    //fildes not open for writing
+  } else errnum= TFS_BAD_FILDES;
+  
+  return -1;
 }
+
 
 /**
  * 
