@@ -103,7 +103,7 @@ error start_disk(char *name,disk_id *id){
   int i = 0;
   // md5
   char fullpath[PATH_MAX+D_NAME_MAXLEN+1];
-  if (getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN)) return D_GETWD_FAIL;
+  if (getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN)==NULL);
   strcat(fullpath, name);
   char md5print[HASH_LEN];
   hashmd5(fullpath, md5print);
@@ -111,9 +111,10 @@ error start_disk(char *name,disk_id *id){
   for (int i = 0; i < DD_MAX; ++i)
     {
       if (_disk[i] != NULL             &&
-	  strcmp(name, _disk[i]->name) &&
-	  strncmp(_disk[i]->hash, md5print, HASH_LEN))
-	{
+	  !strcmp(name, _disk[i]->name) //&&
+	  //!strncmp(_disk[i]->hash, md5print, HASH_LEN)
+	  )
+	{puts("bug");
 	  *id = i;
 	  return EXIT_SUCCESS;
 	}

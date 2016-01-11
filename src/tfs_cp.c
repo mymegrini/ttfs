@@ -172,6 +172,7 @@ cp(char *argv0, char *oldpath, char *newpath)
 		exit(-1);
 	      }
 	      int lu;
+	      puts("but");
 	      while ((lu = read(newfd, buff, 1024)) > 0)
 		if (tfs_write(newfd, buff, 1024) < lu) {
 		  fprintf(stderr, "Writing error on %s.\n", newpath);

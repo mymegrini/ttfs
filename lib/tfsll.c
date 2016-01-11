@@ -1121,7 +1121,7 @@ path_follow (const char * path,  char **entry) {
   static char *workpath = NULL;
   if (path == NULL) {
     if (workpath == NULL)
-      return TFS_ERRPATH_NOWORKINGPATH;
+      return TFS_ERRPATH_NOPATH;
     else {
       *entry = strtok(NULL, PATH_STRSEP);
       if (*entry == NULL) {
@@ -1172,14 +1172,18 @@ path_split (char *path, char **leaf)
 error
 find_inode (const char *path, uint32_t *ino)
 {
-  char *last_el;
-  char *pathcpy = strdup(path);
-  error e = path_split(pathcpy, &last_el);
-  if (e != EXIT_SUCCESS) {
-    free(pathcpy);
-    return e;
-  }
+  puts(path);
   char *token;
+  char *pathcpy = strdup(path);
+  error e;
+  int fd;
+  char dirent[TFS_DIRECTORY_ENTRY_SIZE];
+  int test;
+
+  //path follow init
+  if ((e = path_follow(pathcpy, NULL)) != EXIT_SUCCESS)
+    return e;
+
   // token : disk
   if ((path_follow(NULL, &token)) != EXIT_SUCCESS) {
     free(pathcpy);
@@ -1190,10 +1194,15 @@ find_inode (const char *path, uint32_t *ino)
     return TFS_ERRPATH_HOST;
   }
   disk_id id;
-  if ((e = start_disk(token, &id)) != EXIT_SUCCESS) {
+  char* diskname = (char*)malloc((strlen(token)+5)*sizeof(char));
+  strcpy(diskname, token);
+  strcpy(diskname+strlen(token), DEF_EXT);
+  if ((e = start_disk(diskname, &id)) != EXIT_SUCCESS) {
     free(pathcpy);
     return e;
   }
+  puts(diskname);
+  free(diskname);
   // token : part index
   if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
     free(pathcpy);
@@ -1214,27 +1223,31 @@ find_inode (const char *path, uint32_t *ino)
     stop_disk(id);
     return e;
   }
-  struct _DIR *parent = opendir(path);
-  if (parent == NULL) {
-    free(pathcpy);
-    stop_disk(id);
-    return TFS_ERRPATH;
-  }
-  struct dirent *ent;
-  // look for the last element
-  while ((ent = readdir(parent)) != NULL)
-    // found
-    if (strcmp(ent->d_name, last_el) == 0) {
-      free(pathcpy);
-      *ino = ent->d_ino;
-      closedir(parent);
-      stop_disk(id);
-      return EXIT_SUCCESS;
+  *ino = 0;
+  // exploring file system tree
+  while ((e= path_follow(NULL, &token))==EXIT_SUCCESS){
+    //opening current directory
+    fd = file_open(id, vol_addr, *ino, O_RDONLY, TFS_DIRECTORY_TYPE, 0);
+    if (fd == -1) break;
+    while(tfs_read(fd, dirent, TFS_DIRECTORY_ENTRY_SIZE)!=-1){
+      //debug
+      //dirent[TFS_DIRECTORY_ENTRY_SIZE-1] = 0;
+      //puts(dirent);
+
+      //check for token file entry and store its inode
+      if (strncmp(token, dirent+INTX(1), TFS_DIRECTORY_ENTRY_SIZE-INTX(1))==0){
+	rintle(ino, (block)dirent, 0);
+	test = 1;
+	break;
+      }
     }
-  // Not found
-  closedir(parent);
+    tfs_close(fd);
+    if (test--) break;
+  }
   free(pathcpy);
-  return TFS_F_NOTFOUND;  
+  printerror("find", e);
+  if (e==TFS_PATHLEAF) return EXIT_SUCCESS;
+  else return TFS_F_NOTFOUND;  
 }
 
 
