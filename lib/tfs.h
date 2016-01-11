@@ -32,6 +32,7 @@ typedef struct _DIR DIR;
  */
 int tfs_rm(const char *path);
 
+
 /**
  * @brief This function attempts to create a directory named <path>
  * @param[in] path specifies name and location of directory

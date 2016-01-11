@@ -1241,6 +1241,7 @@ file_stat (disk_id id, uint32_t vol_addr, uint32_t inode, f_stat* stat){
   stat->size = ftent.size;
   stat->type = ftent.type;
   stat->subtype = ftent.subtype;
+  
   return EXIT_SUCCESS;
 }
 
