@@ -58,7 +58,7 @@ int answer(char* prompt){
 }
 
 
-#define _XOPEN_RESOURCE
+/*#define _XOPEN_RESOURCE
 #include <unistd.h>
 #include <string.h>
 #include <crypt.h>
@@ -75,3 +75,4 @@ void hashmd5(char *str, char *hash) {
 	strcat(hash, hex);
       }
 }
+*/

@@ -1178,7 +1178,7 @@ find_inode (const char *path, uint32_t *ino)
   error e;
   int fd;
   char dirent[TFS_DIRECTORY_ENTRY_SIZE];
-  int test;
+  //int test;
 
   //path follow init
   if ((e = path_follow(pathcpy, NULL)) != EXIT_SUCCESS)
@@ -1201,7 +1201,7 @@ find_inode (const char *path, uint32_t *ino)
     free(pathcpy);
     return e;
   }
-  puts(diskname);
+  //puts(diskname);
   free(diskname);
   // token : part index
   if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
@@ -1221,12 +1221,14 @@ find_inode (const char *path, uint32_t *ino)
   if ((e = p_index(id, partid, &vol_addr)) != EXIT_SUCCESS) {
     free(pathcpy);
     stop_disk(id);
+    printf("%d %lld", id, partid);
     return e;
   }
   *ino = 0;
   // exploring file system tree
   while ((e= path_follow(NULL, &token))==EXIT_SUCCESS){
     //opening current directory
+    puts(token);
     fd = file_open(id, vol_addr, *ino, O_RDONLY, TFS_DIRECTORY_TYPE, 0);
     if (fd == -1) break;
     while(tfs_read(fd, dirent, TFS_DIRECTORY_ENTRY_SIZE)!=-1){
@@ -1237,12 +1239,11 @@ find_inode (const char *path, uint32_t *ino)
       //check for token file entry and store its inode
       if (strncmp(token, dirent+INTX(1), TFS_DIRECTORY_ENTRY_SIZE-INTX(1))==0){
 	rintle(ino, (block)dirent, 0);
-	test = 1;
+	
 	break;
       }
     }
     tfs_close(fd);
-    if (test--) break;
   }
   free(pathcpy);
   printerror("find", e);

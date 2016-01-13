@@ -20,7 +20,7 @@ typedef uint32_t ad_b;    /**< address for blocks in the disk */
  */
 typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk     */
-  char hash[HASH_LEN];            /** md5 generated from path */
+  //char hash[HASH_LEN];            /** md5 generated from path */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
@@ -105,8 +105,8 @@ error start_disk(char *name,disk_id *id){
   char fullpath[PATH_MAX+D_NAME_MAXLEN+1];
   if (getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN)==NULL);
   strcat(fullpath, name);
-  char md5print[HASH_LEN];
-  hashmd5(fullpath, md5print);
+  //char md5print[HASH_LEN];
+  //hashmd5(fullpath, md5print);
   // looking for existing id
   for (int i = 0; i < DD_MAX; ++i)
     {
@@ -114,7 +114,7 @@ error start_disk(char *name,disk_id *id){
 	  !strcmp(name, _disk[i]->name) //&&
 	  //!strncmp(_disk[i]->hash, md5print, HASH_LEN)
 	  )
-	{puts("bug");
+	{
 	  *id = i;
 	  return EXIT_SUCCESS;
 	}
@@ -126,6 +126,7 @@ error start_disk(char *name,disk_id *id){
     return OD_FULL;
   
   int fd = open(name, O_RDWR);
+  puts(name);
   if(fd == -1){
     return D_OPEN_ERR;
   }
@@ -227,7 +228,7 @@ error stop_disk(disk_id id){
   if ( id >= DD_MAX || _disk[id] == NULL ) {
     return D_WRONGID;
   }
-  if (flock(_disk[id]->fd, LOCK_SH) == -1)
+  if (flock(_disk[id]->fd, LOCK_UN) == -1)
     return D_LOCK;
   if (close(_disk[id]->fd) !=0 )
     e = D_STOP_FAIL;
@@ -248,7 +249,7 @@ error disk_stat(disk_id id, d_stat* stat){
   } else {
     int n;
     strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN);
-    strncpy(stat->hash, _disk[id]->hash, HASH_LEN);
+    //strncpy(stat->hash, _disk[id]->hash, HASH_LEN);
     stat->size = _disk[id]->size;
     stat->npart = _disk[id]->npart;
     stat->time = _disk[id]->time;

@@ -76,6 +76,7 @@ void ls(char *argv0, char *path)
   char *parent = strdup(path);
   char *token;
   char *leaf;
+  error e;
   if (path_split(parent, &leaf) != EXIT_SUCCESS) {
     fprintf(stderr, "Path %s invalid.\n", path);
     usage(argv0);
@@ -92,8 +93,8 @@ void ls(char *argv0, char *path)
     exit(execl("ls", argv0, path + PATH_FPFXLEN + 4, NULL));
 
   disk_id id;
-  if (start_disk(path, &id) != EXIT_SUCCESS) {
-    fprintf(stderr, "Can't access disk %s.\n", token);
+  if ((e=start_disk("test.tfs", &id)) != EXIT_SUCCESS) {
+    printerror("ls", e);
     usage(argv0);
     exit(TFS_ERRPATH);
   }
