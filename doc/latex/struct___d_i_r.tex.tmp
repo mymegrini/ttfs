@@ -1,0 +1,33 @@
+\hypertarget{struct___d_i_r}{}\section{\+\_\+\+D\+I\+R Struct Reference}
+\label{struct___d_i_r}\index{\+\_\+\+D\+I\+R@{\+\_\+\+D\+I\+R}}
+
+
+Collaboration diagram for \+\_\+\+D\+I\+R\+:
+% FIG 0
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{struct___d_i_r_a6f8059414f0228f0256115e024eeed4b}{}int {\bfseries fd}\label{struct___d_i_r_a6f8059414f0228f0256115e024eeed4b}
+
+\item 
+\hypertarget{struct___d_i_r_aa7d9e8195489d0093a4a42495e55beec}{}uint32\+\_\+t {\bfseries b\+\_\+offset}\label{struct___d_i_r_aa7d9e8195489d0093a4a42495e55beec}
+
+\item 
+\hypertarget{struct___d_i_r_a74a107b6ecf6720b85be3ab754ebb91d}{}uint32\+\_\+t {\bfseries b\+\_\+size}\label{struct___d_i_r_a74a107b6ecf6720b85be3ab754ebb91d}
+
+\item 
+\hypertarget{struct___d_i_r_a70aca33069c63d89b270ba5e4cf2e552}{}struct \hyperlink{structdirent}{dirent} {\bfseries buf} \mbox{[}32\mbox{]}\label{struct___d_i_r_a70aca33069c63d89b270ba5e4cf2e552}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 34 of file tfs.\+c.
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+lib/tfs.\+c\end{DoxyCompactItemize}

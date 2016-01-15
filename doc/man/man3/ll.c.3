@@ -1,0 +1,244 @@
+.TH "lib/ll.c" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/ll.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'll\&.h'\fP
+.br
+\fC#include 'error\&.h'\fP
+.br
+\fC#include 'block\&.h'\fP
+.br
+\fC#include 'utils\&.h'\fP
+.br
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <limits\&.h>\fP
+.br
+\fC#include <unistd\&.h>\fP
+.br
+\fC#include <sys/file\&.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBdisk_ent\fP"
+.br
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBB0_IDX_DSIZE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBB0_IDX_PRTCOUNT\fP   4"
+.br
+.ti -1c
+.RI "#define \fBB0_IDX_PRTABLE\fP   8"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef uint32_t \fBad_b\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBerror\fP \fBread_physical_block\fP (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+.br
+.ti -1c
+.RI "\fBerror\fP \fBwrite_physical_block\fP (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+.br
+.ti -1c
+.RI "\fBerror\fP \fBstart_disk\fP (char *name, \fBdisk_id\fP *id)"
+.br
+.RI "\fIThis function associates an id number to a disk\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBread_block\fP (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+.br
+.RI "\fIThis function reads a data block from the disk\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBwrite_block\fP (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+.br
+.RI "\fIThis function writes a data block from the disk\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBsync_disk\fP (\fBdisk_id\fP id)"
+.br
+.RI "\fIThis function flushes te buffer\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBstop_disk\fP (\fBdisk_id\fP id)"
+.br
+.RI "\fIThis function ends the session corresponding to id\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBdisk_stat\fP (\fBdisk_id\fP id, \fBd_stat\fP *stat)"
+.br
+.RI "\fIThis function returns basic disk information\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBp_index\fP (\fBdisk_id\fP id, uint32_t partid, uint32_t *partidx)"
+.br
+.RI "\fIThis function returns the partition's physical index\&. \fP"
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define B0_IDX_DSIZE   0"
+index of disk size 
+.PP
+Definition at line 12 of file ll\&.c\&.
+.SS "#define B0_IDX_PRTABLE   8"
+index of partition table 
+.PP
+Definition at line 14 of file ll\&.c\&.
+.SS "#define B0_IDX_PRTCOUNT   4"
+index of number of partition 
+.PP
+Definition at line 13 of file ll\&.c\&.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef uint32_t \fBad_b\fP"
+address for blocks in the disk 
+.PP
+Definition at line 16 of file ll\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "\fBerror\fP disk_stat (\fBdisk_id\fP id, \fBd_stat\fP * stat)"
+
+.PP
+This function returns basic disk information\&. Returns disk information 
+.PP
+Definition at line 245 of file ll\&.c\&.
+.SS "\fBerror\fP p_index (\fBdisk_id\fP id, uint32_t partid, uint32_t * partidx)"
+
+.PP
+This function returns the partition's physical index\&. Returns a partition superblock's index on the volume 
+.PP
+Definition at line 269 of file ll\&.c\&.
+.SS "\fBerror\fP read_block (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+
+.PP
+This function reads a data block from the disk\&. Read a block from disk\&. Use a cache memory to read\&. 
+.PP
+Definition at line 175 of file ll\&.c\&.
+.SS "\fBerror\fP read_physical_block (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+Physical reading of a block in a disk\&. Lowest level to read a block, are directly accessed\&. This function is private
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP the id of the disk 
+.br
+\fIb\fP the block to store the reading 
+.br
+\fInum\fP the number of the block 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBD_WRONGID\fP 
+.PP
+\fBB_OUT_OF_DISK\fP 
+.PP
+\fBD_SEEK_ERR\fP 
+.PP
+\fBD_READ_ERR\fP 
+.RE
+.PP
+
+.PP
+Definition at line 50 of file ll\&.c\&.
+.SS "\fBerror\fP start_disk (char * name, \fBdisk_id\fP * id)"
+
+.PP
+This function associates an id number to a disk\&. Starting a disk Attribute a dynamic id to this disk Readding the block zero for starting disk
+.PP
+\fBParameters:\fP
+.RS 4
+\fIname\fP the name of the disk 
+.br
+\fIid\fP the dynamic id attribute to the disk at start 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+strncmp(_disk[i]->hash, md5print, HASH_LEN) 
+.PP
+Definition at line 102 of file ll\&.c\&.
+.SS "\fBerror\fP stop_disk (\fBdisk_id\fP id)"
+
+.PP
+This function ends the session corresponding to id\&. Closes an opened disk\&. Frees all associated memory
+.PP
+\fBSee also:\fP
+.RS 4
+\fBD_STOP_FAIL\fP 
+.RE
+.PP
+
+.PP
+Definition at line 225 of file ll\&.c\&.
+.SS "\fBerror\fP sync_disk (\fBdisk_id\fP id)"
+
+.PP
+This function flushes te buffer\&. Syncronize the disk\&. Flush the cache\&. 
+.PP
+Definition at line 208 of file ll\&.c\&.
+.SS "\fBerror\fP write_block (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+
+.PP
+This function writes a data block from the disk\&. Write a block to a disk\&. Use a cache memory to write\&.e 
+.PP
+Definition at line 192 of file ll\&.c\&.
+.SS "\fBerror\fP write_physical_block (\fBdisk_id\fP id, \fBblock\fP b, uint32_t num)"
+Physical writing of a block in a disk\&. Lowest level to read a block, are directly accessed\&. This function is private
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP the id of the disk 
+.br
+\fIb\fP the block to store the reading 
+.br
+\fInum\fP the number of the block 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBD_WRONGID\fP 
+.PP
+\fBB_OUT_OF_DISK\fP 
+.PP
+\fBD_SEEK_ERR\fP 
+.PP
+\fBD_READ_ERR\fP 
+.RE
+.PP
+
+.PP
+Definition at line 77 of file ll\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

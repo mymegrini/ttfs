@@ -1,0 +1,293 @@
+\hypertarget{ll_8c}{}\section{lib/ll.c File Reference}
+\label{ll_8c}\index{lib/ll.\+c@{lib/ll.\+c}}
+{\ttfamily \#include \char`\"{}ll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$limits.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/file.\+h$>$}\\*
+Include dependency graph for ll.\+c\+:
+% FIG 0
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structdisk__ent}{disk\+\_\+ent}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ll_8c_a112fb7e2075e361f6f9bf82a70fee5bc}{B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E}~0
+\item 
+\#define \hyperlink{ll_8c_adf7d04eb518b90e082c8e2717e248f11}{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T}~4
+\item 
+\#define \hyperlink{ll_8c_ab900c2e2a5dc68f26658492ae185ae5f}{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E}~8
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint32\+\_\+t \hyperlink{ll_8c_ad211ef55fc8f75566da227164c962213}{ad\+\_\+b}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_a7053158f77d44651162a4961f6b6c25a}{read\+\_\+physical\+\_\+block} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, \hyperlink{structblock}{block} b, uint32\+\_\+t num)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_af0d7b4dbeb7488574e7b54df2b3640ea}{write\+\_\+physical\+\_\+block} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, \hyperlink{structblock}{block} b, uint32\+\_\+t num)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_a43fa001214cb3004fcd83ac65a9e5663}{start\+\_\+disk} (char $\ast$name, \hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} $\ast$id)
+\begin{DoxyCompactList}\small\item\em This function associates an id number to a disk. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_aa7c9471e45f41ad03286d5d2d8f82d3a}{read\+\_\+block} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, \hyperlink{structblock}{block} b, uint32\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em This function reads a data block from the disk. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_acf1ce6cef2aa69e4ae06f8b8cb4a7241}{write\+\_\+block} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, \hyperlink{structblock}{block} b, uint32\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em This function writes a data block from the disk. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_a16487263f98deced4d3f300500800375}{sync\+\_\+disk} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id)
+\begin{DoxyCompactList}\small\item\em This function flushes te buffer. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_aed3b9996eee3fb7070c081d77525de0b}{stop\+\_\+disk} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id)
+\begin{DoxyCompactList}\small\item\em This function ends the session corresponding to id. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_a98eac4ed1ea04fe431db1989df3d0105}{disk\+\_\+stat} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, \hyperlink{structd__stat}{d\+\_\+stat} $\ast$stat)
+\begin{DoxyCompactList}\small\item\em This function returns basic disk information. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{ll_8c_a4644dd5135a1a5f5f4e635489776349a}{p\+\_\+index} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t partid, uint32\+\_\+t $\ast$partidx)
+\begin{DoxyCompactList}\small\item\em This function returns the partition\textquotesingle{}s physical index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{ll_8c_a112fb7e2075e361f6f9bf82a70fee5bc}{}\index{ll.\+c@{ll.\+c}!B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E@{B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E}}
+\index{B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E@{B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E}!ll.\+c@{ll.\+c}}
+\subsubsection[{B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+I\+D\+X\+\_\+\+D\+S\+I\+Z\+E~0}\label{ll_8c_a112fb7e2075e361f6f9bf82a70fee5bc}
+index of disk size 
+
+Definition at line 12 of file ll.\+c.
+
+\hypertarget{ll_8c_ab900c2e2a5dc68f26658492ae185ae5f}{}\index{ll.\+c@{ll.\+c}!B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E@{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E}}
+\index{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E@{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E}!ll.\+c@{ll.\+c}}
+\subsubsection[{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+A\+B\+L\+E~8}\label{ll_8c_ab900c2e2a5dc68f26658492ae185ae5f}
+index of partition table 
+
+Definition at line 14 of file ll.\+c.
+
+\hypertarget{ll_8c_adf7d04eb518b90e082c8e2717e248f11}{}\index{ll.\+c@{ll.\+c}!B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T@{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T}}
+\index{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T@{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T}!ll.\+c@{ll.\+c}}
+\subsubsection[{B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+I\+D\+X\+\_\+\+P\+R\+T\+C\+O\+U\+N\+T~4}\label{ll_8c_adf7d04eb518b90e082c8e2717e248f11}
+index of number of partition 
+
+Definition at line 13 of file ll.\+c.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{ll_8c_ad211ef55fc8f75566da227164c962213}{}\index{ll.\+c@{ll.\+c}!ad\+\_\+b@{ad\+\_\+b}}
+\index{ad\+\_\+b@{ad\+\_\+b}!ll.\+c@{ll.\+c}}
+\subsubsection[{ad\+\_\+b}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint32\+\_\+t {\bf ad\+\_\+b}}\label{ll_8c_ad211ef55fc8f75566da227164c962213}
+address for blocks in the disk 
+
+Definition at line 16 of file ll.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{ll_8c_a98eac4ed1ea04fe431db1989df3d0105}{}\index{ll.\+c@{ll.\+c}!disk\+\_\+stat@{disk\+\_\+stat}}
+\index{disk\+\_\+stat@{disk\+\_\+stat}!ll.\+c@{ll.\+c}}
+\subsubsection[{disk\+\_\+stat}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} disk\+\_\+stat (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{{\bf d\+\_\+stat} $\ast$}]{stat}
+\end{DoxyParamCaption}
+)}\label{ll_8c_a98eac4ed1ea04fe431db1989df3d0105}
+
+
+This function returns basic disk information. 
+
+Returns disk information 
+
+Definition at line 245 of file ll.\+c.
+
+\hypertarget{ll_8c_a4644dd5135a1a5f5f4e635489776349a}{}\index{ll.\+c@{ll.\+c}!p\+\_\+index@{p\+\_\+index}}
+\index{p\+\_\+index@{p\+\_\+index}!ll.\+c@{ll.\+c}}
+\subsubsection[{p\+\_\+index}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} p\+\_\+index (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{partid, }
+\item[{uint32\+\_\+t $\ast$}]{partidx}
+\end{DoxyParamCaption}
+)}\label{ll_8c_a4644dd5135a1a5f5f4e635489776349a}
+
+
+This function returns the partition\textquotesingle{}s physical index. 
+
+Returns a partition superblock\textquotesingle{}s index on the volume 
+
+Definition at line 269 of file ll.\+c.
+
+\hypertarget{ll_8c_aa7c9471e45f41ad03286d5d2d8f82d3a}{}\index{ll.\+c@{ll.\+c}!read\+\_\+block@{read\+\_\+block}}
+\index{read\+\_\+block@{read\+\_\+block}!ll.\+c@{ll.\+c}}
+\subsubsection[{read\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} read\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{{\bf block}}]{b, }
+\item[{uint32\+\_\+t}]{num}
+\end{DoxyParamCaption}
+)}\label{ll_8c_aa7c9471e45f41ad03286d5d2d8f82d3a}
+
+
+This function reads a data block from the disk. 
+
+Read a block from disk. Use a cache memory to read. 
+
+Definition at line 175 of file ll.\+c.
+
+\hypertarget{ll_8c_a7053158f77d44651162a4961f6b6c25a}{}\index{ll.\+c@{ll.\+c}!read\+\_\+physical\+\_\+block@{read\+\_\+physical\+\_\+block}}
+\index{read\+\_\+physical\+\_\+block@{read\+\_\+physical\+\_\+block}!ll.\+c@{ll.\+c}}
+\subsubsection[{read\+\_\+physical\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} read\+\_\+physical\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{{\bf block}}]{b, }
+\item[{uint32\+\_\+t}]{num}
+\end{DoxyParamCaption}
+)}\label{ll_8c_a7053158f77d44651162a4961f6b6c25a}
+Physical reading of a block in a disk. Lowest level to read a block, are directly accessed. This function is private
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & the id of the disk \\
+\hline
+{\em b} & the block to store the reading \\
+\hline
+{\em num} & the number of the block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_a62a8edd367d554fa1abe39f568458e58}{D\+\_\+\+W\+R\+O\+N\+G\+I\+D} 
+
+\hyperlink{error_8h_aa5f283e5a78d907527d6fda785813067}{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K} 
+
+\hyperlink{error_8h_a98320f7130a66e221c7ebec00bde975b}{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a89147f8149ded631eeab5b339ea10fa4}{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R} 
+\end{DoxySeeAlso}
+
+
+Definition at line 50 of file ll.\+c.
+
+\hypertarget{ll_8c_a43fa001214cb3004fcd83ac65a9e5663}{}\index{ll.\+c@{ll.\+c}!start\+\_\+disk@{start\+\_\+disk}}
+\index{start\+\_\+disk@{start\+\_\+disk}!ll.\+c@{ll.\+c}}
+\subsubsection[{start\+\_\+disk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} start\+\_\+disk (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{name, }
+\item[{{\bf disk\+\_\+id} $\ast$}]{id}
+\end{DoxyParamCaption}
+)}\label{ll_8c_a43fa001214cb3004fcd83ac65a9e5663}
+
+
+This function associates an id number to a disk. 
+
+Starting a disk Attribute a dynamic id to this disk Readding the block zero for starting disk
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & the name of the disk \\
+\hline
+{\em id} & the dynamic id attribute to the disk at start \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+strncmp(\+\_\+disk\mbox{[}i\mbox{]}-\/$>$hash, md5print, H\+A\+S\+H\+\_\+\+L\+E\+N) 
+
+Definition at line 102 of file ll.\+c.
+
+\hypertarget{ll_8c_aed3b9996eee3fb7070c081d77525de0b}{}\index{ll.\+c@{ll.\+c}!stop\+\_\+disk@{stop\+\_\+disk}}
+\index{stop\+\_\+disk@{stop\+\_\+disk}!ll.\+c@{ll.\+c}}
+\subsubsection[{stop\+\_\+disk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} stop\+\_\+disk (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id}
+\end{DoxyParamCaption}
+)}\label{ll_8c_aed3b9996eee3fb7070c081d77525de0b}
+
+
+This function ends the session corresponding to id. 
+
+Closes an opened disk. Frees all associated memory
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_a191571925462b9d659b7d44b037986ca}{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L} 
+\end{DoxySeeAlso}
+
+
+Definition at line 225 of file ll.\+c.
+
+\hypertarget{ll_8c_a16487263f98deced4d3f300500800375}{}\index{ll.\+c@{ll.\+c}!sync\+\_\+disk@{sync\+\_\+disk}}
+\index{sync\+\_\+disk@{sync\+\_\+disk}!ll.\+c@{ll.\+c}}
+\subsubsection[{sync\+\_\+disk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} sync\+\_\+disk (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id}
+\end{DoxyParamCaption}
+)}\label{ll_8c_a16487263f98deced4d3f300500800375}
+
+
+This function flushes te buffer. 
+
+Syncronize the disk. Flush the cache. 
+
+Definition at line 208 of file ll.\+c.
+
+\hypertarget{ll_8c_acf1ce6cef2aa69e4ae06f8b8cb4a7241}{}\index{ll.\+c@{ll.\+c}!write\+\_\+block@{write\+\_\+block}}
+\index{write\+\_\+block@{write\+\_\+block}!ll.\+c@{ll.\+c}}
+\subsubsection[{write\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} write\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{{\bf block}}]{b, }
+\item[{uint32\+\_\+t}]{num}
+\end{DoxyParamCaption}
+)}\label{ll_8c_acf1ce6cef2aa69e4ae06f8b8cb4a7241}
+
+
+This function writes a data block from the disk. 
+
+Write a block to a disk. Use a cache memory to write.\+e 
+
+Definition at line 192 of file ll.\+c.
+
+\hypertarget{ll_8c_af0d7b4dbeb7488574e7b54df2b3640ea}{}\index{ll.\+c@{ll.\+c}!write\+\_\+physical\+\_\+block@{write\+\_\+physical\+\_\+block}}
+\index{write\+\_\+physical\+\_\+block@{write\+\_\+physical\+\_\+block}!ll.\+c@{ll.\+c}}
+\subsubsection[{write\+\_\+physical\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} write\+\_\+physical\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{{\bf block}}]{b, }
+\item[{uint32\+\_\+t}]{num}
+\end{DoxyParamCaption}
+)}\label{ll_8c_af0d7b4dbeb7488574e7b54df2b3640ea}
+Physical writing of a block in a disk. Lowest level to read a block, are directly accessed. This function is private
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & the id of the disk \\
+\hline
+{\em b} & the block to store the reading \\
+\hline
+{\em num} & the number of the block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_a62a8edd367d554fa1abe39f568458e58}{D\+\_\+\+W\+R\+O\+N\+G\+I\+D} 
+
+\hyperlink{error_8h_aa5f283e5a78d907527d6fda785813067}{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K} 
+
+\hyperlink{error_8h_a98320f7130a66e221c7ebec00bde975b}{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a89147f8149ded631eeab5b339ea10fa4}{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R} 
+\end{DoxySeeAlso}
+
+
+Definition at line 77 of file ll.\+c.
+

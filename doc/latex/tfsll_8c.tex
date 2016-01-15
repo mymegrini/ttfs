@@ -1,0 +1,756 @@
+\hypertarget{tfsll_8c}{}\section{lib/tfsll.c File Reference}
+\label{tfsll_8c}\index{lib/tfsll.\+c@{lib/tfsll.\+c}}
+{\ttfamily \#include \char`\"{}ll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfsll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$limits.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+Include dependency graph for tfsll.\+c\+:
+% FIG 0
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtfs__description}{tfs\+\_\+description}
+\item 
+struct \hyperlink{struct__index}{\+\_\+index}
+\item 
+struct \hyperlink{structtfs__ftent}{tfs\+\_\+ftent}
+\begin{DoxyCompactList}\small\item\em \hyperlink{struct_file}{File} table entry structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfsll_8c_a1fd99cf4016b6340b716f286b0cafa1e}{L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X}~(\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E} -\/ 1 -\/ S\+I\+Z\+E\+O\+F\+\_\+\+I\+N\+T)
+\item 
+\#define \hyperlink{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N}~(\hyperlink{tfsll_8h_aa22ff5357087db56d08f3b8c0c6f9ad3}{T\+F\+S\+\_\+\+D\+I\+R\+E\+C\+T\+\_\+\+B\+L\+O\+C\+K\+S\+\_\+\+N\+U\+M\+B\+E\+R}$\ast$\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})
+\item 
+\#define \hyperlink{tfsll_8c_a950fb7128e962c81443e8e5304521479}{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N}~(\hyperlink{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N} + \hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}$\ast$\hyperlink{tfsll_8h_a52b6e3b7761e4ebc77a578d2ca8ca43c}{I\+N\+T\+\_\+\+P\+E\+R\+\_\+\+B\+L\+O\+C\+K})
+\item 
+\#define \hyperlink{tfsll_8c_a18851de1cac2bd8b6fe679466c5c46ac}{I\+S\+I\+N\+D\+I\+R\+E\+C\+T2}(fileindex)~((fileindex) $>$= \hyperlink{tfsll_8c_a950fb7128e962c81443e8e5304521479}{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N})
+\item 
+\#define \hyperlink{tfsll_8c_af67a713d0e74a5c5662f579e3101abc4}{I\+S\+I\+N\+D\+I\+R\+E\+C\+T1}(fileindex)
+\item 
+\#define \hyperlink{tfsll_8c_a4c15c6139791c430835310f5a6ba85e9}{I\+S\+D\+I\+R\+E\+C\+T}(fileindex)~((fileindex) $<$ \hyperlink{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N})
+\item 
+\#define \hyperlink{tfsll_8c_a7d27470ddf7941b7f117b9fb0123d6f5}{D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X}(fileindex)~((fileindex)/\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})
+\item 
+\#define \hyperlink{tfsll_8c_ab8ab8c12f43f91f8ea669910e5c098e8}{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X}(fileindex)
+\item 
+\#define \hyperlink{tfsll_8c_a0202aed55848e459101a682922fe535a}{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X}(fileindex)
+\item 
+\#define \hyperlink{tfsll_8c_ae1bcc06e1c760c83d8cad98803f79176}{L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S}(fileindex)~((fileindex)\%\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})
+\item 
+\#define \hyperlink{tfsll_8c_ace461eb06f355e46a8933fd1bfbd6ad8}{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T}~0
+\item 
+\#define \hyperlink{tfsll_8c_a51ec770a75ad70efde706781188f2584}{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T}~1
+\item 
+\#define \hyperlink{tfsll_8c_ab90b8e94c6b38d2200ef45f3bd1ded5c}{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T}~2
+\item 
+\#define \hyperlink{tfsll_8c_a62be2348e24bb0c47f5257dd2e9c18ae}{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S}~\char`\"{}semb\char`\"{}
+\item 
+\#define \hyperlink{tfsll_8c_ab54c5922318477407c6de74e6946de57}{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S}~\char`\"{}semt\char`\"{}
+\item 
+\#define \hyperlink{tfsll_8c_ab61a0126d68c61150bdd32781306578f}{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S}~\char`\"{}semf\char`\"{}
+\item 
+\#define \hyperlink{tfsll_8c_ad7dad192c3af590d166013dbba27d454}{S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N}~N\+A\+M\+E\+\_\+\+M\+A\+X-\/5
+\item 
+\#define \hyperlink{tfsll_8c_a21b494ab79d0e1a3a14e4fa9baa75ce8}{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}~(\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E} / \hyperlink{tfsll_8h_aed45414998052fb757f4c770fec74e02}{T\+F\+S\+\_\+\+F\+I\+L\+E\+\_\+\+T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+S\+I\+Z\+E})
+\item 
+\#define \hyperlink{tfsll_8c_a33280dd2b397dae10eb9f699d6c24144}{I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K}(inode)~(1 + ((inode)/\hyperlink{tfsll_8c_a21b494ab79d0e1a3a14e4fa9baa75ce8}{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}))
+\item 
+\#define \hyperlink{tfsll_8c_a19b1f6a5f2304dd8c6fad559c574278f}{I\+N\+O\+\_\+\+B\+P\+O\+S}(inode)~((inode) \% \hyperlink{tfsll_8c_a21b494ab79d0e1a3a14e4fa9baa75ce8}{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K})
+\item 
+\#define \hyperlink{tfsll_8c_a65ca5e4b10144d8900f6c5d9c47f0dde}{P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D}(p)~(strncmp(p, \hyperlink{tfs_8h_a0e6b17985a3095348e38094b978770da}{P\+A\+T\+H\+\_\+\+F\+P\+F\+X}, \hyperlink{tfs_8h_accfe6070f33c1248b84e8c287682f8ec}{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}) == 0)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_ac23a5b78ec651d6227a7aeae97f58a08}{index\+\_\+init} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, \hyperlink{struct__index}{\+\_\+index} index)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_ac376ff0d970d2f3437edf6e09d82170e}{fileblock\+\_\+add} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, \hyperlink{struct__index}{\+\_\+index} index)
+\begin{DoxyCompactList}\small\item\em Add a data block to a file. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_af1d0841243821f07caeb6424f2200f58}{fileblock\+\_\+rm} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, \hyperlink{struct__index}{\+\_\+index} index)
+\begin{DoxyCompactList}\small\item\em Remove a data block from a file. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a095690b3277138c0ccbd7a2019235462}{freeblock\+\_\+push} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t b\+\_\+addr)
+\begin{DoxyCompactList}\small\item\em Push the block $<$b\+\_\+addr$>$ to the free blocks list. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a7431b03d0c11b1c93ea11118bd60fabd}{freeblock\+\_\+pop} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t $\ast$b\+\_\+addr)
+\begin{DoxyCompactList}\small\item\em Remove the block at b\+\_\+addr of the free blocks list. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_aa0ccdca757263fd288943ccba21909bc}{freefile\+\_\+push} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode)
+\begin{DoxyCompactList}\small\item\em Push the file entry $<$inode$>$ to the free file entry list. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a1d08bc0170d3e081e26a2d7441bc4a92}{freefile\+\_\+pop} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t $\ast$inode)
+\begin{DoxyCompactList}\small\item\em Remove the file entry $<$inode$>$ from the free file entry list. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a940934770f197ee97fed5de4fe942ed6}{file\+\_\+realloc} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, uint32\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Change size of file $<$inode$>$ to size $<$size$>$ \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a702498aa39340b1e33ff2c83224e0265}{find\+\_\+addr} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, uint32\+\_\+t b\+\_\+file\+\_\+addr, uint32\+\_\+t $\ast$b\+\_\+addr)
+\begin{DoxyCompactList}\small\item\em Finds a file block\textquotesingle{}s volume address. \end{DoxyCompactList}\item 
+int \hyperlink{tfsll_8c_a4fd3b89272908cad415e7e1855ed8a86}{file\+\_\+open} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, int flags, int type, int subtype)
+\begin{DoxyCompactList}\small\item\em This function returns a file descriptor for use in subsequent system calls. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_ad806ff31d7fd645d95b030a82bebcd62}{directory\+\_\+pushent} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, const struct \hyperlink{structdirent}{dirent} $\ast$entry)
+\begin{DoxyCompactList}\small\item\em Push the directory entry to the directory. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a9ed5c542df5caae00d510b01405bc9e8}{directory\+\_\+rment} (const \hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, const uint32\+\_\+t vol\+\_\+addr, const uint32\+\_\+t inode, char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Remove a directory entry. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_ad5ce0a90a4a2d05d3cb3320bd11282cf}{path\+\_\+follow} (const char $\ast$path, char $\ast$$\ast$entry)
+\begin{DoxyCompactList}\small\item\em Follow a path. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a1ed4383596380b124d81ee7ec3f5da24}{path\+\_\+split} (char $\ast$path, char $\ast$$\ast$leaf)
+\begin{DoxyCompactList}\small\item\em Split a path between parent directory path and last element. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a622de912f80a619dd913b591e55ce58a}{find\+\_\+inode} (const char $\ast$path, uint32\+\_\+t $\ast$ino)
+\begin{DoxyCompactList}\small\item\em Recover filenumber from a valid path. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfsll_8c_a5d2a02f4e67ae4a0f2ad924ad8603bef}{file\+\_\+stat} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} id, uint32\+\_\+t vol\+\_\+addr, uint32\+\_\+t inode, \hyperlink{structf__stat}{f\+\_\+stat} $\ast$stat)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfsll_8c_a7d27470ddf7941b7f117b9fb0123d6f5}{}\index{tfsll.\+c@{tfsll.\+c}!D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X@{D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X}}
+\index{D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X@{D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+I\+R\+E\+C\+T\+\_\+\+I\+D\+X(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)~((fileindex)/{\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})}\label{tfsll_8c_a7d27470ddf7941b7f117b9fb0123d6f5}
+
+
+Definition at line 34 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N@{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N}}
+\index{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N@{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N~({\bf T\+F\+S\+\_\+\+D\+I\+R\+E\+C\+T\+\_\+\+B\+L\+O\+C\+K\+S\+\_\+\+N\+U\+M\+B\+E\+R}$\ast${\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})}\label{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}
+
+
+Definition at line 28 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ab8ab8c12f43f91f8ea669910e5c098e8}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X@{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X}}
+\index{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X@{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+I\+D\+X(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_ab8ab8c12f43f91f8ea669910e5c098e8}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((fileindex)/\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{TFS\_VOLUME\_BLOCK\_SIZE}    \(\backslash\)
+                   - \hyperlink{tfsll_8h_aa22ff5357087db56d08f3b8c0c6f9ad3}{TFS\_DIRECT\_BLOCKS\_NUMBER})% 
+      \hyperlink{tfsll_8h_a52b6e3b7761e4ebc77a578d2ca8ca43c}{INT\_PER\_BLOCK})
+\end{DoxyCode}
+
+
+Definition at line 35 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a950fb7128e962c81443e8e5304521479}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N@{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N}}
+\index{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N@{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N~({\bf I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N} + {\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}$\ast${\bf I\+N\+T\+\_\+\+P\+E\+R\+\_\+\+B\+L\+O\+C\+K})}\label{tfsll_8c_a950fb7128e962c81443e8e5304521479}
+
+
+Definition at line 29 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a0202aed55848e459101a682922fe535a}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X@{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X}}
+\index{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X@{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+I\+D\+X(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a0202aed55848e459101a682922fe535a}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(((fileindex)/\hyperlink{tfsll_8h_a43ae1360df25a9025eeb05e5c61ad0d1}{TFS\_VOLUME\_BLOCK\_SIZE} \(\backslash\)
+                    - \hyperlink{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{INDIRECT1\_BEGIN})/ \hyperlink{tfsll_8h_a52b6e3b7761e4ebc77a578d2ca8ca43c}{INT\_PER\_BLOCK})
+\end{DoxyCode}
+
+
+Definition at line 37 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a19b1f6a5f2304dd8c6fad559c574278f}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+O\+\_\+\+B\+P\+O\+S@{I\+N\+O\+\_\+\+B\+P\+O\+S}}
+\index{I\+N\+O\+\_\+\+B\+P\+O\+S@{I\+N\+O\+\_\+\+B\+P\+O\+S}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+O\+\_\+\+B\+P\+O\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+O\+\_\+\+B\+P\+O\+S(
+\begin{DoxyParamCaption}
+\item[{}]{inode}
+\end{DoxyParamCaption}
+)~((inode) \% {\bf N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K})}\label{tfsll_8c_a19b1f6a5f2304dd8c6fad559c574278f}
+
+
+Definition at line 95 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a33280dd2b397dae10eb9f699d6c24144}{}\index{tfsll.\+c@{tfsll.\+c}!I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K@{I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K}}
+\index{I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K@{I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+O\+\_\+\+F\+T\+B\+L\+O\+C\+K(
+\begin{DoxyParamCaption}
+\item[{}]{inode}
+\end{DoxyParamCaption}
+)~(1 + ((inode)/{\bf N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}))}\label{tfsll_8c_a33280dd2b397dae10eb9f699d6c24144}
+
+
+Definition at line 94 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a4c15c6139791c430835310f5a6ba85e9}{}\index{tfsll.\+c@{tfsll.\+c}!I\+S\+D\+I\+R\+E\+C\+T@{I\+S\+D\+I\+R\+E\+C\+T}}
+\index{I\+S\+D\+I\+R\+E\+C\+T@{I\+S\+D\+I\+R\+E\+C\+T}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+S\+D\+I\+R\+E\+C\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+D\+I\+R\+E\+C\+T(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)~((fileindex) $<$ {\bf I\+N\+D\+I\+R\+E\+C\+T1\+\_\+\+B\+E\+G\+I\+N})}\label{tfsll_8c_a4c15c6139791c430835310f5a6ba85e9}
+
+
+Definition at line 33 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_af67a713d0e74a5c5662f579e3101abc4}{}\index{tfsll.\+c@{tfsll.\+c}!I\+S\+I\+N\+D\+I\+R\+E\+C\+T1@{I\+S\+I\+N\+D\+I\+R\+E\+C\+T1}}
+\index{I\+S\+I\+N\+D\+I\+R\+E\+C\+T1@{I\+S\+I\+N\+D\+I\+R\+E\+C\+T1}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+S\+I\+N\+D\+I\+R\+E\+C\+T1}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+I\+N\+D\+I\+R\+E\+C\+T1(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_af67a713d0e74a5c5662f579e3101abc4}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+((fileindex) >= \hyperlink{tfsll_8c_ab02774b0a839b14134cd1094680c0aa8}{INDIRECT1\_BEGIN} \(\backslash\)
+                && ! \hyperlink{tfsll_8c_a18851de1cac2bd8b6fe679466c5c46ac}{ISINDIRECT2}(fileindex))
+\end{DoxyCode}
+
+
+Definition at line 31 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a18851de1cac2bd8b6fe679466c5c46ac}{}\index{tfsll.\+c@{tfsll.\+c}!I\+S\+I\+N\+D\+I\+R\+E\+C\+T2@{I\+S\+I\+N\+D\+I\+R\+E\+C\+T2}}
+\index{I\+S\+I\+N\+D\+I\+R\+E\+C\+T2@{I\+S\+I\+N\+D\+I\+R\+E\+C\+T2}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{I\+S\+I\+N\+D\+I\+R\+E\+C\+T2}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+I\+N\+D\+I\+R\+E\+C\+T2(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)~((fileindex) $>$= {\bf I\+N\+D\+I\+R\+E\+C\+T2\+\_\+\+B\+E\+G\+I\+N})}\label{tfsll_8c_a18851de1cac2bd8b6fe679466c5c46ac}
+
+
+Definition at line 30 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ae1bcc06e1c760c83d8cad98803f79176}{}\index{tfsll.\+c@{tfsll.\+c}!L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S@{L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S}}
+\index{L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S@{L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+A\+S\+T\+B\+Y\+T\+E\+\_\+\+P\+O\+S(
+\begin{DoxyParamCaption}
+\item[{}]{fileindex}
+\end{DoxyParamCaption}
+)~((fileindex)\%{\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E})}\label{tfsll_8c_ae1bcc06e1c760c83d8cad98803f79176}
+
+
+Definition at line 39 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a1fd99cf4016b6340b716f286b0cafa1e}{}\index{tfsll.\+c@{tfsll.\+c}!L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X@{L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X}}
+\index{L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X@{L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+A\+S\+T\+I\+N\+T\+\_\+\+I\+D\+X~({\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E} -\/ 1 -\/ S\+I\+Z\+E\+O\+F\+\_\+\+I\+N\+T)}\label{tfsll_8c_a1fd99cf4016b6340b716f286b0cafa1e}
+
+
+Definition at line 27 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a21b494ab79d0e1a3a14e4fa9baa75ce8}{}\index{tfsll.\+c@{tfsll.\+c}!N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K@{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}}
+\index{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K@{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+E\+N\+T\+B\+Y\+B\+L\+O\+C\+K~({\bf T\+F\+S\+\_\+\+V\+O\+L\+U\+M\+E\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E} / {\bf T\+F\+S\+\_\+\+F\+I\+L\+E\+\_\+\+T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+S\+I\+Z\+E})}\label{tfsll_8c_a21b494ab79d0e1a3a14e4fa9baa75ce8}
+
+
+Definition at line 93 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a65ca5e4b10144d8900f6c5d9c47f0dde}{}\index{tfsll.\+c@{tfsll.\+c}!P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D@{P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D}}
+\index{P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D@{P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+T\+H\+\_\+\+I\+S\+V\+A\+L\+I\+D(
+\begin{DoxyParamCaption}
+\item[{}]{p}
+\end{DoxyParamCaption}
+)~(strncmp(p, {\bf P\+A\+T\+H\+\_\+\+F\+P\+F\+X}, {\bf P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}) == 0)}\label{tfsll_8c_a65ca5e4b10144d8900f6c5d9c47f0dde}
+
+
+Definition at line 1118 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a62be2348e24bb0c47f5257dd2e9c18ae}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S@{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S}}
+\index{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S@{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+S~\char`\"{}semb\char`\"{}}\label{tfsll_8c_a62be2348e24bb0c47f5257dd2e9c18ae}
+
+
+Definition at line 44 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ace461eb06f355e46a8933fd1bfbd6ad8}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T@{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T}}
+\index{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T@{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+B\+L\+\_\+\+T~0}\label{tfsll_8c_ace461eb06f355e46a8933fd1bfbd6ad8}
+
+
+Definition at line 41 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ab54c5922318477407c6de74e6946de57}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S@{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S}}
+\index{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S@{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+S~\char`\"{}semt\char`\"{}}\label{tfsll_8c_ab54c5922318477407c6de74e6946de57}
+
+
+Definition at line 45 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a51ec770a75ad70efde706781188f2584}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T@{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T}}
+\index{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T@{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+E\+L\+\_\+\+T~1}\label{tfsll_8c_a51ec770a75ad70efde706781188f2584}
+
+
+Definition at line 42 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ab61a0126d68c61150bdd32781306578f}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S@{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S}}
+\index{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S@{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+S~\char`\"{}semf\char`\"{}}\label{tfsll_8c_ab61a0126d68c61150bdd32781306578f}
+
+
+Definition at line 46 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ab90b8e94c6b38d2200ef45f3bd1ded5c}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T@{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T}}
+\index{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T@{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+F\+I\+L\+E\+\_\+\+T~2}\label{tfsll_8c_ab90b8e94c6b38d2200ef45f3bd1ded5c}
+
+
+Definition at line 43 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ad7dad192c3af590d166013dbba27d454}{}\index{tfsll.\+c@{tfsll.\+c}!S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N@{S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N}}
+\index{S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N@{S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+E\+M\+\_\+\+N\+A\+M\+E\+\_\+\+L\+E\+N~N\+A\+M\+E\+\_\+\+M\+A\+X-\/5}\label{tfsll_8c_ad7dad192c3af590d166013dbba27d454}
+
+
+Definition at line 47 of file tfsll.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfsll_8c_ad806ff31d7fd645d95b030a82bebcd62}{}\index{tfsll.\+c@{tfsll.\+c}!directory\+\_\+pushent@{directory\+\_\+pushent}}
+\index{directory\+\_\+pushent@{directory\+\_\+pushent}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{directory\+\_\+pushent}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} directory\+\_\+pushent (
+\begin{DoxyParamCaption}
+\item[{const {\bf disk\+\_\+id}}]{id, }
+\item[{const uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{const uint32\+\_\+t}]{inode, }
+\item[{const struct {\bf dirent} $\ast$}]{entry}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_ad806ff31d7fd645d95b030a82bebcd62}
+
+
+Push the directory entry to the directory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dir} & \\
+\hline
+{\em ent} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+F\+U\+L\+L if the volume is full 
+\end{DoxyReturn}
+
+
+Definition at line 838 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a9ed5c542df5caae00d510b01405bc9e8}{}\index{tfsll.\+c@{tfsll.\+c}!directory\+\_\+rment@{directory\+\_\+rment}}
+\index{directory\+\_\+rment@{directory\+\_\+rment}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{directory\+\_\+rment}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} directory\+\_\+rment (
+\begin{DoxyParamCaption}
+\item[{const {\bf disk\+\_\+id}}]{id, }
+\item[{const uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{const uint32\+\_\+t}]{inode, }
+\item[{char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a9ed5c542df5caae00d510b01405bc9e8}
+
+
+Remove a directory entry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em inode} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S 
+\end{DoxyReturn}
+
+
+Definition at line 1062 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a4fd3b89272908cad415e7e1855ed8a86}{}\index{tfsll.\+c@{tfsll.\+c}!file\+\_\+open@{file\+\_\+open}}
+\index{file\+\_\+open@{file\+\_\+open}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{file\+\_\+open}]{\setlength{\rightskip}{0pt plus 5cm}int file\+\_\+open (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{int}]{flags, }
+\item[{int}]{type, }
+\item[{int}]{subtype}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a4fd3b89272908cad415e7e1855ed8a86}
+
+
+This function returns a file descriptor for use in subsequent system calls. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em vol\+\_\+addr} & volume address \\
+\hline
+\mbox{\tt in}  & {\em inode} & file number \\
+\hline
+\mbox{\tt in}  & {\em flags} & opening mode \\
+\hline
+\mbox{\tt in}  & {\em } & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 775 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a940934770f197ee97fed5de4fe942ed6}{}\index{tfsll.\+c@{tfsll.\+c}!file\+\_\+realloc@{file\+\_\+realloc}}
+\index{file\+\_\+realloc@{file\+\_\+realloc}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{file\+\_\+realloc}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} file\+\_\+realloc (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{uint32\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a940934770f197ee97fed5de4fe942ed6}
+
+
+Change size of file $<$inode$>$ to size $<$size$>$ 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & disk id \\
+\hline
+{\em vol} & partition number \\
+\hline
+{\em inode} & file inode number \\
+\hline
+{\em size} & new file size \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 667 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a5d2a02f4e67ae4a0f2ad924ad8603bef}{}\index{tfsll.\+c@{tfsll.\+c}!file\+\_\+stat@{file\+\_\+stat}}
+\index{file\+\_\+stat@{file\+\_\+stat}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{file\+\_\+stat}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} file\+\_\+stat (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{{\bf f\+\_\+stat} $\ast$}]{stat}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a5d2a02f4e67ae4a0f2ad924ad8603bef}
+
+
+Definition at line 1257 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ac376ff0d970d2f3437edf6e09d82170e}{}\index{tfsll.\+c@{tfsll.\+c}!fileblock\+\_\+add@{fileblock\+\_\+add}}
+\index{fileblock\+\_\+add@{fileblock\+\_\+add}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{fileblock\+\_\+add}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} fileblock\+\_\+add (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{{\bf \+\_\+index}}]{index}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_ac376ff0d970d2f3437edf6e09d82170e}
+
+
+Add a data block to a file. 
+
+Add the block at b\+\_\+addr to the file of inode file number
+
+
+\begin{DoxyParams}{Parameters}
+{\em inode} & file inode \\
+\hline
+{\em b\+\_\+addr} & block index on the volume \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+E\+R\+R\+B\+L\+O\+C\+K if adress is not valid T\+F\+S\+\_\+\+E\+R\+R\+I\+N\+O\+D\+E if the inode is not valid 
+\end{DoxyReturn}
+
+
+Definition at line 285 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_af1d0841243821f07caeb6424f2200f58}{}\index{tfsll.\+c@{tfsll.\+c}!fileblock\+\_\+rm@{fileblock\+\_\+rm}}
+\index{fileblock\+\_\+rm@{fileblock\+\_\+rm}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{fileblock\+\_\+rm}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} fileblock\+\_\+rm (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{{\bf \+\_\+index}}]{index}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_af1d0841243821f07caeb6424f2200f58}
+
+
+Remove a data block from a file. 
+
+Remove the data block $<$b\+\_\+adrr$>$ from the file $<$inode$>$
+
+
+\begin{DoxyParams}{Parameters}
+{\em inode} & file inode \\
+\hline
+{\em b\+\_\+addr} & block index in the file \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+E\+R\+R\+B\+L\+O\+C\+K if adress is not valid, T\+F\+S\+\_\+\+E\+R\+R\+I\+N\+O\+D\+E if the inode is not valid 
+\end{DoxyReturn}
+
+
+Definition at line 375 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a702498aa39340b1e33ff2c83224e0265}{}\index{tfsll.\+c@{tfsll.\+c}!find\+\_\+addr@{find\+\_\+addr}}
+\index{find\+\_\+addr@{find\+\_\+addr}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{find\+\_\+addr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} find\+\_\+addr (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{uint32\+\_\+t}]{b\+\_\+file\+\_\+addr, }
+\item[{uint32\+\_\+t $\ast$}]{b\+\_\+addr}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a702498aa39340b1e33ff2c83224e0265}
+
+
+Finds a file block\textquotesingle{}s volume address. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em inode} & file inode \\
+\hline
+ & {\em vol} & partition index \\
+\hline
+ & {\em id} & disk id number \\
+\hline
+\mbox{\tt in}  & {\em b\+\_\+file\+\_\+addr} & block\textquotesingle{}s file number \\
+\hline
+\mbox{\tt out}  & {\em b\+\_\+addr} & block\textquotesingle{}s volume address \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 719 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a622de912f80a619dd913b591e55ce58a}{}\index{tfsll.\+c@{tfsll.\+c}!find\+\_\+inode@{find\+\_\+inode}}
+\index{find\+\_\+inode@{find\+\_\+inode}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{find\+\_\+inode}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} find\+\_\+inode (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path, }
+\item[{uint32\+\_\+t $\ast$}]{ino}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a622de912f80a619dd913b591e55ce58a}
+
+
+Recover filenumber from a valid path. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & \\
+\hline
+{\em ino} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+
+
+Definition at line 1173 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a7431b03d0c11b1c93ea11118bd60fabd}{}\index{tfsll.\+c@{tfsll.\+c}!freeblock\+\_\+pop@{freeblock\+\_\+pop}}
+\index{freeblock\+\_\+pop@{freeblock\+\_\+pop}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{freeblock\+\_\+pop}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} freeblock\+\_\+pop (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t $\ast$}]{b\+\_\+addr}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a7431b03d0c11b1c93ea11118bd60fabd}
+
+
+Remove the block at b\+\_\+addr of the free blocks list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & disk id \\
+\hline
+{\em vol} & partition number \\
+\hline
+{\em b\+\_\+addr} & block volume address \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+E\+R\+R\+A\+D\+D\+R if address is not valid 
+\end{DoxyReturn}
+
+
+Definition at line 505 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a095690b3277138c0ccbd7a2019235462}{}\index{tfsll.\+c@{tfsll.\+c}!freeblock\+\_\+push@{freeblock\+\_\+push}}
+\index{freeblock\+\_\+push@{freeblock\+\_\+push}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{freeblock\+\_\+push}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} freeblock\+\_\+push (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{b\+\_\+addr}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a095690b3277138c0ccbd7a2019235462}
+
+
+Push the block $<$b\+\_\+addr$>$ to the free blocks list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em b\+\_\+addr} & block index on the volume \\
+\hline
+{\em id} & disk id \\
+\hline
+{\em vol} & partition number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+E\+R\+R\+B\+L\+O\+C\+K if address is not valid 
+\end{DoxyReturn}
+
+
+Definition at line 459 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a1d08bc0170d3e081e26a2d7441bc4a92}{}\index{tfsll.\+c@{tfsll.\+c}!freefile\+\_\+pop@{freefile\+\_\+pop}}
+\index{freefile\+\_\+pop@{freefile\+\_\+pop}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{freefile\+\_\+pop}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} freefile\+\_\+pop (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t $\ast$}]{inode}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a1d08bc0170d3e081e26a2d7441bc4a92}
+
+
+Remove the file entry $<$inode$>$ from the free file entry list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & disk id \\
+\hline
+{\em vol} & partition number \\
+\hline
+{\em inode} & file inode number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+
+
+Definition at line 608 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_aa0ccdca757263fd288943ccba21909bc}{}\index{tfsll.\+c@{tfsll.\+c}!freefile\+\_\+push@{freefile\+\_\+push}}
+\index{freefile\+\_\+push@{freefile\+\_\+push}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{freefile\+\_\+push}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} freefile\+\_\+push (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_aa0ccdca757263fd288943ccba21909bc}
+
+
+Push the file entry $<$inode$>$ to the free file entry list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em inode} & file inode \\
+\hline
+{\em id} & disk id \\
+\hline
+{\em vol} & partition number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+
+
+Definition at line 564 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ac23a5b78ec651d6227a7aeae97f58a08}{}\index{tfsll.\+c@{tfsll.\+c}!index\+\_\+init@{index\+\_\+init}}
+\index{index\+\_\+init@{index\+\_\+init}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{index\+\_\+init}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} index\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{id, }
+\item[{uint32\+\_\+t}]{vol\+\_\+addr, }
+\item[{uint32\+\_\+t}]{inode, }
+\item[{{\bf \+\_\+index}}]{index}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_ac23a5b78ec651d6227a7aeae97f58a08}
+
+
+Definition at line 235 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_ad5ce0a90a4a2d05d3cb3320bd11282cf}{}\index{tfsll.\+c@{tfsll.\+c}!path\+\_\+follow@{path\+\_\+follow}}
+\index{path\+\_\+follow@{path\+\_\+follow}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{path\+\_\+follow}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} path\+\_\+follow (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path, }
+\item[{char $\ast$$\ast$}]{entry}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_ad5ce0a90a4a2d05d3cb3320bd11282cf}
+
+
+Follow a path. 
+
+Follow the path path by filling entry with the next entry. entry should be the adress of a char $\ast$.
+
+Usage\+:
+
+First, call path\+\_\+follow with the full path, i.\+e. prefixed by F\+I\+L\+E\+://, and the adress of an unitialized char$\ast$. For the first call, the pointer $\ast$entry is not modified so you can pass N\+U\+L\+L. If the path is not prefixed, T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+F\+X is returned. Example\+: char path\mbox{[}\mbox{]} = \char`\"{}\+F\+I\+L\+E\+://disk/vol/entry1/entry2\char`\"{} if (path\+\_\+follow(path, N\+U\+L\+L) == T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H) ...;
+
+To follow the previous path, you should now call follow\+\_\+path with a null path and the adress of an unitialized char$\ast$. If the last call has reached a leaf, then T\+F\+S\+\_\+\+P\+A\+T\+H\+L\+E\+A\+F is returned and entry stay unchanged. If you try calling path\+\_\+follow(\+N\+U\+L\+L,\+N\+U\+L\+L) you will get a segmentation fault. Example\+: char $\ast$entry; while (path\+\_\+follow(\+N\+U\+L\+L, \&entry) != T\+F\+S\+\_\+\+P\+A\+T\+H\+L\+E\+A\+F) \{ printf(\char`\"{}\+Entry \+: \%s\textbackslash{}n\char`\"{}, entry); \} printf(\char`\"{}\+Last entry \%s was a leaf.\textbackslash{}n\char`\"{});
+
+If the working path has not been initialized by a first call and you follow a path (with something like follow\+\_\+path(\+N\+U\+L\+L, \&entry))\$ then error T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+W\+O\+R\+K\+I\+N\+G\+P\+A\+T\+H is returned.
+
+About memory allocation\+: An internal static char$\ast$ is used to work on, it is automatically released after reaching a leaf or after
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & \\
+\hline
+\mbox{\tt out}  & {\em entry} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S, T\+F\+S\+\_\+\+P\+A\+T\+H\+L\+E\+A\+F, T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+F\+X, T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+W\+O\+R\+K\+I\+N\+G\+P\+A\+T\+H 
+\end{DoxyReturn}
+
+
+Definition at line 1120 of file tfsll.\+c.
+
+\hypertarget{tfsll_8c_a1ed4383596380b124d81ee7ec3f5da24}{}\index{tfsll.\+c@{tfsll.\+c}!path\+\_\+split@{path\+\_\+split}}
+\index{path\+\_\+split@{path\+\_\+split}!tfsll.\+c@{tfsll.\+c}}
+\subsubsection[{path\+\_\+split}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} path\+\_\+split (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{path, }
+\item[{char $\ast$$\ast$}]{last\+\_\+element}
+\end{DoxyParamCaption}
+)}\label{tfsll_8c_a1ed4383596380b124d81ee7ec3f5da24}
+
+
+Split a path between parent directory path and last element. 
+
+After successfull execution, path is modified to contain the parent directory path, last\+\_\+element point to the last\+\_\+element of the path. Also test if path is prefixed, you can then just call path\+\_\+follow with a N\+U\+L\+L path to follow the path without testing prefix. 
+\begin{DoxyParams}{Parameters}
+{\em path} & \\
+\hline
+{\em leaf} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error 
+\end{DoxyReturn}
+
+
+Definition at line 1152 of file tfsll.\+c.
+

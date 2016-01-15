@@ -1,0 +1,74 @@
+\hypertarget{error_8c}{}\section{lib/error.c File Reference}
+\label{error_8c}\index{lib/error.\+c@{lib/error.\+c}}
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+Include dependency graph for error.\+c\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{error_8c_ab6b35044ba6496e2fe4dc59557923af4}{printerror} (char $\ast$s, \hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} err)
+\item 
+void \hyperlink{error_8c_a571be2305c567deb80d4b77f30cadcd3}{testerror} (char $\ast$msg, \hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} err)
+\begin{DoxyCompactList}\small\item\em This function forces an exit if an error is encountered. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{error_8c_af2af6e4ea36bbb786123dc9b24c26fc9}{errnum} = \hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}
+\begin{DoxyCompactList}\small\item\em This variable can store an error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{error_8c_ab6b35044ba6496e2fe4dc59557923af4}{}\index{error.\+c@{error.\+c}!printerror@{printerror}}
+\index{printerror@{printerror}!error.\+c@{error.\+c}}
+\subsubsection[{printerror}]{\setlength{\rightskip}{0pt plus 5cm}void printerror (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{{\bf error}}]{err}
+\end{DoxyParamCaption}
+)}\label{error_8c_ab6b35044ba6496e2fe4dc59557923af4}
+Prints an errror message on error output using the format $<$s\+: error message$>$
+
+
+\begin{DoxyParams}{Parameters}
+{\em s\mbox{[}in\mbox{]}} & sting to be added at beginning of error output \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+
+
+Definition at line 84 of file error.\+c.
+
+\hypertarget{error_8c_a571be2305c567deb80d4b77f30cadcd3}{}\index{error.\+c@{error.\+c}!testerror@{testerror}}
+\index{testerror@{testerror}!error.\+c@{error.\+c}}
+\subsubsection[{testerror}]{\setlength{\rightskip}{0pt plus 5cm}void testerror (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{msg, }
+\item[{{\bf error}}]{err}
+\end{DoxyParamCaption}
+)}\label{error_8c_a571be2305c567deb80d4b77f30cadcd3}
+
+
+This function forces an exit if an error is encountered. 
+
+This function prints an error message and terminates the program if $<$err$>$ is not E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S 
+
+Definition at line 93 of file error.\+c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{error_8c_af2af6e4ea36bbb786123dc9b24c26fc9}{}\index{error.\+c@{error.\+c}!errnum@{errnum}}
+\index{errnum@{errnum}!error.\+c@{error.\+c}}
+\subsubsection[{errnum}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} errnum = {\bf E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}}\label{error_8c_af2af6e4ea36bbb786123dc9b24c26fc9}
+
+
+This variable can store an error. 
+
+This variable can be used to store an error in functions which do not return $<$error$>$ 
+
+Definition at line 106 of file error.\+c.
+

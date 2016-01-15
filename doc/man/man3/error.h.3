@@ -1,0 +1,532 @@
+.TH "lib/error.h" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/error.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdint\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBERR_STRLEN\fP   80"
+.br
+.ti -1c
+.RI "#define \fBEXIT_SUCCESS\fP   0"
+.br
+.ti -1c
+.RI "#define \fBEXIT_SUCCESS\fP   0"
+.br
+.ti -1c
+.RI "#define \fBC_FORMAT\fP   1"
+.br
+.ti -1c
+.RI "#define \fBD_WRONGID\fP   2"
+.br
+.ti -1c
+.RI "#define \fBB_OUT_OF_DISK\fP   3"
+.br
+.ti -1c
+.RI "#define \fBD_SEEK_ERR\fP   4"
+.br
+.ti -1c
+.RI "#define \fBD_READ_ERR\fP   5"
+.br
+.ti -1c
+.RI "#define \fBD_WRITE_ERR\fP   6"
+.br
+.ti -1c
+.RI "#define \fBOD_FULL\fP   7"
+.br
+.ti -1c
+.RI "#define \fBD_OPEN_ERR\fP   8"
+.br
+.ti -1c
+.RI "#define \fBD_NEWDISK\fP   9"
+.br
+.ti -1c
+.RI "#define \fBB_WRONGIDX\fP   10"
+.br
+.ti -1c
+.RI "#define \fBP_WRONGIDX\fP   11"
+.br
+.ti -1c
+.RI "#define \fBP_CORRUPTED\fP   12"
+.br
+.ti -1c
+.RI "#define \fBB_WRONGNAME\fP   13"
+.br
+.ti -1c
+.RI "#define \fBP_WRONGVALUE\fP   14"
+.br
+.ti -1c
+.RI "#define \fBV_FULL\fP   15"
+.br
+.ti -1c
+.RI "#define \fBV_FBL_CORRUPTED\fP   16"
+.br
+.ti -1c
+.RI "#define \fBF_FULL\fP   17"
+.br
+.ti -1c
+.RI "#define \fBFT_FULL\fP   18"
+.br
+.ti -1c
+.RI "#define \fBFT_FEL_CORRUPTED\fP   19"
+.br
+.ti -1c
+.RI "#define \fBF_SIZE_CORRUPTED\fP   20"
+.br
+.ti -1c
+.RI "#define \fBF_EMPTY\fP   21"
+.br
+.ti -1c
+.RI "#define \fBI_CORRUPTED\fP   22"
+.br
+.ti -1c
+.RI "#define \fBB_OUTOFBOUNDS\fP   23"
+.br
+.ti -1c
+.RI "#define \fBD_STOP_FAIL\fP   24"
+.br
+.ti -1c
+.RI "#define \fBD_PERM_FAIL\fP   25"
+.br
+.ti -1c
+.RI "#define \fBS_WRONGTYPE\fP   26"
+.br
+.ti -1c
+.RI "#define \fBTFS_MAX_FILE\fP   27"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERR_BIGFILE\fP   28"
+.br
+.ti -1c
+.RI "#define \fBTFS_SYSDIR\fP   29"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERR_OPERATION\fP   30"
+.br
+.ti -1c
+.RI "#define \fBDIR_BLOCKFULL\fP   31"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH\fP   32"
+.br
+.ti -1c
+.RI "#define \fBTFS_ENTRY_NOTFOUND\fP   33"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRLOCK\fP   34"
+.br
+.ti -1c
+.RI "#define \fBTFS_F_NOTFOUND\fP   35"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_HOST\fP   36"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_PARTID\fP   37"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILENOTFOUND\fP   38"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_NODISK\fP   39"
+.br
+.ti -1c
+.RI "#define \fBTFS_EXISTINGENTRY\fP   40"
+.br
+.ti -1c
+.RI "#define \fBTFS_BAD_FILDES\fP   41"
+.br
+.ti -1c
+.RI "#define \fBTFS_LOCK_FAIL\fP   42"
+.br
+.ti -1c
+.RI "#define \fBTFS_UNLOCK_FAIL\fP   43"
+.br
+.ti -1c
+.RI "#define \fBERR_TFS_READ\fP   44"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERROPEN\fP   45"
+.br
+.ti -1c
+.RI "#define \fBTFS_NOENTRY\fP   46"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRNOTEMPTY\fP   47"
+.br
+.ti -1c
+.RI "#define \fBTFS_O_NOACCESS\fP   48"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRWRITE\fP   49"
+.br
+.ti -1c
+.RI "#define \fBD_LOCK\fP   50"
+.br
+.ti -1c
+.RI "#define \fBD_UNLOCK\fP   51"
+.br
+.ti -1c
+.RI "#define \fBD_GETWD_FAIL\fP   52"
+.br
+.ti -1c
+.RI "#define \fBTFS_NOTSUPPORTED\fP   53"
+.br
+.ti -1c
+.RI "#define \fBTFS_SEG_FAULT\fP   54"
+.br
+.ti -1c
+.RI "#define \fBTFS_WRONGSUBTYPE\fP   55"
+.br
+.ti -1c
+.RI "#define \fBTFS_WRONGTYPE\fP   56"
+.br
+.ti -1c
+.RI "#define \fBTFS_INVALIDSEEK\fP   57"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_NOPATH\fP   58"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef uint8_t \fBerror\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBprinterror\fP (char *s, \fBerror\fP err)"
+.br
+.ti -1c
+.RI "void \fBtesterror\fP (char *msg, \fBerror\fP err)"
+.br
+.RI "\fIThis function forces an exit if an error is encountered\&. \fP"
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBerror\fP \fBerrnum\fP"
+.br
+.RI "\fIThis variable can store an error\&. \fP"
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define B_OUT_OF_DISK   3"
+Access impossible: block number out of the disk > 
+.PP
+Definition at line 47 of file error\&.h\&.
+.SS "#define B_OUTOFBOUNDS   23"
+Block file address exceeds maximum file size > 
+.PP
+Definition at line 67 of file error\&.h\&.
+.SS "#define B_WRONGIDX   10"
+Wrong block index > 
+.PP
+Definition at line 54 of file error\&.h\&.
+.SS "#define B_WRONGNAME   13"
+Wrong block name > 
+.PP
+Definition at line 57 of file error\&.h\&.
+.SS "#define C_FORMAT   1"
+Bad command format > 
+.PP
+Definition at line 45 of file error\&.h\&.
+.SS "#define D_GETWD_FAIL   52"
+Failed to read current working directoryn 
+.PP
+Definition at line 96 of file error\&.h\&.
+.SS "#define D_LOCK   50"
+Can't lock disk when starting 
+.PP
+Definition at line 94 of file error\&.h\&.
+.SS "#define D_NEWDISK   9"
+If a disk is created > 
+.PP
+Definition at line 53 of file error\&.h\&.
+.SS "#define D_OPEN_ERR   8"
+Error while opening a disk > 
+.PP
+Definition at line 52 of file error\&.h\&.
+.SS "#define D_PERM_FAIL   25"
+Setting permissions for disk failed > 
+.PP
+Definition at line 69 of file error\&.h\&.
+.SS "#define D_READ_ERR   5"
+Error while reading a block > 
+.PP
+Definition at line 49 of file error\&.h\&.
+.SS "#define D_SEEK_ERR   4"
+Error while seeking to a block > 
+.PP
+Definition at line 48 of file error\&.h\&.
+.SS "#define D_STOP_FAIL   24"
+Attempt to sync disk failed > 
+.PP
+Definition at line 68 of file error\&.h\&.
+.SS "#define D_UNLOCK   51"
+Can't unlock disk at closing 
+.PP
+Definition at line 95 of file error\&.h\&.
+.SS "#define D_WRITE_ERR   6"
+Error while writing a block > 
+.PP
+Definition at line 50 of file error\&.h\&.
+.SS "#define D_WRONGID   2"
+Wrong disk_id > 
+.PP
+Definition at line 46 of file error\&.h\&.
+.SS "#define DIR_BLOCKFULL   31"
+Directory block full 
+.PP
+Definition at line 75 of file error\&.h\&.
+.SS "#define ERR_STRLEN   80"
+
+.PP
+Definition at line 6 of file error\&.h\&.
+.SS "#define ERR_TFS_READ   44"
+Error while reading a file 
+.PP
+Definition at line 88 of file error\&.h\&.
+.SS "#define EXIT_SUCCESS   0"
+Successful execution > 
+.PP
+Definition at line 44 of file error\&.h\&.
+.SS "#define EXIT_SUCCESS   0"
+Successful execution > 
+.PP
+Definition at line 44 of file error\&.h\&.
+.SS "#define F_EMPTY   21"
+Empty file > 
+.PP
+Definition at line 65 of file error\&.h\&.
+.SS "#define F_FULL   17"
+\fBFile\fP reached maximum supported size > 
+.PP
+Definition at line 61 of file error\&.h\&.
+.SS "#define F_SIZE_CORRUPTED   20"
+\fBFile\fP size value corrupted > 
+.PP
+Definition at line 64 of file error\&.h\&.
+.SS "#define FT_FEL_CORRUPTED   19"
+\fBFile\fP table free entry list corrupted > 
+.PP
+Definition at line 63 of file error\&.h\&.
+.SS "#define FT_FULL   18"
+\fBFile\fP table full > 
+.PP
+Definition at line 62 of file error\&.h\&.
+.SS "#define I_CORRUPTED   22"
+Corrupted index structure > 
+.PP
+Definition at line 66 of file error\&.h\&.
+.SS "#define OD_FULL   7"
+Array _disk full > 
+.PP
+Definition at line 51 of file error\&.h\&.
+.SS "#define P_CORRUPTED   12"
+Partition size does not match disk size > 
+.PP
+Definition at line 56 of file error\&.h\&.
+.SS "#define P_WRONGIDX   11"
+Wrong partition index > 
+.PP
+Definition at line 55 of file error\&.h\&.
+.SS "#define P_WRONGVALUE   14"
+Wrong value of the partition (negative) > 
+.PP
+Definition at line 58 of file error\&.h\&.
+.SS "#define S_WRONGTYPE   26"
+Semaphore type unrecognized 
+.PP
+Definition at line 70 of file error\&.h\&.
+.SS "#define TFS_BAD_FILDES   41"
+Bad file descriptor 
+.PP
+Definition at line 85 of file error\&.h\&.
+.SS "#define TFS_DIRNOTEMPTY   47"
+directory not empty 
+.PP
+Definition at line 91 of file error\&.h\&.
+.SS "#define TFS_ENTRY_NOTFOUND   33"
+Entry not found 
+.PP
+Definition at line 77 of file error\&.h\&.
+.SS "#define TFS_ERR_BIGFILE   28"
+Big file error 
+.PP
+Definition at line 72 of file error\&.h\&.
+.SS "#define TFS_ERR_OPERATION   30"
+Operation error 
+.PP
+Definition at line 74 of file error\&.h\&.
+.SS "#define TFS_ERRLOCK   34"
+Lock error 
+.PP
+Definition at line 78 of file error\&.h\&.
+.SS "#define TFS_ERROPEN   45"
+Open error 
+.PP
+Definition at line 89 of file error\&.h\&.
+.SS "#define TFS_ERRPATH   32"
+Path error 
+.PP
+Definition at line 76 of file error\&.h\&.
+.SS "#define TFS_ERRPATH_HOST   36"
+Path error : HOST 
+.PP
+Definition at line 80 of file error\&.h\&.
+.SS "#define TFS_ERRPATH_NODISK   39"
+Disk missing from path 
+.PP
+Definition at line 83 of file error\&.h\&.
+.SS "#define TFS_ERRPATH_NOPATH   58"
+
+.PP
+Definition at line 102 of file error\&.h\&.
+.SS "#define TFS_ERRPATH_PARTID   37"
+Volume id missing from path 
+.PP
+Definition at line 81 of file error\&.h\&.
+.SS "#define TFS_ERRWRITE   49"
+Error while writing a file 
+.PP
+Definition at line 93 of file error\&.h\&.
+.SS "#define TFS_EXISTINGENTRY   40"
+Entry already exists 
+.PP
+Definition at line 84 of file error\&.h\&.
+.SS "#define TFS_F_NOTFOUND   35"
+\fBFile\fP not found 
+.PP
+Definition at line 79 of file error\&.h\&.
+.SS "#define TFS_FILENOTFOUND   38"
+\fBFile\fP not found 
+.PP
+Definition at line 82 of file error\&.h\&.
+.SS "#define TFS_INVALIDSEEK   57"
+Invalid seek mode 
+.PP
+Definition at line 101 of file error\&.h\&.
+.SS "#define TFS_LOCK_FAIL   42"
+Failed to acquire lock on file 
+.PP
+Definition at line 86 of file error\&.h\&.
+.SS "#define TFS_MAX_FILE   27"
+Maximum number of open files reached 
+.PP
+Definition at line 71 of file error\&.h\&.
+.SS "#define TFS_NOENTRY   46"
+entry doesn't exist in the directory 
+.PP
+Definition at line 90 of file error\&.h\&.
+.SS "#define TFS_NOTSUPPORTED   53"
+Operation not supported yet 
+.PP
+Definition at line 97 of file error\&.h\&.
+.SS "#define TFS_O_NOACCESS   48"
+Access mode bits not found 
+.PP
+Definition at line 92 of file error\&.h\&.
+.SS "#define TFS_SEG_FAULT   54"
+Segmentation fault > 
+.PP
+Definition at line 98 of file error\&.h\&.
+.SS "#define TFS_SYSDIR   29"
+System directory 
+.PP
+Definition at line 73 of file error\&.h\&.
+.SS "#define TFS_UNLOCK_FAIL   43"
+Failed to release lock on file 
+.PP
+Definition at line 87 of file error\&.h\&.
+.SS "#define TFS_WRONGSUBTYPE   55"
+Unrecognized subtype 
+.PP
+Definition at line 99 of file error\&.h\&.
+.SS "#define TFS_WRONGTYPE   56"
+Unrecognized file type 
+.PP
+Definition at line 100 of file error\&.h\&.
+.SS "#define V_FBL_CORRUPTED   16"
+Volume free block list corrupted > 
+.PP
+Definition at line 60 of file error\&.h\&.
+.SS "#define V_FULL   15"
+No free volume blocks remaining > 
+.PP
+Definition at line 59 of file error\&.h\&.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef uint8_t \fBerror\fP"
+A structure to represent an error id 
+.PP
+Definition at line 13 of file error\&.h\&.
+.SH "Function Documentation"
+.PP 
+.SS "void printerror (char * s, \fBerror\fP err)"
+Prints an errror message on error output
+.PP
+Prints an errror message on error output using the format <s: error message>
+.PP
+\fBParameters:\fP
+.RS 4
+\fIs[in]\fP sting to be added at beginning of error output 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void 
+.RE
+.PP
+
+.PP
+Definition at line 84 of file error\&.c\&.
+.SS "void testerror (char * msg, \fBerror\fP err)"
+
+.PP
+This function forces an exit if an error is encountered\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIerr\fP error value 
+.br
+\fImsg\fP error message header 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBprinterror\fP Abbreviation list: C : Command D : Disk OD : Open Disk Array B : Block P : Partition V : Volume F : \fBFile\fP FT : \fBFile\fP Table FBL: Free Block List FEL: Free Entry List TFS: Toy \fBFile\fP System >
+.RE
+.PP
+This function prints an error message and terminates the program if <err> is not EXIT_SUCCESS 
+.PP
+Definition at line 93 of file error\&.c\&.
+.SH "Variable Documentation"
+.PP 
+.SS "\fBerror\fP errnum"
+
+.PP
+This variable can store an error\&. This variable can be used to store an error in functions which do not return <error> 
+.PP
+Definition at line 106 of file error\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

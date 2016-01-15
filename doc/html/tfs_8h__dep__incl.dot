@@ -1,0 +1,24 @@
+digraph "lib/tfs.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="lib/tfs.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="lib/tfs.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs_8c.html"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="lib/tfsll.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfsll_8c.html"];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="src/tfs_analyze.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__analyze_8c.html"];
+  Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="src/tfs_cat.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__cat_8c.html"];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="src/tfs_cp.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__cp_8c.html"];
+  Node1 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="src/tfs_format.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__format_8c.html"];
+  Node1 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="src/tfs_ls.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__ls_8c.html"];
+  Node1 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="src/tfs_mkdir.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__mkdir_8c.html"];
+  Node1 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="src/tfs_mv.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tfs__mv_8c.html"];
+}

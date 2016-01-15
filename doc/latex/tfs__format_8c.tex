@@ -1,0 +1,302 @@
+\hypertarget{tfs__format_8c}{}\section{src/tfs\+\_\+format.c File Reference}
+\label{tfs__format_8c}\index{src/tfs\+\_\+format.\+c@{src/tfs\+\_\+format.\+c}}
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+Include dependency graph for tfs\+\_\+format.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__format_8c_ab30348e352fc02b3ad044bfe2577ef18}{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/
+\item 
+\#define \hyperlink{tfs__format_8c_ab3a3ecd17e8bbd389478437af475fb09}{F\+\_\+\+O\+W\+R}~1    /$\ast$$\ast$$\ast$$<$ flag for overwrite option $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{tfs__format_8c_af7c15991e6202d5a041cbac67876f14c}{usage} (char $\ast$argv0, F\+I\+L\+E $\ast$out)
+\begin{DoxyCompactList}\small\item\em This command creates a minimal filesystem on an existing partition. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__format_8c_aae1f05476da259754e098b4621c71355}{init\+\_\+sblock} (int id, uint32\+\_\+t pidx, uint32\+\_\+t psize, int filecount)
+\begin{DoxyCompactList}\small\item\em This function initializes a partition\textquotesingle{}s superblock. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__format_8c_acba03cbbf8b19409034cfc6b9b8f92e0}{init\+\_\+ftab} (int id, uint32\+\_\+t pidx, uint32\+\_\+t psize, int filecount)
+\begin{DoxyCompactList}\small\item\em This function initializes a partition\textquotesingle{}s file table. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__format_8c_a21eaa51acbd2aef72491c87166adfa05}{init\+\_\+root} (int id, uint32\+\_\+t ridx)
+\begin{DoxyCompactList}\small\item\em This function initializes a file system\textquotesingle{}s root directory. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__format_8c_a5bdbe3418f894b197d21f6619d91e637}{init\+\_\+fblocks} (int id, uint32\+\_\+t pidx, uint32\+\_\+t psize, int filecount)
+\begin{DoxyCompactList}\small\item\em This function chains the volume\textquotesingle{}s free blocks. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__format_8c_a68fb83edff3b073061d41cabaa9991b0}{format\+\_\+partition} (char $\ast$name, int \hyperlink{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}{partition}, int filecount, char $\ast$argv0, int flags)
+\begin{DoxyCompactList}\small\item\em This function opens a disk and formats one of its partitions. \end{DoxyCompactList}\item 
+int \hyperlink{tfs__format_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em This function parses command line input. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__format_8c_ab30348e352fc02b3ad044bfe2577ef18}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}}
+\index{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/}\label{tfs__format_8c_ab30348e352fc02b3ad044bfe2577ef18}
+
+
+Definition at line 11 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_ab3a3ecd17e8bbd389478437af475fb09}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!F\+\_\+\+O\+W\+R@{F\+\_\+\+O\+W\+R}}
+\index{F\+\_\+\+O\+W\+R@{F\+\_\+\+O\+W\+R}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{F\+\_\+\+O\+W\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+\_\+\+O\+W\+R~1    /$\ast$$\ast$$\ast$$<$ flag for overwrite option $\ast$/}\label{tfs__format_8c_ab3a3ecd17e8bbd389478437af475fb09}
+
+
+Definition at line 12 of file tfs\+\_\+format.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__format_8c_a68fb83edff3b073061d41cabaa9991b0}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!format\+\_\+partition@{format\+\_\+partition}}
+\index{format\+\_\+partition@{format\+\_\+partition}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{format\+\_\+partition}]{\setlength{\rightskip}{0pt plus 5cm}void format\+\_\+partition (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{name, }
+\item[{int}]{partition, }
+\item[{int}]{filecount, }
+\item[{char $\ast$}]{argv0, }
+\item[{int}]{flags}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_a68fb83edff3b073061d41cabaa9991b0}
+
+
+This function opens a disk and formats one of its partitions. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & name of the disk \\
+\hline
+\mbox{\tt in}  & {\em partition} & index of the partition \\
+\hline
+\mbox{\tt in}  & {\em filecount} & max file count \\
+\hline
+\mbox{\tt in}  & {\em argv0} & name of the calling command \\
+\hline
+\mbox{\tt in}  & {\em flags} & value containing option flags \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function opens a disk and proceeds to format one of its partitions, provided it is empty or the user clears it for overwriting.
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{tfs__format_8c_aae1f05476da259754e098b4621c71355}{init\+\_\+sblock} 
+
+\hyperlink{tfs__format_8c_acba03cbbf8b19409034cfc6b9b8f92e0}{init\+\_\+ftab} 
+
+\hyperlink{tfs__format_8c_a21eaa51acbd2aef72491c87166adfa05}{init\+\_\+root} 
+
+\hyperlink{tfs__format_8c_a5bdbe3418f894b197d21f6619d91e637}{init\+\_\+fblocks} 
+\end{DoxySeeAlso}
+
+
+Definition at line 197 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_a5bdbe3418f894b197d21f6619d91e637}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!init\+\_\+fblocks@{init\+\_\+fblocks}}
+\index{init\+\_\+fblocks@{init\+\_\+fblocks}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{init\+\_\+fblocks}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+fblocks (
+\begin{DoxyParamCaption}
+\item[{int}]{id, }
+\item[{uint32\+\_\+t}]{pidx, }
+\item[{uint32\+\_\+t}]{psize, }
+\item[{int}]{filecount}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_a5bdbe3418f894b197d21f6619d91e637}
+
+
+This function chains the volume\textquotesingle{}s free blocks. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em pidx} & partition index \\
+\hline
+\mbox{\tt in}  & {\em psize} & partition size \\
+\hline
+\mbox{\tt in}  & {\em filecount} & max file count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function chains the volume\textquotesingle{}s free blocks making last free block its own successor 
+
+Definition at line 163 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_acba03cbbf8b19409034cfc6b9b8f92e0}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!init\+\_\+ftab@{init\+\_\+ftab}}
+\index{init\+\_\+ftab@{init\+\_\+ftab}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{init\+\_\+ftab}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+ftab (
+\begin{DoxyParamCaption}
+\item[{int}]{id, }
+\item[{uint32\+\_\+t}]{pidx, }
+\item[{uint32\+\_\+t}]{psize, }
+\item[{int}]{filecount}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_acba03cbbf8b19409034cfc6b9b8f92e0}
+
+
+This function initializes a partition\textquotesingle{}s file table. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em pidx} & partition index \\
+\hline
+\mbox{\tt in}  & {\em psize} & partition size \\
+\hline
+\mbox{\tt in}  & {\em filecount} & max file count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function creates the root directory\textquotesingle{}s file table entry then proceeds to chain the remain free file table entries 
+
+Definition at line 100 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_a21eaa51acbd2aef72491c87166adfa05}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!init\+\_\+root@{init\+\_\+root}}
+\index{init\+\_\+root@{init\+\_\+root}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{init\+\_\+root}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+root (
+\begin{DoxyParamCaption}
+\item[{int}]{id, }
+\item[{uint32\+\_\+t}]{ridx}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_a21eaa51acbd2aef72491c87166adfa05}
+
+
+This function initializes a file system\textquotesingle{}s root directory. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em ridx} & root directory\textquotesingle{}s index on the disk \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function initializes the data block occupied by the root directory with the appropriate values 
+
+Definition at line 140 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_aae1f05476da259754e098b4621c71355}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!init\+\_\+sblock@{init\+\_\+sblock}}
+\index{init\+\_\+sblock@{init\+\_\+sblock}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{init\+\_\+sblock}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+sblock (
+\begin{DoxyParamCaption}
+\item[{int}]{id, }
+\item[{uint32\+\_\+t}]{pidx, }
+\item[{uint32\+\_\+t}]{psize, }
+\item[{int}]{filecount}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_aae1f05476da259754e098b4621c71355}
+
+
+This function initializes a partition\textquotesingle{}s superblock. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em pidx} & partition index \\
+\hline
+\mbox{\tt in}  & {\em psize} & partition size \\
+\hline
+\mbox{\tt in}  & {\em filecount} & max file count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function fills in the initial filesystem\textquotesingle{}s description for the partition located at $<$pidx$>$ on the disk opened at $<$id$>$ 
+
+Definition at line 57 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+This function parses command line input. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em id} & disk id \\
+\hline
+\mbox{\tt in}  & {\em pidx} & partition index \\
+\hline
+\mbox{\tt in}  & {\em psize} & partition size \\
+\hline
+\mbox{\tt in}  & {\em filecount} & max file count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function parses command line input and launches auxiliary functions with the appropriate parameters and options 
+
+Definition at line 259 of file tfs\+\_\+format.\+c.
+
+\hypertarget{tfs__format_8c_af7c15991e6202d5a041cbac67876f14c}{}\index{tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}!usage@{usage}}
+\index{usage@{usage}!tfs\+\_\+format.\+c@{tfs\+\_\+format.\+c}}
+\subsubsection[{usage}]{\setlength{\rightskip}{0pt plus 5cm}void usage (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0, }
+\item[{F\+I\+L\+E $\ast$}]{out}
+\end{DoxyParamCaption}
+)}\label{tfs__format_8c_af7c15991e6202d5a041cbac67876f14c}
+
+
+This command creates a minimal filesystem on an existing partition. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em partition} & \\
+\hline
+\mbox{\tt in}  & {\em max-\/file-\/count} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+prints name of disk and its size
+\end{DoxyReturn}
+This command creates a minimal filesystem on the $<$partition$>$ partition which supports a maximum of $<$max-\/file-\/count$>$ files
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_adfb020b9554c80391c7a39f29b11b0cc}{C\+\_\+\+F\+O\+R\+M\+A\+T} 
+
+\hyperlink{error_8h_ab4c997899a12106ad68ae1eb466fa46b}{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X} 
+
+\hyperlink{error_8h_ae0957dad153824fb45f729b4ac0da788}{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D} 
+
+\hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S} This function prints the command prototype 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em argv0} & command name \\
+\hline
+\mbox{\tt out}  & {\em out} & output stream \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function prints the command prototype to the $<$out$>$ stream 
+
+Definition at line 40 of file tfs\+\_\+format.\+c.
+

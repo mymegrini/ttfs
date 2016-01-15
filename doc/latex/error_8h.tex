@@ -1,0 +1,659 @@
+\hypertarget{error_8h}{}\section{lib/error.h File Reference}
+\label{error_8h}\index{lib/error.\+h@{lib/error.\+h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+Include dependency graph for error.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{error_8h_a56acfebc3346f42b3daf7d1267442310}{E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N}~80
+\item 
+\#define \hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}~0
+\item 
+\#define \hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}~0
+\item 
+\#define \hyperlink{error_8h_adfb020b9554c80391c7a39f29b11b0cc}{C\+\_\+\+F\+O\+R\+M\+A\+T}~1
+\item 
+\#define \hyperlink{error_8h_a62a8edd367d554fa1abe39f568458e58}{D\+\_\+\+W\+R\+O\+N\+G\+I\+D}~2
+\item 
+\#define \hyperlink{error_8h_aa5f283e5a78d907527d6fda785813067}{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K}~3
+\item 
+\#define \hyperlink{error_8h_a98320f7130a66e221c7ebec00bde975b}{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R}~4
+\item 
+\#define \hyperlink{error_8h_a89147f8149ded631eeab5b339ea10fa4}{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R}~5
+\item 
+\#define \hyperlink{error_8h_a73ab0e8e087c378b11d78a5ceeb553f7}{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R}~6
+\item 
+\#define \hyperlink{error_8h_a8ec63c1ae965248d5a1e2c8590eaebbc}{O\+D\+\_\+\+F\+U\+L\+L}~7
+\item 
+\#define \hyperlink{error_8h_aa872caeaea9781725ac1b6428832988c}{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R}~8
+\item 
+\#define \hyperlink{error_8h_a47e66bc5d9530af9107c1272584dc522}{D\+\_\+\+N\+E\+W\+D\+I\+S\+K}~9
+\item 
+\#define \hyperlink{error_8h_a7adedda73b55794ab5b0b8d3fbc8defb}{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}~10
+\item 
+\#define \hyperlink{error_8h_ab4c997899a12106ad68ae1eb466fa46b}{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}~11
+\item 
+\#define \hyperlink{error_8h_ae0957dad153824fb45f729b4ac0da788}{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}~12
+\item 
+\#define \hyperlink{error_8h_a891fb3811f45706b55f9deb895fca247}{B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E}~13
+\item 
+\#define \hyperlink{error_8h_ab1543c1e92225f12342a2ca0437dcd09}{P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E}~14
+\item 
+\#define \hyperlink{error_8h_a7d240bc0a38a5cb42fbd563b6320bbe6}{V\+\_\+\+F\+U\+L\+L}~15
+\item 
+\#define \hyperlink{error_8h_a23063085b304a25686978cd1d5e85b1b}{V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}~16
+\item 
+\#define \hyperlink{error_8h_a7aa5ac999d1042924eb59ca9cac825d7}{F\+\_\+\+F\+U\+L\+L}~17
+\item 
+\#define \hyperlink{error_8h_ae2508c4c38b14cf2d3010f741528ba53}{F\+T\+\_\+\+F\+U\+L\+L}~18
+\item 
+\#define \hyperlink{error_8h_ab4832c4377e9aae144e2e75038e55f64}{F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}~19
+\item 
+\#define \hyperlink{error_8h_a8a970ae7bc312b31c4f6ae1801814913}{F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}~20
+\item 
+\#define \hyperlink{error_8h_ace815cb4741c4e0b1b0ddb12d2199a4c}{F\+\_\+\+E\+M\+P\+T\+Y}~21
+\item 
+\#define \hyperlink{error_8h_a57340290f98ebb58094a23a2b17bb916}{I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}~22
+\item 
+\#define \hyperlink{error_8h_a5f7120a95c346b1b8c88eede9f6aa6d5}{B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S}~23
+\item 
+\#define \hyperlink{error_8h_a191571925462b9d659b7d44b037986ca}{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L}~24
+\item 
+\#define \hyperlink{error_8h_a80b8d2828871f962635b872da5da17da}{D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L}~25
+\item 
+\#define \hyperlink{error_8h_a8c5ba7aeddfcbdc637a6fe240c99611a}{S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}~26
+\item 
+\#define \hyperlink{error_8h_abddb28aba21409210fe3a6b004304776}{T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E}~27
+\item 
+\#define \hyperlink{error_8h_afd8902b1d240b91c805a2140a0511848}{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E}~28
+\item 
+\#define \hyperlink{error_8h_aa88463f531fd42315979ecf4bfcd3957}{T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R}~29
+\item 
+\#define \hyperlink{error_8h_a0e7a6bea17a640327e6affe3b9a36058}{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N}~30
+\item 
+\#define \hyperlink{error_8h_ae6b707047471ec3332b5961abddf27e3}{D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L}~31
+\item 
+\#define \hyperlink{error_8h_a65bb4d0daa2d19c3ed145bd8eb5dd821}{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H}~32
+\item 
+\#define \hyperlink{error_8h_ad5b109c79011c87384d796c5bb7cfda8}{T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}~33
+\item 
+\#define \hyperlink{error_8h_af6b80fdef2dbf20df66a5786c2a2d6e8}{T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K}~34
+\item 
+\#define \hyperlink{error_8h_acc1fd68031799d1bd29ef76fcdf8481e}{T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}~35
+\item 
+\#define \hyperlink{error_8h_a16c88b9087f472f61ccd202836334e94}{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T}~36
+\item 
+\#define \hyperlink{error_8h_a109781eaefb5e13f2e6e6e6a4fd51091}{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D}~37
+\item 
+\#define \hyperlink{error_8h_a525511feb1c6440109ecfc40926a3153}{T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D}~38
+\item 
+\#define \hyperlink{error_8h_a006620fe59cef684bfab4bdc03a6408e}{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K}~39
+\item 
+\#define \hyperlink{error_8h_a5fa46665ffcac038303ebdc46a175a63}{T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y}~40
+\item 
+\#define \hyperlink{error_8h_a12004f88922dab9fafaa0193edab3df1}{T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S}~41
+\item 
+\#define \hyperlink{error_8h_ae24e664d12adf9b263123af6378b3d94}{T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}~42
+\item 
+\#define \hyperlink{error_8h_a83242971ac86d6d36f1a175a196dd9c9}{T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}~43
+\item 
+\#define \hyperlink{error_8h_a7bc29b262bf7b1d09ec5e3b7c6f157e0}{E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D}~44
+\item 
+\#define \hyperlink{error_8h_a2ac7ed49fc2c9ccd66fb67f1d544403b}{T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N}~45
+\item 
+\#define \hyperlink{error_8h_ad6f161d080c3cf686259608f3298f86a}{T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y}~46
+\item 
+\#define \hyperlink{error_8h_ad70e98f96988085d3bfb8065ca956f04}{T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y}~47
+\item 
+\#define \hyperlink{error_8h_af3e8468fc4a0a5a75d8dde7dc8b78ea5}{T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S}~48
+\item 
+\#define \hyperlink{error_8h_ae34198ac4358b7f94a6642d726194d7e}{T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E}~49
+\item 
+\#define \hyperlink{error_8h_ada9ecd255ba9bdbd5a1efda5e66bb111}{D\+\_\+\+L\+O\+C\+K}~50
+\item 
+\#define \hyperlink{error_8h_add8ae2158685d674513a6d7be2b39032}{D\+\_\+\+U\+N\+L\+O\+C\+K}~51
+\item 
+\#define \hyperlink{error_8h_a11fa3ed9b1990639e086a0b08992fb13}{D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L}~52
+\item 
+\#define \hyperlink{error_8h_a902f255869d41eda015c43ddc3247023}{T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D}~53
+\item 
+\#define \hyperlink{error_8h_ab5d52116e5573622757e679c6c681893}{T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T}~54
+\item 
+\#define \hyperlink{error_8h_a9a8a75b13df01ae3b09ef565ed43721b}{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E}~55
+\item 
+\#define \hyperlink{error_8h_a79c7bd7f4e9de165f676dcd76649c2ce}{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}~56
+\item 
+\#define \hyperlink{error_8h_a28410ad0e7687667ad805aefd49a5286}{T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K}~57
+\item 
+\#define \hyperlink{error_8h_a581a33c7dbdc5580246b9ea9e98dc13e}{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H}~58
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint8\+\_\+t \hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{error_8h_ab6b35044ba6496e2fe4dc59557923af4}{printerror} (char $\ast$s, \hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} err)
+\item 
+void \hyperlink{error_8h_a571be2305c567deb80d4b77f30cadcd3}{testerror} (char $\ast$msg, \hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} err)
+\begin{DoxyCompactList}\small\item\em This function forces an exit if an error is encountered. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{error_8h_af2af6e4ea36bbb786123dc9b24c26fc9}{errnum}
+\begin{DoxyCompactList}\small\item\em This variable can store an error. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{error_8h_aa5f283e5a78d907527d6fda785813067}{}\index{error.\+h@{error.\+h}!B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K@{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K}}
+\index{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K@{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K}!error.\+h@{error.\+h}}
+\subsubsection[{B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+D\+I\+S\+K~3}\label{error_8h_aa5f283e5a78d907527d6fda785813067}
+Access impossible\+: block number out of the disk $>$ 
+
+Definition at line 47 of file error.\+h.
+
+\hypertarget{error_8h_a5f7120a95c346b1b8c88eede9f6aa6d5}{}\index{error.\+h@{error.\+h}!B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S@{B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S}}
+\index{B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S@{B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S}!error.\+h@{error.\+h}}
+\subsubsection[{B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+\_\+\+O\+U\+T\+O\+F\+B\+O\+U\+N\+D\+S~23}\label{error_8h_a5f7120a95c346b1b8c88eede9f6aa6d5}
+Block file address exceeds maximum file size $>$ 
+
+Definition at line 67 of file error.\+h.
+
+\hypertarget{error_8h_a7adedda73b55794ab5b0b8d3fbc8defb}{}\index{error.\+h@{error.\+h}!B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X@{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}}
+\index{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X@{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}!error.\+h@{error.\+h}}
+\subsubsection[{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X~10}\label{error_8h_a7adedda73b55794ab5b0b8d3fbc8defb}
+Wrong block index $>$ 
+
+Definition at line 54 of file error.\+h.
+
+\hypertarget{error_8h_a891fb3811f45706b55f9deb895fca247}{}\index{error.\+h@{error.\+h}!B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E@{B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E}}
+\index{B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E@{B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E}!error.\+h@{error.\+h}}
+\subsubsection[{B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+\_\+\+W\+R\+O\+N\+G\+N\+A\+M\+E~13}\label{error_8h_a891fb3811f45706b55f9deb895fca247}
+Wrong block name $>$ 
+
+Definition at line 57 of file error.\+h.
+
+\hypertarget{error_8h_adfb020b9554c80391c7a39f29b11b0cc}{}\index{error.\+h@{error.\+h}!C\+\_\+\+F\+O\+R\+M\+A\+T@{C\+\_\+\+F\+O\+R\+M\+A\+T}}
+\index{C\+\_\+\+F\+O\+R\+M\+A\+T@{C\+\_\+\+F\+O\+R\+M\+A\+T}!error.\+h@{error.\+h}}
+\subsubsection[{C\+\_\+\+F\+O\+R\+M\+A\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+F\+O\+R\+M\+A\+T~1}\label{error_8h_adfb020b9554c80391c7a39f29b11b0cc}
+Bad command format $>$ 
+
+Definition at line 45 of file error.\+h.
+
+\hypertarget{error_8h_a11fa3ed9b1990639e086a0b08992fb13}{}\index{error.\+h@{error.\+h}!D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L@{D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L}}
+\index{D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L@{D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+G\+E\+T\+W\+D\+\_\+\+F\+A\+I\+L~52}\label{error_8h_a11fa3ed9b1990639e086a0b08992fb13}
+Failed to read current working directoryn 
+
+Definition at line 96 of file error.\+h.
+
+\hypertarget{error_8h_ada9ecd255ba9bdbd5a1efda5e66bb111}{}\index{error.\+h@{error.\+h}!D\+\_\+\+L\+O\+C\+K@{D\+\_\+\+L\+O\+C\+K}}
+\index{D\+\_\+\+L\+O\+C\+K@{D\+\_\+\+L\+O\+C\+K}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+L\+O\+C\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+L\+O\+C\+K~50}\label{error_8h_ada9ecd255ba9bdbd5a1efda5e66bb111}
+Can\textquotesingle{}t lock disk when starting 
+
+Definition at line 94 of file error.\+h.
+
+\hypertarget{error_8h_a47e66bc5d9530af9107c1272584dc522}{}\index{error.\+h@{error.\+h}!D\+\_\+\+N\+E\+W\+D\+I\+S\+K@{D\+\_\+\+N\+E\+W\+D\+I\+S\+K}}
+\index{D\+\_\+\+N\+E\+W\+D\+I\+S\+K@{D\+\_\+\+N\+E\+W\+D\+I\+S\+K}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+N\+E\+W\+D\+I\+S\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+N\+E\+W\+D\+I\+S\+K~9}\label{error_8h_a47e66bc5d9530af9107c1272584dc522}
+If a disk is created $>$ 
+
+Definition at line 53 of file error.\+h.
+
+\hypertarget{error_8h_aa872caeaea9781725ac1b6428832988c}{}\index{error.\+h@{error.\+h}!D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R@{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R}}
+\index{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R@{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R~8}\label{error_8h_aa872caeaea9781725ac1b6428832988c}
+Error while opening a disk $>$ 
+
+Definition at line 52 of file error.\+h.
+
+\hypertarget{error_8h_a80b8d2828871f962635b872da5da17da}{}\index{error.\+h@{error.\+h}!D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L@{D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L}}
+\index{D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L@{D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+P\+E\+R\+M\+\_\+\+F\+A\+I\+L~25}\label{error_8h_a80b8d2828871f962635b872da5da17da}
+Setting permissions for disk failed $>$ 
+
+Definition at line 69 of file error.\+h.
+
+\hypertarget{error_8h_a89147f8149ded631eeab5b339ea10fa4}{}\index{error.\+h@{error.\+h}!D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R@{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R}}
+\index{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R@{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+R\+E\+A\+D\+\_\+\+E\+R\+R~5}\label{error_8h_a89147f8149ded631eeab5b339ea10fa4}
+Error while reading a block $>$ 
+
+Definition at line 49 of file error.\+h.
+
+\hypertarget{error_8h_a98320f7130a66e221c7ebec00bde975b}{}\index{error.\+h@{error.\+h}!D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R@{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R}}
+\index{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R@{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R~4}\label{error_8h_a98320f7130a66e221c7ebec00bde975b}
+Error while seeking to a block $>$ 
+
+Definition at line 48 of file error.\+h.
+
+\hypertarget{error_8h_a191571925462b9d659b7d44b037986ca}{}\index{error.\+h@{error.\+h}!D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L@{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L}}
+\index{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L@{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+S\+T\+O\+P\+\_\+\+F\+A\+I\+L~24}\label{error_8h_a191571925462b9d659b7d44b037986ca}
+Attempt to sync disk failed $>$ 
+
+Definition at line 68 of file error.\+h.
+
+\hypertarget{error_8h_add8ae2158685d674513a6d7be2b39032}{}\index{error.\+h@{error.\+h}!D\+\_\+\+U\+N\+L\+O\+C\+K@{D\+\_\+\+U\+N\+L\+O\+C\+K}}
+\index{D\+\_\+\+U\+N\+L\+O\+C\+K@{D\+\_\+\+U\+N\+L\+O\+C\+K}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+U\+N\+L\+O\+C\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+U\+N\+L\+O\+C\+K~51}\label{error_8h_add8ae2158685d674513a6d7be2b39032}
+Can\textquotesingle{}t unlock disk at closing 
+
+Definition at line 95 of file error.\+h.
+
+\hypertarget{error_8h_a73ab0e8e087c378b11d78a5ceeb553f7}{}\index{error.\+h@{error.\+h}!D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R@{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R}}
+\index{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R@{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R~6}\label{error_8h_a73ab0e8e087c378b11d78a5ceeb553f7}
+Error while writing a block $>$ 
+
+Definition at line 50 of file error.\+h.
+
+\hypertarget{error_8h_a62a8edd367d554fa1abe39f568458e58}{}\index{error.\+h@{error.\+h}!D\+\_\+\+W\+R\+O\+N\+G\+I\+D@{D\+\_\+\+W\+R\+O\+N\+G\+I\+D}}
+\index{D\+\_\+\+W\+R\+O\+N\+G\+I\+D@{D\+\_\+\+W\+R\+O\+N\+G\+I\+D}!error.\+h@{error.\+h}}
+\subsubsection[{D\+\_\+\+W\+R\+O\+N\+G\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+W\+R\+O\+N\+G\+I\+D~2}\label{error_8h_a62a8edd367d554fa1abe39f568458e58}
+Wrong disk\+\_\+id $>$ 
+
+Definition at line 46 of file error.\+h.
+
+\hypertarget{error_8h_ae6b707047471ec3332b5961abddf27e3}{}\index{error.\+h@{error.\+h}!D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L@{D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L}}
+\index{D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L@{D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L}!error.\+h@{error.\+h}}
+\subsubsection[{D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+I\+R\+\_\+\+B\+L\+O\+C\+K\+F\+U\+L\+L~31}\label{error_8h_ae6b707047471ec3332b5961abddf27e3}
+Directory block full 
+
+Definition at line 75 of file error.\+h.
+
+\hypertarget{error_8h_a56acfebc3346f42b3daf7d1267442310}{}\index{error.\+h@{error.\+h}!E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N@{E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N}}
+\index{E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N@{E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N}!error.\+h@{error.\+h}}
+\subsubsection[{E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+R\+R\+\_\+\+S\+T\+R\+L\+E\+N~80}\label{error_8h_a56acfebc3346f42b3daf7d1267442310}
+
+
+Definition at line 6 of file error.\+h.
+
+\hypertarget{error_8h_a7bc29b262bf7b1d09ec5e3b7c6f157e0}{}\index{error.\+h@{error.\+h}!E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D@{E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D}}
+\index{E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D@{E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D}!error.\+h@{error.\+h}}
+\subsubsection[{E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+R\+R\+\_\+\+T\+F\+S\+\_\+\+R\+E\+A\+D~44}\label{error_8h_a7bc29b262bf7b1d09ec5e3b7c6f157e0}
+Error while reading a file 
+
+Definition at line 88 of file error.\+h.
+
+\hypertarget{error_8h_a687984f47d8cce148d1b914d2b79612a}{}\index{error.\+h@{error.\+h}!E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}!error.\+h@{error.\+h}}
+\subsubsection[{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S~0}\label{error_8h_a687984f47d8cce148d1b914d2b79612a}
+Successful execution $>$ 
+
+Definition at line 44 of file error.\+h.
+
+\hypertarget{error_8h_a687984f47d8cce148d1b914d2b79612a}{}\index{error.\+h@{error.\+h}!E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}!error.\+h@{error.\+h}}
+\subsubsection[{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S~0}\label{error_8h_a687984f47d8cce148d1b914d2b79612a}
+Successful execution $>$ 
+
+Definition at line 44 of file error.\+h.
+
+\hypertarget{error_8h_ace815cb4741c4e0b1b0ddb12d2199a4c}{}\index{error.\+h@{error.\+h}!F\+\_\+\+E\+M\+P\+T\+Y@{F\+\_\+\+E\+M\+P\+T\+Y}}
+\index{F\+\_\+\+E\+M\+P\+T\+Y@{F\+\_\+\+E\+M\+P\+T\+Y}!error.\+h@{error.\+h}}
+\subsubsection[{F\+\_\+\+E\+M\+P\+T\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+\_\+\+E\+M\+P\+T\+Y~21}\label{error_8h_ace815cb4741c4e0b1b0ddb12d2199a4c}
+Empty file $>$ 
+
+Definition at line 65 of file error.\+h.
+
+\hypertarget{error_8h_a7aa5ac999d1042924eb59ca9cac825d7}{}\index{error.\+h@{error.\+h}!F\+\_\+\+F\+U\+L\+L@{F\+\_\+\+F\+U\+L\+L}}
+\index{F\+\_\+\+F\+U\+L\+L@{F\+\_\+\+F\+U\+L\+L}!error.\+h@{error.\+h}}
+\subsubsection[{F\+\_\+\+F\+U\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+\_\+\+F\+U\+L\+L~17}\label{error_8h_a7aa5ac999d1042924eb59ca9cac825d7}
+\hyperlink{struct_file}{File} reached maximum supported size $>$ 
+
+Definition at line 61 of file error.\+h.
+
+\hypertarget{error_8h_a8a970ae7bc312b31c4f6ae1801814913}{}\index{error.\+h@{error.\+h}!F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}}
+\index{F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+\_\+\+S\+I\+Z\+E\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D~20}\label{error_8h_a8a970ae7bc312b31c4f6ae1801814913}
+\hyperlink{struct_file}{File} size value corrupted $>$ 
+
+Definition at line 64 of file error.\+h.
+
+\hypertarget{error_8h_ab4832c4377e9aae144e2e75038e55f64}{}\index{error.\+h@{error.\+h}!F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}}
+\index{F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+T\+\_\+\+F\+E\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D~19}\label{error_8h_ab4832c4377e9aae144e2e75038e55f64}
+\hyperlink{struct_file}{File} table free entry list corrupted $>$ 
+
+Definition at line 63 of file error.\+h.
+
+\hypertarget{error_8h_ae2508c4c38b14cf2d3010f741528ba53}{}\index{error.\+h@{error.\+h}!F\+T\+\_\+\+F\+U\+L\+L@{F\+T\+\_\+\+F\+U\+L\+L}}
+\index{F\+T\+\_\+\+F\+U\+L\+L@{F\+T\+\_\+\+F\+U\+L\+L}!error.\+h@{error.\+h}}
+\subsubsection[{F\+T\+\_\+\+F\+U\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+T\+\_\+\+F\+U\+L\+L~18}\label{error_8h_ae2508c4c38b14cf2d3010f741528ba53}
+\hyperlink{struct_file}{File} table full $>$ 
+
+Definition at line 62 of file error.\+h.
+
+\hypertarget{error_8h_a57340290f98ebb58094a23a2b17bb916}{}\index{error.\+h@{error.\+h}!I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}}
+\index{I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D~22}\label{error_8h_a57340290f98ebb58094a23a2b17bb916}
+Corrupted index structure $>$ 
+
+Definition at line 66 of file error.\+h.
+
+\hypertarget{error_8h_a8ec63c1ae965248d5a1e2c8590eaebbc}{}\index{error.\+h@{error.\+h}!O\+D\+\_\+\+F\+U\+L\+L@{O\+D\+\_\+\+F\+U\+L\+L}}
+\index{O\+D\+\_\+\+F\+U\+L\+L@{O\+D\+\_\+\+F\+U\+L\+L}!error.\+h@{error.\+h}}
+\subsubsection[{O\+D\+\_\+\+F\+U\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+D\+\_\+\+F\+U\+L\+L~7}\label{error_8h_a8ec63c1ae965248d5a1e2c8590eaebbc}
+Array \+\_\+disk full $>$ 
+
+Definition at line 51 of file error.\+h.
+
+\hypertarget{error_8h_ae0957dad153824fb45f729b4ac0da788}{}\index{error.\+h@{error.\+h}!P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}}
+\index{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D~12}\label{error_8h_ae0957dad153824fb45f729b4ac0da788}
+Partition size does not match disk size $>$ 
+
+Definition at line 56 of file error.\+h.
+
+\hypertarget{error_8h_ab4c997899a12106ad68ae1eb466fa46b}{}\index{error.\+h@{error.\+h}!P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X@{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}}
+\index{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X@{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}!error.\+h@{error.\+h}}
+\subsubsection[{P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X~11}\label{error_8h_ab4c997899a12106ad68ae1eb466fa46b}
+Wrong partition index $>$ 
+
+Definition at line 55 of file error.\+h.
+
+\hypertarget{error_8h_ab1543c1e92225f12342a2ca0437dcd09}{}\index{error.\+h@{error.\+h}!P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E@{P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E}}
+\index{P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E@{P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E}!error.\+h@{error.\+h}}
+\subsubsection[{P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+\_\+\+W\+R\+O\+N\+G\+V\+A\+L\+U\+E~14}\label{error_8h_ab1543c1e92225f12342a2ca0437dcd09}
+Wrong value of the partition (negative) $>$ 
+
+Definition at line 58 of file error.\+h.
+
+\hypertarget{error_8h_a8c5ba7aeddfcbdc637a6fe240c99611a}{}\index{error.\+h@{error.\+h}!S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E@{S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}}
+\index{S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E@{S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}!error.\+h@{error.\+h}}
+\subsubsection[{S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E~26}\label{error_8h_a8c5ba7aeddfcbdc637a6fe240c99611a}
+Semaphore type unrecognized 
+
+Definition at line 70 of file error.\+h.
+
+\hypertarget{error_8h_a12004f88922dab9fafaa0193edab3df1}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S@{T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S}}
+\index{T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S@{T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+B\+A\+D\+\_\+\+F\+I\+L\+D\+E\+S~41}\label{error_8h_a12004f88922dab9fafaa0193edab3df1}
+Bad file descriptor 
+
+Definition at line 85 of file error.\+h.
+
+\hypertarget{error_8h_ad70e98f96988085d3bfb8065ca956f04}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y@{T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y}}
+\index{T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y@{T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+D\+I\+R\+N\+O\+T\+E\+M\+P\+T\+Y~47}\label{error_8h_ad70e98f96988085d3bfb8065ca956f04}
+directory not empty 
+
+Definition at line 91 of file error.\+h.
+
+\hypertarget{error_8h_ad5b109c79011c87384d796c5bb7cfda8}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}}
+\index{T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+N\+T\+R\+Y\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D~33}\label{error_8h_ad5b109c79011c87384d796c5bb7cfda8}
+Entry not found 
+
+Definition at line 77 of file error.\+h.
+
+\hypertarget{error_8h_afd8902b1d240b91c805a2140a0511848}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E@{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E@{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+B\+I\+G\+F\+I\+L\+E~28}\label{error_8h_afd8902b1d240b91c805a2140a0511848}
+Big file error 
+
+Definition at line 72 of file error.\+h.
+
+\hypertarget{error_8h_a0e7a6bea17a640327e6affe3b9a36058}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N@{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N@{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+\_\+\+O\+P\+E\+R\+A\+T\+I\+O\+N~30}\label{error_8h_a0e7a6bea17a640327e6affe3b9a36058}
+Operation error 
+
+Definition at line 74 of file error.\+h.
+
+\hypertarget{error_8h_af6b80fdef2dbf20df66a5786c2a2d6e8}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K@{T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K@{T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+L\+O\+C\+K~34}\label{error_8h_af6b80fdef2dbf20df66a5786c2a2d6e8}
+Lock error 
+
+Definition at line 78 of file error.\+h.
+
+\hypertarget{error_8h_a2ac7ed49fc2c9ccd66fb67f1d544403b}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N@{T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N@{T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+O\+P\+E\+N~45}\label{error_8h_a2ac7ed49fc2c9ccd66fb67f1d544403b}
+Open error 
+
+Definition at line 89 of file error.\+h.
+
+\hypertarget{error_8h_a65bb4d0daa2d19c3ed145bd8eb5dd821}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H~32}\label{error_8h_a65bb4d0daa2d19c3ed145bd8eb5dd821}
+Path error 
+
+Definition at line 76 of file error.\+h.
+
+\hypertarget{error_8h_a16c88b9087f472f61ccd202836334e94}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+H\+O\+S\+T~36}\label{error_8h_a16c88b9087f472f61ccd202836334e94}
+Path error \+: H\+O\+S\+T 
+
+Definition at line 80 of file error.\+h.
+
+\hypertarget{error_8h_a006620fe59cef684bfab4bdc03a6408e}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+D\+I\+S\+K~39}\label{error_8h_a006620fe59cef684bfab4bdc03a6408e}
+Disk missing from path 
+
+Definition at line 83 of file error.\+h.
+
+\hypertarget{error_8h_a581a33c7dbdc5580246b9ea9e98dc13e}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+N\+O\+P\+A\+T\+H~58}\label{error_8h_a581a33c7dbdc5580246b9ea9e98dc13e}
+
+
+Definition at line 102 of file error.\+h.
+
+\hypertarget{error_8h_a109781eaefb5e13f2e6e6e6a4fd51091}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D@{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+P\+A\+T\+H\+\_\+\+P\+A\+R\+T\+I\+D~37}\label{error_8h_a109781eaefb5e13f2e6e6e6a4fd51091}
+Volume id missing from path 
+
+Definition at line 81 of file error.\+h.
+
+\hypertarget{error_8h_ae34198ac4358b7f94a6642d726194d7e}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E@{T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E}}
+\index{T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E@{T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+R\+R\+W\+R\+I\+T\+E~49}\label{error_8h_ae34198ac4358b7f94a6642d726194d7e}
+Error while writing a file 
+
+Definition at line 93 of file error.\+h.
+
+\hypertarget{error_8h_a5fa46665ffcac038303ebdc46a175a63}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y@{T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y}}
+\index{T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y@{T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+E\+X\+I\+S\+T\+I\+N\+G\+E\+N\+T\+R\+Y~40}\label{error_8h_a5fa46665ffcac038303ebdc46a175a63}
+Entry already exists 
+
+Definition at line 84 of file error.\+h.
+
+\hypertarget{error_8h_acc1fd68031799d1bd29ef76fcdf8481e}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}}
+\index{T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+F\+\_\+\+N\+O\+T\+F\+O\+U\+N\+D~35}\label{error_8h_acc1fd68031799d1bd29ef76fcdf8481e}
+\hyperlink{struct_file}{File} not found 
+
+Definition at line 79 of file error.\+h.
+
+\hypertarget{error_8h_a525511feb1c6440109ecfc40926a3153}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D}}
+\index{T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D@{T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+F\+I\+L\+E\+N\+O\+T\+F\+O\+U\+N\+D~38}\label{error_8h_a525511feb1c6440109ecfc40926a3153}
+\hyperlink{struct_file}{File} not found 
+
+Definition at line 82 of file error.\+h.
+
+\hypertarget{error_8h_a28410ad0e7687667ad805aefd49a5286}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K@{T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K}}
+\index{T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K@{T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+I\+N\+V\+A\+L\+I\+D\+S\+E\+E\+K~57}\label{error_8h_a28410ad0e7687667ad805aefd49a5286}
+Invalid seek mode 
+
+Definition at line 101 of file error.\+h.
+
+\hypertarget{error_8h_ae24e664d12adf9b263123af6378b3d94}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L@{T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}}
+\index{T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L@{T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L~42}\label{error_8h_ae24e664d12adf9b263123af6378b3d94}
+Failed to acquire lock on file 
+
+Definition at line 86 of file error.\+h.
+
+\hypertarget{error_8h_abddb28aba21409210fe3a6b004304776}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E@{T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E}}
+\index{T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E@{T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+M\+A\+X\+\_\+\+F\+I\+L\+E~27}\label{error_8h_abddb28aba21409210fe3a6b004304776}
+Maximum number of open files reached 
+
+Definition at line 71 of file error.\+h.
+
+\hypertarget{error_8h_ad6f161d080c3cf686259608f3298f86a}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y@{T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y}}
+\index{T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y@{T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+N\+O\+E\+N\+T\+R\+Y~46}\label{error_8h_ad6f161d080c3cf686259608f3298f86a}
+entry doesn\textquotesingle{}t exist in the directory 
+
+Definition at line 90 of file error.\+h.
+
+\hypertarget{error_8h_a902f255869d41eda015c43ddc3247023}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D@{T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D}}
+\index{T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D@{T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+N\+O\+T\+S\+U\+P\+P\+O\+R\+T\+E\+D~53}\label{error_8h_a902f255869d41eda015c43ddc3247023}
+Operation not supported yet 
+
+Definition at line 97 of file error.\+h.
+
+\hypertarget{error_8h_af3e8468fc4a0a5a75d8dde7dc8b78ea5}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S@{T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S}}
+\index{T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S@{T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+O\+\_\+\+N\+O\+A\+C\+C\+E\+S\+S~48}\label{error_8h_af3e8468fc4a0a5a75d8dde7dc8b78ea5}
+Access mode bits not found 
+
+Definition at line 92 of file error.\+h.
+
+\hypertarget{error_8h_ab5d52116e5573622757e679c6c681893}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T@{T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T}}
+\index{T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T@{T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+S\+E\+G\+\_\+\+F\+A\+U\+L\+T~54}\label{error_8h_ab5d52116e5573622757e679c6c681893}
+Segmentation fault $>$ 
+
+Definition at line 98 of file error.\+h.
+
+\hypertarget{error_8h_aa88463f531fd42315979ecf4bfcd3957}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R@{T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R}}
+\index{T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R@{T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+S\+Y\+S\+D\+I\+R~29}\label{error_8h_aa88463f531fd42315979ecf4bfcd3957}
+System directory 
+
+Definition at line 73 of file error.\+h.
+
+\hypertarget{error_8h_a83242971ac86d6d36f1a175a196dd9c9}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L@{T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}}
+\index{T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L@{T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+U\+N\+L\+O\+C\+K\+\_\+\+F\+A\+I\+L~43}\label{error_8h_a83242971ac86d6d36f1a175a196dd9c9}
+Failed to release lock on file 
+
+Definition at line 87 of file error.\+h.
+
+\hypertarget{error_8h_a9a8a75b13df01ae3b09ef565ed43721b}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E@{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E}}
+\index{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E@{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+S\+U\+B\+T\+Y\+P\+E~55}\label{error_8h_a9a8a75b13df01ae3b09ef565ed43721b}
+Unrecognized subtype 
+
+Definition at line 99 of file error.\+h.
+
+\hypertarget{error_8h_a79c7bd7f4e9de165f676dcd76649c2ce}{}\index{error.\+h@{error.\+h}!T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E@{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}}
+\index{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E@{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}!error.\+h@{error.\+h}}
+\subsubsection[{T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+F\+S\+\_\+\+W\+R\+O\+N\+G\+T\+Y\+P\+E~56}\label{error_8h_a79c7bd7f4e9de165f676dcd76649c2ce}
+Unrecognized file type 
+
+Definition at line 100 of file error.\+h.
+
+\hypertarget{error_8h_a23063085b304a25686978cd1d5e85b1b}{}\index{error.\+h@{error.\+h}!V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}}
+\index{V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D@{V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}!error.\+h@{error.\+h}}
+\subsubsection[{V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\+\_\+\+F\+B\+L\+\_\+\+C\+O\+R\+R\+U\+P\+T\+E\+D~16}\label{error_8h_a23063085b304a25686978cd1d5e85b1b}
+Volume free block list corrupted $>$ 
+
+Definition at line 60 of file error.\+h.
+
+\hypertarget{error_8h_a7d240bc0a38a5cb42fbd563b6320bbe6}{}\index{error.\+h@{error.\+h}!V\+\_\+\+F\+U\+L\+L@{V\+\_\+\+F\+U\+L\+L}}
+\index{V\+\_\+\+F\+U\+L\+L@{V\+\_\+\+F\+U\+L\+L}!error.\+h@{error.\+h}}
+\subsubsection[{V\+\_\+\+F\+U\+L\+L}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\+\_\+\+F\+U\+L\+L~15}\label{error_8h_a7d240bc0a38a5cb42fbd563b6320bbe6}
+No free volume blocks remaining $>$ 
+
+Definition at line 59 of file error.\+h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{error_8h_a8765e3594431b5759071393ed6de3e45}{}\index{error.\+h@{error.\+h}!error@{error}}
+\index{error@{error}!error.\+h@{error.\+h}}
+\subsubsection[{error}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint8\+\_\+t {\bf error}}\label{error_8h_a8765e3594431b5759071393ed6de3e45}
+A structure to represent an error id 
+
+Definition at line 13 of file error.\+h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{error_8h_ab6b35044ba6496e2fe4dc59557923af4}{}\index{error.\+h@{error.\+h}!printerror@{printerror}}
+\index{printerror@{printerror}!error.\+h@{error.\+h}}
+\subsubsection[{printerror}]{\setlength{\rightskip}{0pt plus 5cm}void printerror (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s, }
+\item[{{\bf error}}]{err}
+\end{DoxyParamCaption}
+)}\label{error_8h_ab6b35044ba6496e2fe4dc59557923af4}
+Prints an errror message on error output
+
+Prints an errror message on error output using the format $<$s\+: error message$>$
+
+
+\begin{DoxyParams}{Parameters}
+{\em s\mbox{[}in\mbox{]}} & sting to be added at beginning of error output \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+
+
+Definition at line 84 of file error.\+c.
+
+\hypertarget{error_8h_a571be2305c567deb80d4b77f30cadcd3}{}\index{error.\+h@{error.\+h}!testerror@{testerror}}
+\index{testerror@{testerror}!error.\+h@{error.\+h}}
+\subsubsection[{testerror}]{\setlength{\rightskip}{0pt plus 5cm}void testerror (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{msg, }
+\item[{{\bf error}}]{err}
+\end{DoxyParamCaption}
+)}\label{error_8h_a571be2305c567deb80d4b77f30cadcd3}
+
+
+This function forces an exit if an error is encountered. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em err} & error value \\
+\hline
+\mbox{\tt in}  & {\em msg} & error message header \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8c_ab6b35044ba6496e2fe4dc59557923af4}{printerror} Abbreviation list\+: C \+: Command D \+: Disk O\+D \+: Open Disk Array B \+: Block P \+: Partition V \+: Volume F \+: \hyperlink{struct_file}{File} F\+T \+: \hyperlink{struct_file}{File} Table F\+B\+L\+: Free Block List F\+E\+L\+: Free Entry List T\+F\+S\+: Toy \hyperlink{struct_file}{File} System $>$
+\end{DoxySeeAlso}
+This function prints an error message and terminates the program if $<$err$>$ is not E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S 
+
+Definition at line 93 of file error.\+c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{error_8h_af2af6e4ea36bbb786123dc9b24c26fc9}{}\index{error.\+h@{error.\+h}!errnum@{errnum}}
+\index{errnum@{errnum}!error.\+h@{error.\+h}}
+\subsubsection[{errnum}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} errnum}\label{error_8h_af2af6e4ea36bbb786123dc9b24c26fc9}
+
+
+This variable can store an error. 
+
+This variable can be used to store an error in functions which do not return $<$error$>$ 
+
+Definition at line 106 of file error.\+c.
+

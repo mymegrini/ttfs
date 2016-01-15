@@ -1,0 +1,130 @@
+\hypertarget{tfs__ls_8c}{}\section{src/tfs\+\_\+ls.c File Reference}
+\label{tfs__ls_8c}\index{src/tfs\+\_\+ls.\+c@{src/tfs\+\_\+ls.\+c}}
+{\ttfamily \#include \char`\"{}tfsll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+Include dependency graph for tfs\+\_\+ls.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__ls_8c_adaef1917469e58d838e08ea9eec83aa5}{O\+P\+T\+\_\+\+H\+E\+L\+P}~\textquotesingle{}h\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__ls_8c_a1ea8dc79a78c520be81fa16c785bef65}{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}~\char`\"{}help\char`\"{}
+\item 
+\#define \hyperlink{tfs__ls_8c_a91fea349332c05eb78ce3c17202e1dc9}{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}~\char`\"{}h\char`\"{}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{tfs__ls_8c_a4907135737e2fb22dcde4be8474bcab1}{usage} (char $\ast$argv0)
+\item 
+void \hyperlink{tfs__ls_8c_ac5b3462ec0c812741cb7010d27232d35}{help} (char $\ast$argv0)
+\item 
+void \hyperlink{tfs__ls_8c_a7e4b085fb0f20c74f3ddb2d1f8c59575}{ls} (char $\ast$argv0, char $\ast$path)
+\item 
+int \hyperlink{tfs__ls_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct option \hyperlink{tfs__ls_8c_af3fa26ecabe32d66e998a45c701cb116}{options} \mbox{[}4\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__ls_8c_adaef1917469e58d838e08ea9eec83aa5}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}}
+\index{O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+H\+E\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+H\+E\+L\+P~\textquotesingle{}h\textquotesingle{}}\label{tfs__ls_8c_adaef1917469e58d838e08ea9eec83aa5}
+
+
+Definition at line 25 of file tfs\+\_\+ls.\+c.
+
+\hypertarget{tfs__ls_8c_a1ea8dc79a78c520be81fa16c785bef65}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}}
+\index{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G~\char`\"{}help\char`\"{}}\label{tfs__ls_8c_a1ea8dc79a78c520be81fa16c785bef65}
+
+
+Definition at line 26 of file tfs\+\_\+ls.\+c.
+
+\hypertarget{tfs__ls_8c_a91fea349332c05eb78ce3c17202e1dc9}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G@{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}}
+\index{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G@{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G~\char`\"{}h\char`\"{}}\label{tfs__ls_8c_a91fea349332c05eb78ce3c17202e1dc9}
+
+
+Definition at line 28 of file tfs\+\_\+ls.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__ls_8c_ac5b3462ec0c812741cb7010d27232d35}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!help@{help}}
+\index{help@{help}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{help}]{\setlength{\rightskip}{0pt plus 5cm}void help (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__ls_8c_ac5b3462ec0c812741cb7010d27232d35}
+
+
+Definition at line 152 of file tfs\+\_\+ls.\+c.
+
+\hypertarget{tfs__ls_8c_a7e4b085fb0f20c74f3ddb2d1f8c59575}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!ls@{ls}}
+\index{ls@{ls}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{ls}]{\setlength{\rightskip}{0pt plus 5cm}void ls (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0, }
+\item[{char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{tfs__ls_8c_a7e4b085fb0f20c74f3ddb2d1f8c59575}
+
+
+Definition at line 74 of file tfs\+\_\+ls.\+c.
+
+\hypertarget{tfs__ls_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__ls_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+Definition at line 46 of file tfs\+\_\+ls.\+c.
+
+\hypertarget{tfs__ls_8c_a4907135737e2fb22dcde4be8474bcab1}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!usage@{usage}}
+\index{usage@{usage}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{usage}]{\setlength{\rightskip}{0pt plus 5cm}void usage (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__ls_8c_a4907135737e2fb22dcde4be8474bcab1}
+
+
+Definition at line 146 of file tfs\+\_\+ls.\+c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{tfs__ls_8c_af3fa26ecabe32d66e998a45c701cb116}{}\index{tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}!options@{options}}
+\index{options@{options}!tfs\+\_\+ls.\+c@{tfs\+\_\+ls.\+c}}
+\subsubsection[{options}]{\setlength{\rightskip}{0pt plus 5cm}struct option options\mbox{[}4\mbox{]}}\label{tfs__ls_8c_af3fa26ecabe32d66e998a45c701cb116}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+  \{ \hyperlink{tfs__ls_8c_a1ea8dc79a78c520be81fa16c785bef65}{OPT\_HELP\_LONG}, no\_argument, 0, \hyperlink{tfs__ls_8c_adaef1917469e58d838e08ea9eec83aa5}{OPT\_HELP} \},
+  \{ 0, 0, 0, 0 \}
+\}
+\end{DoxyCode}
+
+
+Definition at line 32 of file tfs\+\_\+ls.\+c.
+

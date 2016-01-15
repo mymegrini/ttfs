@@ -1,0 +1,67 @@
+.TH "d_stat" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+d_stat \- 
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <ll\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "char \fBname\fP [\fBD_NAME_MAXLEN\fP]"
+.br
+.ti -1c
+.RI "char \fBhash\fP [\fBHASH_LEN\fP]"
+.br
+.ti -1c
+.RI "uint32_t \fBsize\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBnpart\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBpart\fP [\fBD_PARTMAX\fP]"
+.br
+.ti -1c
+.RI "time_t \fBtime\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A structure to store basic disk information 
+.PP
+Definition at line 24 of file ll\&.h\&.
+.SH "Field Documentation"
+.PP 
+.SS "char hash[\fBHASH_LEN\fP]"
+
+.PP
+Definition at line 26 of file ll\&.h\&.
+.SS "char name[\fBD_NAME_MAXLEN\fP]"
+name of the disk 
+.PP
+Definition at line 25 of file ll\&.h\&.
+.SS "uint32_t npart"
+number of partitions 
+.PP
+Definition at line 28 of file ll\&.h\&.
+.SS "uint32_t part[\fBD_PARTMAX\fP]"
+parition sizes 
+.PP
+Definition at line 29 of file ll\&.h\&.
+.SS "uint32_t size"
+size of the disk 
+.PP
+Definition at line 27 of file ll\&.h\&.
+.SS "time_t time"
+
+.PP
+Definition at line 30 of file ll\&.h\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

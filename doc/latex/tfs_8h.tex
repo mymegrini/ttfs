@@ -1,0 +1,486 @@
+\hypertarget{tfs_8h}{}\section{lib/tfs.h File Reference}
+\label{tfs_8h}\index{lib/tfs.\+h@{lib/tfs.\+h}}
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}tfsll.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+Include dependency graph for tfs.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs_8h_a3b8fcdc28c5a39a4d785b53097bd1a16}{P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P}~\char`\"{}/\char`\"{}
+\item 
+\#define \hyperlink{tfs_8h_a0e6b17985a3095348e38094b978770da}{P\+A\+T\+H\+\_\+\+F\+P\+F\+X}~\char`\"{}F\+I\+L\+E\+://\char`\"{}
+\item 
+\#define \hyperlink{tfs_8h_accfe6070f33c1248b84e8c287682f8ec}{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}~7
+\item 
+\#define \hyperlink{tfs_8h_a04d14201c8d5468c25bf29b9840b034b}{I\+S\+H\+O\+S\+T}(token)~((strcmp(token, \char`\"{}H\+O\+S\+T\char`\"{})) == 0)
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct___d_i_r}{\+\_\+\+D\+I\+R} \hyperlink{tfs_8h_a44583d88b882a592026d572920e2f595}{D\+I\+R}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{tfs_8h_af92383a1bc85531642f8cab3a6997cd0}{tfs\+\_\+rm} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em Remove a regular file from a tfs volume. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_ad8c4afbf539b96ed10b493a85fbdea70}{tfs\+\_\+mkdir} (const char $\ast$path, mode\+\_\+t mode)
+\begin{DoxyCompactList}\small\item\em This function attempts to create a directory named $<$path$>$ \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_ade88fe164a7c0c7fff5ec512e298bf1c}{tfs\+\_\+rmdir} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em This function deletes a directory, which must be empty. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_acfc0d27c44cc5741942bc20af3c57326}{tfs\+\_\+rename} (const char $\ast$old, const char $\ast$new)
+\begin{DoxyCompactList}\small\item\em This function renames a file, moving it between directories if required. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_abf117205ecc562d6d9e3e4a907370359}{tfs\+\_\+open} (const char $\ast$name, int oflag,...)
+\begin{DoxyCompactList}\small\item\em This function returns a file descriptor for use in subsequent system calls. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_a7c0c051743345721172b91508b963785}{tfs\+\_\+lock} (int fildes)
+\begin{DoxyCompactList}\small\item\em Gives calling process exclusive control over file. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_afd13d70c162d0fa6cc23dbe8c5d229a2}{tfs\+\_\+unlock} (int fildes)
+\begin{DoxyCompactList}\small\item\em Relinquishes exclusive control over file. \end{DoxyCompactList}\item 
+ssize\+\_\+t \hyperlink{tfs_8h_ad42afdd82fc10a42885741c96735acdd}{tfs\+\_\+read} (int fildes, void $\ast$buf, size\+\_\+t nbytes)
+\begin{DoxyCompactList}\small\item\em This function attempts to read up to $<$nbytes$>$ bytes from file descriptor $<$fildes$>$ into the buffer starting at $<$buf$>$ \end{DoxyCompactList}\item 
+ssize\+\_\+t \hyperlink{tfs_8h_ad1e22c20591b2e68f75cbafdfc7164a2}{tfs\+\_\+write} (int fildes, void $\ast$buf, size\+\_\+t nbytes)
+\begin{DoxyCompactList}\small\item\em This function writes up to $<$nbytes$>$ bytes from the buffer pointed to by $<$buf$>$ to the file reffered to by the file descriptor $<$fildes$>$ \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_a6a198cc4911a969961b9e0978dc166ae}{tfs\+\_\+close} (int fildes)
+\begin{DoxyCompactList}\small\item\em This function closes a file descriptor. \end{DoxyCompactList}\item 
+off\+\_\+t \hyperlink{tfs_8h_a19b98dc6a6e8e1d41f65a32b14cf4596}{tfs\+\_\+lseek} (int fildes, off\+\_\+t offset, int whence)
+\begin{DoxyCompactList}\small\item\em This function repositions the offset of the open file associated with the file descriptor $<$fildes$>$ to the argument $<$offset$>$ according to the directive $<$whence$>$ \end{DoxyCompactList}\item 
+\hyperlink{tfs_8h_a44583d88b882a592026d572920e2f595}{D\+I\+R} $\ast$ \hyperlink{tfs_8h_ad527f278dde35cbc136c2068cf1dda10}{opendir} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em This function opens a directory stream corresponding to the directory $<$filename$>$ \end{DoxyCompactList}\item 
+struct \hyperlink{structdirent}{dirent} $\ast$ \hyperlink{tfs_8h_a58257faf8b13b3f14558613c632b2373}{readdir} (\hyperlink{tfs_8h_a44583d88b882a592026d572920e2f595}{D\+I\+R} $\ast$dirp)
+\begin{DoxyCompactList}\small\item\em This function returns the next directory entry in the directory stream $<$dirp$>$ \end{DoxyCompactList}\item 
+void \hyperlink{tfs_8h_ad4fcb58b9194b1a3c1699654de963719}{rewinddir} (\hyperlink{tfs_8h_a44583d88b882a592026d572920e2f595}{D\+I\+R} $\ast$dirp)
+\begin{DoxyCompactList}\small\item\em This function resets the position of the directory stream $<$dirp$>$ to its beginning. \end{DoxyCompactList}\item 
+int \hyperlink{tfs_8h_aaeac2b41e8c2c3a5f91c9bd511a8c0a6}{closedir} (\hyperlink{tfs_8h_a44583d88b882a592026d572920e2f595}{D\+I\+R} $\ast$dirp)
+\begin{DoxyCompactList}\small\item\em This function closes the directory stream associated with $<$dirp$>$ \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs_8h_a04d14201c8d5468c25bf29b9840b034b}{}\index{tfs.\+h@{tfs.\+h}!I\+S\+H\+O\+S\+T@{I\+S\+H\+O\+S\+T}}
+\index{I\+S\+H\+O\+S\+T@{I\+S\+H\+O\+S\+T}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{I\+S\+H\+O\+S\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+S\+H\+O\+S\+T(
+\begin{DoxyParamCaption}
+\item[{}]{token}
+\end{DoxyParamCaption}
+)~((strcmp(token, \char`\"{}H\+O\+S\+T\char`\"{})) == 0)}\label{tfs_8h_a04d14201c8d5468c25bf29b9840b034b}
+
+
+Definition at line 15 of file tfs.\+h.
+
+\hypertarget{tfs_8h_a0e6b17985a3095348e38094b978770da}{}\index{tfs.\+h@{tfs.\+h}!P\+A\+T\+H\+\_\+\+F\+P\+F\+X@{P\+A\+T\+H\+\_\+\+F\+P\+F\+X}}
+\index{P\+A\+T\+H\+\_\+\+F\+P\+F\+X@{P\+A\+T\+H\+\_\+\+F\+P\+F\+X}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{P\+A\+T\+H\+\_\+\+F\+P\+F\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+T\+H\+\_\+\+F\+P\+F\+X~\char`\"{}F\+I\+L\+E\+://\char`\"{}}\label{tfs_8h_a0e6b17985a3095348e38094b978770da}
+
+
+Definition at line 13 of file tfs.\+h.
+
+\hypertarget{tfs_8h_accfe6070f33c1248b84e8c287682f8ec}{}\index{tfs.\+h@{tfs.\+h}!P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N@{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}}
+\index{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N@{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+T\+H\+\_\+\+F\+P\+F\+X\+L\+E\+N~7}\label{tfs_8h_accfe6070f33c1248b84e8c287682f8ec}
+
+
+Definition at line 14 of file tfs.\+h.
+
+\hypertarget{tfs_8h_a3b8fcdc28c5a39a4d785b53097bd1a16}{}\index{tfs.\+h@{tfs.\+h}!P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P@{P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P}}
+\index{P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P@{P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+T\+H\+\_\+\+S\+T\+R\+S\+E\+P~\char`\"{}/\char`\"{}}\label{tfs_8h_a3b8fcdc28c5a39a4d785b53097bd1a16}
+
+
+Definition at line 12 of file tfs.\+h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{tfs_8h_a44583d88b882a592026d572920e2f595}{}\index{tfs.\+h@{tfs.\+h}!D\+I\+R@{D\+I\+R}}
+\index{D\+I\+R@{D\+I\+R}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{D\+I\+R}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf \+\_\+\+D\+I\+R} {\bf D\+I\+R}}\label{tfs_8h_a44583d88b882a592026d572920e2f595}
+
+
+Definition at line 21 of file tfs.\+h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs_8h_aaeac2b41e8c2c3a5f91c9bd511a8c0a6}{}\index{tfs.\+h@{tfs.\+h}!closedir@{closedir}}
+\index{closedir@{closedir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{closedir}]{\setlength{\rightskip}{0pt plus 5cm}int closedir (
+\begin{DoxyParamCaption}
+\item[{{\bf D\+I\+R} $\ast$}]{dirp}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_aaeac2b41e8c2c3a5f91c9bd511a8c0a6}
+
+
+This function closes the directory stream associated with $<$dirp$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dirp} & directory stream \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured 
+\end{DoxyReturn}
+
+
+Definition at line 984 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ad527f278dde35cbc136c2068cf1dda10}{}\index{tfs.\+h@{tfs.\+h}!opendir@{opendir}}
+\index{opendir@{opendir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{opendir}]{\setlength{\rightskip}{0pt plus 5cm}{\bf D\+I\+R}$\ast$ opendir (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{filename}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ad527f278dde35cbc136c2068cf1dda10}
+
+
+This function opens a directory stream corresponding to the directory $<$filename$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em filename} & directory name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a pointer to the directory stream, on success, N\+U\+L\+L, on error 
+\end{DoxyReturn}
+
+
+Definition at line 904 of file tfs.\+c.
+
+\hypertarget{tfs_8h_a58257faf8b13b3f14558613c632b2373}{}\index{tfs.\+h@{tfs.\+h}!readdir@{readdir}}
+\index{readdir@{readdir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{readdir}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf dirent}$\ast$ readdir (
+\begin{DoxyParamCaption}
+\item[{{\bf D\+I\+R} $\ast$}]{dirp}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_a58257faf8b13b3f14558613c632b2373}
+
+
+This function returns the next directory entry in the directory stream $<$dirp$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dirp} & directory stream \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a pointer to a $<$dirent$>$ structure, on success, N\+U\+L\+L, on error 
+\end{DoxyReturn}
+
+
+Definition at line 934 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ad4fcb58b9194b1a3c1699654de963719}{}\index{tfs.\+h@{tfs.\+h}!rewinddir@{rewinddir}}
+\index{rewinddir@{rewinddir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{rewinddir}]{\setlength{\rightskip}{0pt plus 5cm}void rewinddir (
+\begin{DoxyParamCaption}
+\item[{{\bf D\+I\+R} $\ast$}]{dirp}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ad4fcb58b9194b1a3c1699654de963719}
+
+
+This function resets the position of the directory stream $<$dirp$>$ to its beginning. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em dirp} & directory stream \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns no value 
+\end{DoxyReturn}
+
+
+Definition at line 960 of file tfs.\+c.
+
+\hypertarget{tfs_8h_a6a198cc4911a969961b9e0978dc166ae}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+close@{tfs\+\_\+close}}
+\index{tfs\+\_\+close@{tfs\+\_\+close}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+close}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+close (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_a6a198cc4911a969961b9e0978dc166ae}
+
+
+This function closes a file descriptor. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fildes} & file descriptor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured 
+\end{DoxyReturn}
+
+
+Definition at line 806 of file tfs.\+c.
+
+\hypertarget{tfs_8h_a7c0c051743345721172b91508b963785}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+lock@{tfs\+\_\+lock}}
+\index{tfs\+\_\+lock@{tfs\+\_\+lock}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+lock}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+lock (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_a7c0c051743345721172b91508b963785}
+
+
+Gives calling process exclusive control over file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fildes} & file descriptor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure (errnum set) 
+\end{DoxyReturn}
+
+
+Definition at line 543 of file tfs.\+c.
+
+\hypertarget{tfs_8h_a19b98dc6a6e8e1d41f65a32b14cf4596}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+lseek@{tfs\+\_\+lseek}}
+\index{tfs\+\_\+lseek@{tfs\+\_\+lseek}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+lseek}]{\setlength{\rightskip}{0pt plus 5cm}off\+\_\+t tfs\+\_\+lseek (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes, }
+\item[{off\+\_\+t}]{offset, }
+\item[{int}]{whence}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_a19b98dc6a6e8e1d41f65a32b14cf4596}
+
+
+This function repositions the offset of the open file associated with the file descriptor $<$fildes$>$ to the argument $<$offset$>$ according to the directive $<$whence$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fildes} & file descriptor \\
+\hline
+\mbox{\tt in}  & {\em offset} & number of bytes \\
+\hline
+\mbox{\tt in}  & {\em whence} & directive \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the resulting offset location measured from the beginning of the file, on success, and -\/1, on error 
+\end{DoxyReturn}
+
+
+Definition at line 827 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ad8c4afbf539b96ed10b493a85fbdea70}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+mkdir@{tfs\+\_\+mkdir}}
+\index{tfs\+\_\+mkdir@{tfs\+\_\+mkdir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+mkdir}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+mkdir (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path, }
+\item[{mode\+\_\+t}]{mode}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ad8c4afbf539b96ed10b493a85fbdea70}
+
+
+This function attempts to create a directory named $<$path$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & specifies name and location of directory \\
+\hline
+\mbox{\tt in}  & {\em mode} & specifies the permissions to use \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured 
+\end{DoxyReturn}
+
+
+Definition at line 259 of file tfs.\+c.
+
+\hypertarget{tfs_8h_abf117205ecc562d6d9e3e4a907370359}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+open@{tfs\+\_\+open}}
+\index{tfs\+\_\+open@{tfs\+\_\+open}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+open}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+open (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{name, }
+\item[{int}]{oflag, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_abf117205ecc562d6d9e3e4a907370359}
+
+
+This function returns a file descriptor for use in subsequent system calls. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & of file to be opened \\
+\hline
+\mbox{\tt in}  & {\em oflag} & specifies access modes \\
+\hline
+\mbox{\tt in}  & {\em mode} & specifies permissions to use for O\+\_\+\+C\+R\+E\+A\+T \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured
+\end{DoxyReturn}
+
+\begin{DoxyParams}{Parameters}
+{\em oflag} & O\+\_\+\+R\+D\+O\+N\+L\+Y$\vert$\+O\+\_\+\+W\+R\+O\+N\+L\+Y$\vert$\+O\+\_\+\+R\+D\+W\+R \mbox{[}O\+\_\+\+C\+R\+E\+A\+T$\vert$\+O\+\_\+\+A\+P\+P\+E\+N\+D$\vert$\+O\+\_\+\+T\+R\+U\+N\+C\mbox{]} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 435 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ad42afdd82fc10a42885741c96735acdd}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+read@{tfs\+\_\+read}}
+\index{tfs\+\_\+read@{tfs\+\_\+read}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+read}]{\setlength{\rightskip}{0pt plus 5cm}ssize\+\_\+t tfs\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes, }
+\item[{void $\ast$}]{buf, }
+\item[{size\+\_\+t}]{nbytes}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ad42afdd82fc10a42885741c96735acdd}
+
+
+This function attempts to read up to $<$nbytes$>$ bytes from file descriptor $<$fildes$>$ into the buffer starting at $<$buf$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fildes} & file desctiptor \\
+\hline
+\mbox{\tt in}  & {\em buf} & buffer \\
+\hline
+\mbox{\tt in}  & {\em nbytes} & maximum number of bytes to be read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns, on success, number of bytes read (0 indicates E\+O\+F) and -\/1 on error 
+\end{DoxyReturn}
+
+
+Definition at line 574 of file tfs.\+c.
+
+\hypertarget{tfs_8h_acfc0d27c44cc5741942bc20af3c57326}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+rename@{tfs\+\_\+rename}}
+\index{tfs\+\_\+rename@{tfs\+\_\+rename}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+rename}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+rename (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{old, }
+\item[{const char $\ast$}]{new}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_acfc0d27c44cc5741942bc20af3c57326}
+
+
+This function renames a file, moving it between directories if required. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em old} & specifies old pathname \\
+\hline
+\mbox{\tt in}  & {\em new} & specifies new pathname \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured 
+\end{DoxyReturn}
+
+
+Definition at line 407 of file tfs.\+c.
+
+\hypertarget{tfs_8h_af92383a1bc85531642f8cab3a6997cd0}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+rm@{tfs\+\_\+rm}}
+\index{tfs\+\_\+rm@{tfs\+\_\+rm}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+rm}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+rm (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_af92383a1bc85531642f8cab3a6997cd0}
+
+
+Remove a regular file from a tfs volume. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int 
+\end{DoxyReturn}
+
+
+Definition at line 238 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ade88fe164a7c0c7fff5ec512e298bf1c}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+rmdir@{tfs\+\_\+rmdir}}
+\index{tfs\+\_\+rmdir@{tfs\+\_\+rmdir}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+rmdir}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+rmdir (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ade88fe164a7c0c7fff5ec512e298bf1c}
+
+
+This function deletes a directory, which must be empty. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & specifies name and location of directory \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 on success or -\/1 if an error occured 
+\end{DoxyReturn}
+
+
+Definition at line 345 of file tfs.\+c.
+
+\hypertarget{tfs_8h_afd13d70c162d0fa6cc23dbe8c5d229a2}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+unlock@{tfs\+\_\+unlock}}
+\index{tfs\+\_\+unlock@{tfs\+\_\+unlock}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+unlock}]{\setlength{\rightskip}{0pt plus 5cm}int tfs\+\_\+unlock (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_afd13d70c162d0fa6cc23dbe8c5d229a2}
+
+
+Relinquishes exclusive control over file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fildes} & file descriptor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure (errnum set) 
+\end{DoxyReturn}
+
+
+Definition at line 557 of file tfs.\+c.
+
+\hypertarget{tfs_8h_ad1e22c20591b2e68f75cbafdfc7164a2}{}\index{tfs.\+h@{tfs.\+h}!tfs\+\_\+write@{tfs\+\_\+write}}
+\index{tfs\+\_\+write@{tfs\+\_\+write}!tfs.\+h@{tfs.\+h}}
+\subsubsection[{tfs\+\_\+write}]{\setlength{\rightskip}{0pt plus 5cm}ssize\+\_\+t tfs\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{int}]{fildes, }
+\item[{void $\ast$}]{buf, }
+\item[{size\+\_\+t}]{nbytes}
+\end{DoxyParamCaption}
+)}\label{tfs_8h_ad1e22c20591b2e68f75cbafdfc7164a2}
+
+
+This function writes up to $<$nbytes$>$ bytes from the buffer pointed to by $<$buf$>$ to the file reffered to by the file descriptor $<$fildes$>$ 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fildes} & file desctiptor \\
+\hline
+\mbox{\tt out}  & {\em buf} & buffer \\
+\hline
+\mbox{\tt in}  & {\em nbytes} & maximum number of bytes to be written \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns, on success, number of bytes written and -\/1 on error 
+\end{DoxyReturn}
+
+
+Definition at line 692 of file tfs.\+c.
+

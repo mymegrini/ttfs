@@ -1,0 +1,159 @@
+.TH "src/tfs_mkdir.c" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/tfs_mkdir.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <unistd\&.h>\fP
+.br
+\fC#include <sys/stat\&.h>\fP
+.br
+\fC#include <sys/types\&.h>\fP
+.br
+\fC#include <getopt\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include 'tfs\&.h'\fP
+.br
+\fC#include 'tfsll\&.h'\fP
+.br
+\fC#include 'utils\&.h'\fP
+.br
+\fC#include 'block\&.h'\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBOPT_PARENTS\fP   'p'"
+.br
+.ti -1c
+.RI "#define \fBOPT_PARENTS_LONG\fP   'path'"
+.br
+.ti -1c
+.RI "#define \fBOPT_NAME\fP   'n'"
+.br
+.ti -1c
+.RI "#define \fBOPT_NAME_LONG\fP   'name'"
+.br
+.ti -1c
+.RI "#define \fBOPT_HELP\fP   'h'"
+.br
+.ti -1c
+.RI "#define \fBOPT_HELP_LONG\fP   'help'"
+.br
+.ti -1c
+.RI "#define \fBOPT_STRING\fP   'hpn:'"
+.br
+.ti -1c
+.RI "#define \fBPATH_FORMAT\fP   -1"
+.br
+.ti -1c
+.RI "#define \fBDIRPATH_MISSING\fP   -2"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBerror\fP \fBrecursive_mkdir\fP (char *fullpath, mode_t mode)"
+.br
+.ti -1c
+.RI "void \fBusage\fP (char *argv0)"
+.br
+.ti -1c
+.RI "void \fBhelp\fP (char *argv0)"
+.br
+.ti -1c
+.RI "int \fBmain\fP (int argc, char *argv[])"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "struct option \fBoptions\fP [4]"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define DIRPATH_MISSING   -2"
+
+.PP
+Definition at line 47 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_HELP   'h'"
+
+.PP
+Definition at line 30 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_HELP_LONG   'help'"
+
+.PP
+Definition at line 31 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_NAME   'n'"
+
+.PP
+Definition at line 28 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_NAME_LONG   'name'"
+
+.PP
+Definition at line 29 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_PARENTS   'p'"
+
+.PP
+Definition at line 26 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_PARENTS_LONG   'path'"
+
+.PP
+Definition at line 27 of file tfs_mkdir\&.c\&.
+.SS "#define OPT_STRING   'hpn:'"
+
+.PP
+Definition at line 33 of file tfs_mkdir\&.c\&.
+.SS "#define PATH_FORMAT   -1"
+
+.PP
+Definition at line 46 of file tfs_mkdir\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "void help (char * argv0)"
+
+.PP
+Definition at line 145 of file tfs_mkdir\&.c\&.
+.SS "int main (int argc, char * argv[])"
+
+.PP
+Definition at line 59 of file tfs_mkdir\&.c\&.
+.SS "\fBerror\fP recursive_mkdir (char * fullpath, mode_t mode)"
+
+.PP
+Definition at line 113 of file tfs_mkdir\&.c\&.
+.SS "void usage (char * argv0)"
+
+.PP
+Definition at line 138 of file tfs_mkdir\&.c\&.
+.SH "Variable Documentation"
+.PP 
+.SS "struct option options[4]"
+\fBInitial value:\fP
+.PP
+.nf
+= {
+  { OPT_HELP_LONG, no_argument, 0, OPT_HELP },
+  { OPT_NAME_LONG, required_argument, 0, OPT_NAME },
+  { OPT_PARENTS_LONG, no_argument, 0, OPT_PARENTS },
+  { 0, 0, 0, 0 }
+}
+.fi
+.PP
+Definition at line 35 of file tfs_mkdir\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

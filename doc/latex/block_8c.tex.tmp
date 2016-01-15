@@ -1,0 +1,68 @@
+\hypertarget{block_8c}{}\section{lib/block.c File Reference}
+\label{block_8c}\index{lib/block.\+c@{lib/block.\+c}}
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+Include dependency graph for block.\+c\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structblock}{block} \hyperlink{block_8c_a6c413723ed7349d0692c9603ed2eeb52}{new\+\_\+block} (void)
+\begin{DoxyCompactList}\small\item\em Return a new empty block, filled by 0. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{block_8c_a27d0c4b4e5b531e5133ea6330716067c}{rintle} (uint32\+\_\+t $\ast$value, \hyperlink{structblock}{block} b, \hyperlink{block_8h_aea8fe1533cb469cc089393048ef8965f}{addr} idx)
+\begin{DoxyCompactList}\small\item\em Reads an integer in little-\/endian from a block. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{block_8c_a6f48d101fccf2d437c38afc0324207f7}{wintle} (uint32\+\_\+t value, \hyperlink{structblock}{block} b, \hyperlink{block_8h_aea8fe1533cb469cc089393048ef8965f}{addr} idx)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{block_8c_a6c413723ed7349d0692c9603ed2eeb52}{}\index{block.\+c@{block.\+c}!new\+\_\+block@{new\+\_\+block}}
+\index{new\+\_\+block@{new\+\_\+block}!block.\+c@{block.\+c}}
+\subsubsection[{new\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf block} new\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{block_8c_a6c413723ed7349d0692c9603ed2eeb52}
+
+
+Return a new empty block, filled by 0. 
+
+Return a pointer to a new empty. An empty block is full of bytes 0.
+
+\begin{DoxyReturn}{Returns}
+block 
+\end{DoxyReturn}
+
+
+Definition at line 8 of file block.\+c.
+
+\hypertarget{block_8c_a27d0c4b4e5b531e5133ea6330716067c}{}\index{block.\+c@{block.\+c}!rintle@{rintle}}
+\index{rintle@{rintle}!block.\+c@{block.\+c}}
+\subsubsection[{rintle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} rintle (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t $\ast$}]{value, }
+\item[{{\bf block}}]{b, }
+\item[{{\bf addr}}]{idx}
+\end{DoxyParamCaption}
+)}\label{block_8c_a27d0c4b4e5b531e5133ea6330716067c}
+
+
+Reads an integer in little-\/endian from a block. 
+
+Reads an integer in little-\/endian from a block at a specified index idx and stores it in value integer pointer 
+
+Definition at line 19 of file block.\+c.
+
+\hypertarget{block_8c_a6f48d101fccf2d437c38afc0324207f7}{}\index{block.\+c@{block.\+c}!wintle@{wintle}}
+\index{wintle@{wintle}!block.\+c@{block.\+c}}
+\subsubsection[{wintle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} wintle (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{value, }
+\item[{{\bf block}}]{b, }
+\item[{{\bf addr}}]{idx}
+\end{DoxyParamCaption}
+)}\label{block_8c_a6f48d101fccf2d437c38afc0324207f7}
+Writes an integer in little-\/endian to a block at a specified index idx and stores it in value integer pointer 
+
+Definition at line 34 of file block.\+c.
+

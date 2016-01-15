@@ -1,0 +1,331 @@
+\hypertarget{tfs__partition_8c}{}\section{src/tfs\+\_\+partition.c File Reference}
+\label{tfs__partition_8c}\index{src/tfs\+\_\+partition.\+c@{src/tfs\+\_\+partition.\+c}}
+{\ttfamily \#include \char`\"{}ll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+{\ttfamily \#include $<$ctype.\+h$>$}\\*
+{\ttfamily \#include $<$inttypes.\+h$>$}\\*
+Include dependency graph for tfs\+\_\+partition.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__partition_8c_aea7f70401d64e0c72b3df91414bdfd78}{O\+P\+T\+S\+T\+R\+I\+N\+G}~\char`\"{}afhs\+:n\+:\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a11362477daa10513ae3f73c77b772081}{O\+P\+T\+\_\+\+S\+I\+Z\+E}~\textquotesingle{}s\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a072cdd7886d379c028f407b7256dd57a}{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E}~\char`\"{}size\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a5a44059b42cd62194271c932ad05d99a}{O\+P\+T\+\_\+\+N\+A\+M\+E}~\textquotesingle{}n\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a3b1aacb229e3b1276e47cf220f73048c}{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E}~\char`\"{}name\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a1d03fdb4ffe41236b6a965808e4b1266}{O\+P\+T\+\_\+\+F\+O\+R\+C\+E}~\textquotesingle{}f\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a46951d424dcefd60d7459514378bb0ba}{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E}~\char`\"{}force\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_adaef1917469e58d838e08ea9eec83aa5}{O\+P\+T\+\_\+\+H\+E\+L\+P}~\textquotesingle{}h\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__partition_8c_aa2b07e122875665d3142a0e68cd2a7c9}{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P}~\char`\"{}help\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_ae39195f671db53d3d133c8fc11f8dffc}{O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D}~\textquotesingle{}a\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a176eec22c3fe0999cfcc0e716c5db56b}{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D}~\char`\"{}append\char`\"{}
+\item 
+\#define \hyperlink{tfs__partition_8c_a4454b4781bbfc79a4a7dd45ecb378601}{M\+O\+D\+\_\+\+S\+A\+F\+E}~1
+\item 
+\#define \hyperlink{tfs__partition_8c_a7ce608787d2bdb825894df9ea76d5876}{M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D}~2
+\item 
+\#define \hyperlink{tfs__partition_8c_a2911c753c1a58d38b1ba274d2558ecc2}{M\+O\+D\+\_\+\+F\+O\+R\+C\+E}~4
+\item 
+\#define \hyperlink{tfs__partition_8c_a5662ec890d46335b7dd9249cb63f14c7}{M\+O\+D\+\_\+\+H\+E\+L\+P}~8
+\item 
+\#define \hyperlink{tfs__partition_8c_a7e7c880dda21d41a8c7f3ff15e84f710}{M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T}~\hyperlink{tfs__partition_8c_a4454b4781bbfc79a4a7dd45ecb378601}{M\+O\+D\+\_\+\+S\+A\+F\+E}
+\item 
+\#define \hyperlink{tfs__partition_8c_a7ebc9a785e5ab85457c98595aac81589}{Y\+E\+S}~1
+\item 
+\#define \hyperlink{tfs__partition_8c_a996bde01ecac342918f0a2c4e7ce7bd5}{N\+O}~0
+\item 
+\#define \hyperlink{tfs__partition_8c_ae44961d355ca6144ab84acaa3deb6fe4}{H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N}(O\+P\+T\+\_\+\+L\+O\+N\+G,  O\+P\+T\+\_\+\+S\+H\+O\+R\+T,  D\+E\+S\+C\+R\+I\+P\+T\+I\+O\+N)~printf(\char`\"{}  -\/\%c, -\/-\/\%s\textbackslash{}t \%s\textbackslash{}n\char`\"{}, O\+P\+T\+\_\+\+L\+O\+N\+G, O\+P\+T\+\_\+\+S\+H\+O\+R\+T, D\+E\+S\+C\+R\+I\+P\+T\+I\+O\+N)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}{partition} (char $\ast$name, uint32\+\_\+t $\ast$partsize, int nb\+\_\+part, long long unsigned totalsize, short mode)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__partition_8c_afd4b31e13c893cf69120a08a1945df50}{part\+\_\+append} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} d\+\_\+id, uint32\+\_\+t $\ast$partsize, int nb\+\_\+part, long long unsigned totalsize)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__partition_8c_a17cb071db2e3c5dbae8497b07d3fa0d4}{part\+\_\+force} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} d\+\_\+id, uint32\+\_\+t $\ast$partsize, int nb\+\_\+part, long long unsigned totalsize)
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__partition_8c_a5f17884d34bba42a94e74935046dc17a}{part\+\_\+safe} (\hyperlink{ll_8h_acb803223aeb697a794ba4d306d49fe2e}{disk\+\_\+id} d\+\_\+id, uint32\+\_\+t $\ast$partsize, int nb\+\_\+part, long long unsigned totalsize)
+\item 
+void \hyperlink{tfs__partition_8c_af7c15991e6202d5a041cbac67876f14c}{usage} (char $\ast$argv0, F\+I\+L\+E $\ast$out)
+\begin{DoxyCompactList}\small\item\em Print a message about usage of the command. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__partition_8c_ac5b3462ec0c812741cb7010d27232d35}{help} (char $\ast$argv0)
+\item 
+int \hyperlink{tfs__partition_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Partitionate the disk. Write the partition table of a disk. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__partition_8c_ae44961d355ca6144ab84acaa3deb6fe4}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N@{H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N}}
+\index{H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N@{H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define H\+E\+L\+P\+\_\+\+O\+P\+T\+I\+O\+N(
+\begin{DoxyParamCaption}
+\item[{}]{O\+P\+T\+\_\+\+L\+O\+N\+G, }
+\item[{}]{O\+P\+T\+\_\+\+S\+H\+O\+R\+T, }
+\item[{}]{D\+E\+S\+C\+R\+I\+P\+T\+I\+O\+N}
+\end{DoxyParamCaption}
+)~printf(\char`\"{}  -\/\%c, -\/-\/\%s\textbackslash{}t \%s\textbackslash{}n\char`\"{}, O\+P\+T\+\_\+\+L\+O\+N\+G, O\+P\+T\+\_\+\+S\+H\+O\+R\+T, D\+E\+S\+C\+R\+I\+P\+T\+I\+O\+N)}\label{tfs__partition_8c_ae44961d355ca6144ab84acaa3deb6fe4}
+
+
+Definition at line 251 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a7ce608787d2bdb825894df9ea76d5876}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D@{M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D}}
+\index{M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D@{M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+\_\+\+A\+P\+P\+E\+N\+D~2}\label{tfs__partition_8c_a7ce608787d2bdb825894df9ea76d5876}
+
+
+Definition at line 24 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a7e7c880dda21d41a8c7f3ff15e84f710}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T@{M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T}}
+\index{M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T@{M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+\_\+\+D\+E\+F\+A\+U\+L\+T~{\bf M\+O\+D\+\_\+\+S\+A\+F\+E}}\label{tfs__partition_8c_a7e7c880dda21d41a8c7f3ff15e84f710}
+
+
+Definition at line 27 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a2911c753c1a58d38b1ba274d2558ecc2}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!M\+O\+D\+\_\+\+F\+O\+R\+C\+E@{M\+O\+D\+\_\+\+F\+O\+R\+C\+E}}
+\index{M\+O\+D\+\_\+\+F\+O\+R\+C\+E@{M\+O\+D\+\_\+\+F\+O\+R\+C\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{M\+O\+D\+\_\+\+F\+O\+R\+C\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+\_\+\+F\+O\+R\+C\+E~4}\label{tfs__partition_8c_a2911c753c1a58d38b1ba274d2558ecc2}
+
+
+Definition at line 25 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a5662ec890d46335b7dd9249cb63f14c7}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!M\+O\+D\+\_\+\+H\+E\+L\+P@{M\+O\+D\+\_\+\+H\+E\+L\+P}}
+\index{M\+O\+D\+\_\+\+H\+E\+L\+P@{M\+O\+D\+\_\+\+H\+E\+L\+P}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{M\+O\+D\+\_\+\+H\+E\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+\_\+\+H\+E\+L\+P~8}\label{tfs__partition_8c_a5662ec890d46335b7dd9249cb63f14c7}
+
+
+Definition at line 26 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a4454b4781bbfc79a4a7dd45ecb378601}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!M\+O\+D\+\_\+\+S\+A\+F\+E@{M\+O\+D\+\_\+\+S\+A\+F\+E}}
+\index{M\+O\+D\+\_\+\+S\+A\+F\+E@{M\+O\+D\+\_\+\+S\+A\+F\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{M\+O\+D\+\_\+\+S\+A\+F\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+\_\+\+S\+A\+F\+E~1}\label{tfs__partition_8c_a4454b4781bbfc79a4a7dd45ecb378601}
+
+
+Definition at line 23 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a996bde01ecac342918f0a2c4e7ce7bd5}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!N\+O@{N\+O}}
+\index{N\+O@{N\+O}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{N\+O}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+O~0}\label{tfs__partition_8c_a996bde01ecac342918f0a2c4e7ce7bd5}
+
+
+Definition at line 29 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_ae39195f671db53d3d133c8fc11f8dffc}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D@{O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D}}
+\index{O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D@{O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+A\+P\+P\+E\+N\+D~\textquotesingle{}a\textquotesingle{}}\label{tfs__partition_8c_ae39195f671db53d3d133c8fc11f8dffc}
+
+
+Definition at line 20 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a1d03fdb4ffe41236b6a965808e4b1266}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+F\+O\+R\+C\+E@{O\+P\+T\+\_\+\+F\+O\+R\+C\+E}}
+\index{O\+P\+T\+\_\+\+F\+O\+R\+C\+E@{O\+P\+T\+\_\+\+F\+O\+R\+C\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+F\+O\+R\+C\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+F\+O\+R\+C\+E~\textquotesingle{}f\textquotesingle{}}\label{tfs__partition_8c_a1d03fdb4ffe41236b6a965808e4b1266}
+
+
+Definition at line 16 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_adaef1917469e58d838e08ea9eec83aa5}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}}
+\index{O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+H\+E\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+H\+E\+L\+P~\textquotesingle{}h\textquotesingle{}}\label{tfs__partition_8c_adaef1917469e58d838e08ea9eec83aa5}
+
+
+Definition at line 18 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a176eec22c3fe0999cfcc0e716c5db56b}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D}}
+\index{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+A\+P\+P\+E\+N\+D~\char`\"{}append\char`\"{}}\label{tfs__partition_8c_a176eec22c3fe0999cfcc0e716c5db56b}
+
+
+Definition at line 21 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a46951d424dcefd60d7459514378bb0ba}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E}}
+\index{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+F\+O\+R\+C\+E~\char`\"{}force\char`\"{}}\label{tfs__partition_8c_a46951d424dcefd60d7459514378bb0ba}
+
+
+Definition at line 17 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_aa2b07e122875665d3142a0e68cd2a7c9}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P}}
+\index{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+H\+E\+L\+P~\char`\"{}help\char`\"{}}\label{tfs__partition_8c_aa2b07e122875665d3142a0e68cd2a7c9}
+
+
+Definition at line 19 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a3b1aacb229e3b1276e47cf220f73048c}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E}}
+\index{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+N\+A\+M\+E~\char`\"{}name\char`\"{}}\label{tfs__partition_8c_a3b1aacb229e3b1276e47cf220f73048c}
+
+
+Definition at line 15 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a072cdd7886d379c028f407b7256dd57a}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E}}
+\index{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E@{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+L\+O\+N\+G\+\_\+\+S\+I\+Z\+E~\char`\"{}size\char`\"{}}\label{tfs__partition_8c_a072cdd7886d379c028f407b7256dd57a}
+
+
+Definition at line 13 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a5a44059b42cd62194271c932ad05d99a}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+N\+A\+M\+E}}
+\index{O\+P\+T\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+N\+A\+M\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+N\+A\+M\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+N\+A\+M\+E~\textquotesingle{}n\textquotesingle{}}\label{tfs__partition_8c_a5a44059b42cd62194271c932ad05d99a}
+
+
+Definition at line 14 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a11362477daa10513ae3f73c77b772081}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+\_\+\+S\+I\+Z\+E@{O\+P\+T\+\_\+\+S\+I\+Z\+E}}
+\index{O\+P\+T\+\_\+\+S\+I\+Z\+E@{O\+P\+T\+\_\+\+S\+I\+Z\+E}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+S\+I\+Z\+E~\textquotesingle{}s\textquotesingle{}}\label{tfs__partition_8c_a11362477daa10513ae3f73c77b772081}
+
+
+Definition at line 12 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_aea7f70401d64e0c72b3df91414bdfd78}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!O\+P\+T\+S\+T\+R\+I\+N\+G@{O\+P\+T\+S\+T\+R\+I\+N\+G}}
+\index{O\+P\+T\+S\+T\+R\+I\+N\+G@{O\+P\+T\+S\+T\+R\+I\+N\+G}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{O\+P\+T\+S\+T\+R\+I\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+S\+T\+R\+I\+N\+G~\char`\"{}afhs\+:n\+:\char`\"{}}\label{tfs__partition_8c_aea7f70401d64e0c72b3df91414bdfd78}
+
+
+Definition at line 11 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a7ebc9a785e5ab85457c98595aac81589}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!Y\+E\+S@{Y\+E\+S}}
+\index{Y\+E\+S@{Y\+E\+S}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{Y\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define Y\+E\+S~1}\label{tfs__partition_8c_a7ebc9a785e5ab85457c98595aac81589}
+
+
+Definition at line 28 of file tfs\+\_\+partition.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__partition_8c_ac5b3462ec0c812741cb7010d27232d35}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!help@{help}}
+\index{help@{help}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{help}]{\setlength{\rightskip}{0pt plus 5cm}void help (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_ac5b3462ec0c812741cb7010d27232d35}
+
+
+Definition at line 253 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+Partitionate the disk. Write the partition table of a disk. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & \\
+\hline
+{\em argv} & -\/p size (one ore more) \\
+\hline
+{\em } & \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 53 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_afd4b31e13c893cf69120a08a1945df50}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!part\+\_\+append@{part\+\_\+append}}
+\index{part\+\_\+append@{part\+\_\+append}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{part\+\_\+append}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} part\+\_\+append (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{d\+\_\+id, }
+\item[{uint32\+\_\+t $\ast$}]{partsize, }
+\item[{int}]{nb\+\_\+part, }
+\item[{long long unsigned}]{totalsize}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_afd4b31e13c893cf69120a08a1945df50}
+
+
+Definition at line 176 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a17cb071db2e3c5dbae8497b07d3fa0d4}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!part\+\_\+force@{part\+\_\+force}}
+\index{part\+\_\+force@{part\+\_\+force}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{part\+\_\+force}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} part\+\_\+force (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{d\+\_\+id, }
+\item[{uint32\+\_\+t $\ast$}]{partsize, }
+\item[{int}]{nb\+\_\+part, }
+\item[{long long unsigned}]{totalsize}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_a17cb071db2e3c5dbae8497b07d3fa0d4}
+
+
+Definition at line 119 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_a5f17884d34bba42a94e74935046dc17a}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!part\+\_\+safe@{part\+\_\+safe}}
+\index{part\+\_\+safe@{part\+\_\+safe}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{part\+\_\+safe}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} part\+\_\+safe (
+\begin{DoxyParamCaption}
+\item[{{\bf disk\+\_\+id}}]{d\+\_\+id, }
+\item[{uint32\+\_\+t $\ast$}]{partsize, }
+\item[{int}]{nb\+\_\+part, }
+\item[{long long unsigned}]{totalsize}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_a5f17884d34bba42a94e74935046dc17a}
+
+
+Definition at line 144 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!partition@{partition}}
+\index{partition@{partition}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{partition}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} partition (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{name, }
+\item[{uint32\+\_\+t $\ast$}]{partsize, }
+\item[{int}]{nb\+\_\+part, }
+\item[{long long unsigned}]{totalsize, }
+\item[{short}]{mode}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}
+
+
+Definition at line 211 of file tfs\+\_\+partition.\+c.
+
+\hypertarget{tfs__partition_8c_af7c15991e6202d5a041cbac67876f14c}{}\index{tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}!usage@{usage}}
+\index{usage@{usage}!tfs\+\_\+partition.\+c@{tfs\+\_\+partition.\+c}}
+\subsubsection[{usage}]{\setlength{\rightskip}{0pt plus 5cm}void usage (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0, }
+\item[{F\+I\+L\+E $\ast$}]{out}
+\end{DoxyParamCaption}
+)}\label{tfs__partition_8c_af7c15991e6202d5a041cbac67876f14c}
+
+
+Print a message about usage of the command. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argv0} & name of the command \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 247 of file tfs\+\_\+partition.\+c.
+

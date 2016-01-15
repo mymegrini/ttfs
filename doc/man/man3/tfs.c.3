@@ -1,0 +1,438 @@
+.TH "lib/tfs.c" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/tfs.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'tfs\&.h'\fP
+.br
+\fC#include 'tfsll\&.h'\fP
+.br
+\fC#include 'll\&.h'\fP
+.br
+\fC#include 'utils\&.h'\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include <semaphore\&.h>\fP
+.br
+\fC#include <fcntl\&.h>\fP
+.br
+\fC#include <sys/stat\&.h>\fP
+.br
+\fC#include <unistd\&.h>\fP
+.br
+\fC#include <time\&.h>\fP
+.br
+\fC#include <stdio\&.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fB_DIR\fP"
+.br
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBDIRECTORY_SIZEMIN\fP   (2*\fBTFS_DIRECTORY_ENTRY_SIZE\fP)"
+.br
+.ti -1c
+.RI "#define \fBISFILDES\fP(fildes)   ((fildes)<\fBTFS_FILE_MAX\fP && \fB_filedes\fP[fildes])"
+.br
+.ti -1c
+.RI "#define \fBB_FILE_ADDR\fP(offset)   ((offset)/\fBTFS_VOLUME_BLOCK_SIZE\fP)"
+.br
+.ti -1c
+.RI "#define \fBB_SIZE\fP   1024"
+.br
+.ti -1c
+.RI "#define \fBMIN\fP(a,  b)   ((a)>(b)?(a):(b))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBtfs_rm\fP (const char *path)"
+.br
+.RI "\fIRemove a regular file from a tfs volume\&. \fP"
+.ti -1c
+.RI "int \fBtfs_mkdir\fP (const char *path, mode_t mode)"
+.br
+.RI "\fIThis function attempts to create a directory named <path> \fP"
+.ti -1c
+.RI "int \fBtfs_rmdir\fP (const char *path)"
+.br
+.RI "\fIThis function deletes a directory, which must be empty\&. \fP"
+.ti -1c
+.RI "int \fBtfs_rename\fP (const char *oldpath, const char *newpath)"
+.br
+.RI "\fIThis function renames a file, moving it between directories if required\&. \fP"
+.ti -1c
+.RI "int \fBtfs_open\fP (const char *name, int oflag,\&.\&.\&.)"
+.br
+.RI "\fIThis function returns a file descriptor for use in subsequent system calls\&. \fP"
+.ti -1c
+.RI "int \fBtfs_lock\fP (int fildes)"
+.br
+.RI "\fIGives calling process exclusive control over file\&. \fP"
+.ti -1c
+.RI "int \fBtfs_unlock\fP (int fildes)"
+.br
+.RI "\fIRelinquishes exclusive control over file\&. \fP"
+.ti -1c
+.RI "ssize_t \fBtfs_read\fP (int fildes, void *buf, size_t nbytes)"
+.br
+.RI "\fIThis function attempts to read up to <nbytes> bytes from file descriptor <fildes> into the buffer starting at <buf> \fP"
+.ti -1c
+.RI "ssize_t \fBtfs_write\fP (int fildes, void *buf, size_t nbytes)"
+.br
+.RI "\fIThis function writes up to <nbytes> bytes from the buffer pointed to by <buf> to the file reffered to by the file descriptor <fildes> \fP"
+.ti -1c
+.RI "int \fBtfs_close\fP (int fildes)"
+.br
+.RI "\fIThis function closes a file descriptor\&. \fP"
+.ti -1c
+.RI "off_t \fBtfs_lseek\fP (int fildes, off_t offset, int whence)"
+.br
+.RI "\fIThis function repositions the offset of the open file associated with the file descriptor <fildes> to the argument <offset> according to the directive <whence> \fP"
+.ti -1c
+.RI "int \fBtfs_mknod\fP (const char *pathname, int type)"
+.br
+.ti -1c
+.RI "\fBDIR\fP * \fBopendir\fP (const char *filename)"
+.br
+.RI "\fIThis function opens a directory stream corresponding to the directory <filename> \fP"
+.ti -1c
+.RI "struct \fBdirent\fP * \fBreaddir\fP (\fBDIR\fP *dir)"
+.br
+.RI "\fIThis function returns the next directory entry in the directory stream <dirp> \fP"
+.ti -1c
+.RI "void \fBrewinddir\fP (\fBDIR\fP *dir)"
+.br
+.RI "\fIThis function resets the position of the directory stream <dirp> to its beginning\&. \fP"
+.ti -1c
+.RI "int \fBclosedir\fP (\fBDIR\fP *dir)"
+.br
+.RI "\fIThis function closes the directory stream associated with <dirp> \fP"
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define B_FILE_ADDR(offset)   ((offset)/\fBTFS_VOLUME_BLOCK_SIZE\fP)"
+
+.PP
+Definition at line 20 of file tfs\&.c\&.
+.SS "#define B_SIZE   1024"
+
+.PP
+Definition at line 28 of file tfs\&.c\&.
+.SS "#define DIRECTORY_SIZEMIN   (2*\fBTFS_DIRECTORY_ENTRY_SIZE\fP)"
+
+.PP
+Definition at line 18 of file tfs\&.c\&.
+.SS "#define ISFILDES(fildes)   ((fildes)<\fBTFS_FILE_MAX\fP && \fB_filedes\fP[fildes])"
+
+.PP
+Definition at line 19 of file tfs\&.c\&.
+.SS "#define MIN(a, b)   ((a)>(b)?(a):(b))"
+
+.PP
+Definition at line 572 of file tfs\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "int closedir (\fBDIR\fP * dirp)"
+
+.PP
+This function closes the directory stream associated with <dirp> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdirp\fP directory stream 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success or -1 if an error occured 
+.RE
+.PP
+
+.PP
+Definition at line 984 of file tfs\&.c\&.
+.SS "\fBDIR\fP* opendir (const char * filename)"
+
+.PP
+This function opens a directory stream corresponding to the directory <filename> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfilename\fP directory name 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns a pointer to the directory stream, on success, NULL, on error 
+.RE
+.PP
+
+.PP
+Definition at line 904 of file tfs\&.c\&.
+.SS "struct \fBdirent\fP* readdir (\fBDIR\fP * dirp)"
+
+.PP
+This function returns the next directory entry in the directory stream <dirp> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdirp\fP directory stream 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns a pointer to a <dirent> structure, on success, NULL, on error 
+.RE
+.PP
+
+.PP
+Definition at line 934 of file tfs\&.c\&.
+.SS "void rewinddir (\fBDIR\fP * dirp)"
+
+.PP
+This function resets the position of the directory stream <dirp> to its beginning\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdirp\fP directory stream 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns no value 
+.RE
+.PP
+
+.PP
+Definition at line 960 of file tfs\&.c\&.
+.SS "int tfs_close (int fildes)"
+
+.PP
+This function closes a file descriptor\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file descriptor 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success or -1 if an error occured 
+.RE
+.PP
+
+.PP
+Definition at line 806 of file tfs\&.c\&.
+.SS "int tfs_lock (int fildes)"
+
+.PP
+Gives calling process exclusive control over file\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file descriptor 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 on success, -1 on failure (errnum set) 
+.RE
+.PP
+
+.PP
+Definition at line 543 of file tfs\&.c\&.
+.SS "off_t tfs_lseek (int fildes, off_t offset, int whence)"
+
+.PP
+This function repositions the offset of the open file associated with the file descriptor <fildes> to the argument <offset> according to the directive <whence> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file descriptor 
+.br
+\fIoffset\fP number of bytes 
+.br
+\fIwhence\fP directive 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns the resulting offset location measured from the beginning of the file, on success, and -1, on error 
+.RE
+.PP
+
+.PP
+Definition at line 827 of file tfs\&.c\&.
+.SS "int tfs_mkdir (const char * path, mode_t mode)"
+
+.PP
+This function attempts to create a directory named <path> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP specifies name and location of directory 
+.br
+\fImode\fP specifies the permissions to use 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success or -1 if an error occured 
+.RE
+.PP
+
+.PP
+Definition at line 259 of file tfs\&.c\&.
+.SS "int tfs_mknod (const char * pathname, int type)"
+
+.PP
+Definition at line 876 of file tfs\&.c\&.
+.SS "int tfs_open (const char * name, int oflag,  \&.\&.\&.)"
+
+.PP
+This function returns a file descriptor for use in subsequent system calls\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIoflag\fP O_RDONLY|O_WRONLY|O_RDWR [O_CREAT|O_APPEND|O_TRUNC] 
+.RE
+.PP
+
+.PP
+Definition at line 435 of file tfs\&.c\&.
+.SS "ssize_t tfs_read (int fildes, void * buf, size_t nbytes)"
+
+.PP
+This function attempts to read up to <nbytes> bytes from file descriptor <fildes> into the buffer starting at <buf> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file desctiptor 
+.br
+\fIbuf\fP buffer 
+.br
+\fInbytes\fP maximum number of bytes to be read 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns, on success, number of bytes read (0 indicates EOF) and -1 on error 
+.RE
+.PP
+
+.PP
+Definition at line 574 of file tfs\&.c\&.
+.SS "int tfs_rename (const char * old, const char * new)"
+
+.PP
+This function renames a file, moving it between directories if required\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIold\fP specifies old pathname 
+.br
+\fInew\fP specifies new pathname 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success or -1 if an error occured 
+.RE
+.PP
+
+.PP
+Definition at line 407 of file tfs\&.c\&.
+.SS "int tfs_rm (const char * path)"
+
+.PP
+Remove a regular file from a tfs volume\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+int 
+.RE
+.PP
+
+.PP
+Definition at line 238 of file tfs\&.c\&.
+.SS "int tfs_rmdir (const char * path)"
+
+.PP
+This function deletes a directory, which must be empty\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP specifies name and location of directory 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns 0 on success or -1 if an error occured 
+.RE
+.PP
+
+.PP
+Definition at line 345 of file tfs\&.c\&.
+.SS "int tfs_unlock (int fildes)"
+
+.PP
+Relinquishes exclusive control over file\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file descriptor 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+0 on success, -1 on failure (errnum set) 
+.RE
+.PP
+
+.PP
+Definition at line 557 of file tfs\&.c\&.
+.SS "ssize_t tfs_write (int fildes, void * buf, size_t nbytes)"
+
+.PP
+This function writes up to <nbytes> bytes from the buffer pointed to by <buf> to the file reffered to by the file descriptor <fildes> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfildes\fP file desctiptor 
+.br
+\fIbuf\fP buffer 
+.br
+\fInbytes\fP maximum number of bytes to be written 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns, on success, number of bytes written and -1 on error 
+.RE
+.PP
+
+.PP
+Definition at line 692 of file tfs\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

@@ -1,0 +1,284 @@
+.TH "src/tfs_format.c" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/tfs_format.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'error\&.h'\fP
+.br
+\fC#include 'block\&.h'\fP
+.br
+\fC#include 'll\&.h'\fP
+.br
+\fC#include 'tfs\&.h'\fP
+.br
+\fC#include 'utils\&.h'\fP
+.br
+\fC#include <getopt\&.h>\fP
+.br
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <string\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBD_NAME_MAXLEN\fP   79     /***< disk name maximum length */"
+.br
+.ti -1c
+.RI "#define \fBF_OWR\fP   1    /***< flag for overwrite option */"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBusage\fP (char *argv0, FILE *out)"
+.br
+.RI "\fIThis command creates a minimal filesystem on an existing partition\&. \fP"
+.ti -1c
+.RI "void \fBinit_sblock\fP (int id, uint32_t pidx, uint32_t psize, int filecount)"
+.br
+.RI "\fIThis function initializes a partition's superblock\&. \fP"
+.ti -1c
+.RI "void \fBinit_ftab\fP (int id, uint32_t pidx, uint32_t psize, int filecount)"
+.br
+.RI "\fIThis function initializes a partition's file table\&. \fP"
+.ti -1c
+.RI "void \fBinit_root\fP (int id, uint32_t ridx)"
+.br
+.RI "\fIThis function initializes a file system's root directory\&. \fP"
+.ti -1c
+.RI "void \fBinit_fblocks\fP (int id, uint32_t pidx, uint32_t psize, int filecount)"
+.br
+.RI "\fIThis function chains the volume's free blocks\&. \fP"
+.ti -1c
+.RI "void \fBformat_partition\fP (char *name, int \fBpartition\fP, int filecount, char *argv0, int flags)"
+.br
+.RI "\fIThis function opens a disk and formats one of its partitions\&. \fP"
+.ti -1c
+.RI "int \fBmain\fP (int argc, char *argv[])"
+.br
+.RI "\fIThis function parses command line input\&. \fP"
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define D_NAME_MAXLEN   79     /***< disk name maximum length */"
+
+.PP
+Definition at line 11 of file tfs_format\&.c\&.
+.SS "#define F_OWR   1    /***< flag for overwrite option */"
+
+.PP
+Definition at line 12 of file tfs_format\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "void format_partition (char * name, int partition, int filecount, char * argv0, int flags)"
+
+.PP
+This function opens a disk and formats one of its partitions\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIname\fP name of the disk 
+.br
+\fIpartition\fP index of the partition 
+.br
+\fIfilecount\fP max file count 
+.br
+\fIargv0\fP name of the calling command 
+.br
+\fIflags\fP value containing option flags 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function opens a disk and proceeds to format one of its partitions, provided it is empty or the user clears it for overwriting\&.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBinit_sblock\fP 
+.PP
+\fBinit_ftab\fP 
+.PP
+\fBinit_root\fP 
+.PP
+\fBinit_fblocks\fP 
+.RE
+.PP
+
+.PP
+Definition at line 197 of file tfs_format\&.c\&.
+.SS "void init_fblocks (int id, uint32_t pidx, uint32_t psize, int filecount)"
+
+.PP
+This function chains the volume's free blocks\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIpidx\fP partition index 
+.br
+\fIpsize\fP partition size 
+.br
+\fIfilecount\fP max file count 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function chains the volume's free blocks making last free block its own successor 
+.PP
+Definition at line 163 of file tfs_format\&.c\&.
+.SS "void init_ftab (int id, uint32_t pidx, uint32_t psize, int filecount)"
+
+.PP
+This function initializes a partition's file table\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIpidx\fP partition index 
+.br
+\fIpsize\fP partition size 
+.br
+\fIfilecount\fP max file count 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function creates the root directory's file table entry then proceeds to chain the remain free file table entries 
+.PP
+Definition at line 100 of file tfs_format\&.c\&.
+.SS "void init_root (int id, uint32_t ridx)"
+
+.PP
+This function initializes a file system's root directory\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIridx\fP root directory's index on the disk 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function initializes the data block occupied by the root directory with the appropriate values 
+.PP
+Definition at line 140 of file tfs_format\&.c\&.
+.SS "void init_sblock (int id, uint32_t pidx, uint32_t psize, int filecount)"
+
+.PP
+This function initializes a partition's superblock\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIpidx\fP partition index 
+.br
+\fIpsize\fP partition size 
+.br
+\fIfilecount\fP max file count 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function fills in the initial filesystem's description for the partition located at <pidx> on the disk opened at <id> 
+.PP
+Definition at line 57 of file tfs_format\&.c\&.
+.SS "int main (int argc, char * argv[])"
+
+.PP
+This function parses command line input\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIpidx\fP partition index 
+.br
+\fIpsize\fP partition size 
+.br
+\fIfilecount\fP max file count 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function parses command line input and launches auxiliary functions with the appropriate parameters and options 
+.PP
+Definition at line 259 of file tfs_format\&.c\&.
+.SS "void usage (char * argv0, FILE * out)"
+
+.PP
+This command creates a minimal filesystem on an existing partition\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpartition\fP 
+.br
+\fImax-file-count\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+prints name of disk and its size
+.RE
+.PP
+This command creates a minimal filesystem on the <partition> partition which supports a maximum of <max-file-count> files
+.PP
+\fBSee also:\fP
+.RS 4
+\fBC_FORMAT\fP 
+.PP
+\fBP_WRONGIDX\fP 
+.PP
+\fBP_CORRUPTED\fP 
+.PP
+\fBEXIT_SUCCESS\fP This function prints the command prototype 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIargv0\fP command name 
+.br
+\fIout\fP output stream 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void
+.RE
+.PP
+This function prints the command prototype to the <out> stream 
+.PP
+Definition at line 40 of file tfs_format\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

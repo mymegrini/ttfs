@@ -1,0 +1,104 @@
+\hypertarget{tfs__analyze_8c}{}\section{src/tfs\+\_\+analyze.c File Reference}
+\label{tfs__analyze_8c}\index{src/tfs\+\_\+analyze.\+c@{src/tfs\+\_\+analyze.\+c}}
+{\ttfamily \#include \char`\"{}ll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfs.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+Include dependency graph for tfs\+\_\+analyze.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__analyze_8c_acee645ded32d622ccb9bcb897382a31e}{M\+O\+D\+E\+\_\+\+D\+I\+S\+K}~1 /$\ast$$\ast$$\ast$$<$ Mode analyze disk $\ast$/
+\item 
+\#define \hyperlink{tfs__analyze_8c_a244f6dc467df65a29d44c638d9f7dd5b}{M\+O\+D\+E\+\_\+\+P\+A\+R\+T}~2 /$\ast$$\ast$$\ast$$<$ Mode analyze \hyperlink{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}{partition} $\ast$/
+\item 
+\#define \hyperlink{tfs__analyze_8c_aae8dcfa4217a418a69330eb70982700d}{M\+O\+D\+E\+\_\+\+L\+O\+N\+G}~4 /$\ast$$\ast$$\ast$$<$ Mode analyze long $\ast$/
+\item 
+\#define \hyperlink{tfs__analyze_8c_a84e3c4beae1c472a0e42c015ec588c4d}{D\+E\+F\+\_\+\+N\+A\+M\+E}~\char`\"{}disk.\+tfs\char`\"{}   /$\ast$$\ast$$\ast$$<$ default disk name $\ast$/
+\item 
+\#define \hyperlink{tfs__analyze_8c_ab30348e352fc02b3ad044bfe2577ef18}{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__analyze_8c_aeccd00c822c1244d95e7d0c42a12846d}{tfs\+\_\+analyze} (char $\ast$name, int mode, int \hyperlink{tfs__partition_8c_aa5a552c9857d6fc13e06f4026e6d82f5}{partition})
+\begin{DoxyCompactList}\small\item\em Analyze a disk Print the size of the disk, number of partitions and size of them @param name the name of the disk @param mode the mode (M\+O\+D\+E\+\_\+\+L\+O\+N\+G,M\+O\+D\+E\+\_\+\+P\+A\+R\+T,M\+O\+D\+E\+\_\+\+D\+I\+S\+K) @param partition the index of partition @return error. \end{DoxyCompactList}\item 
+int \hyperlink{tfs__analyze_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__analyze_8c_ab30348e352fc02b3ad044bfe2577ef18}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}}
+\index{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/}\label{tfs__analyze_8c_ab30348e352fc02b3ad044bfe2577ef18}
+
+
+Definition at line 20 of file tfs\+\_\+analyze.\+c.
+
+\hypertarget{tfs__analyze_8c_a84e3c4beae1c472a0e42c015ec588c4d}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!D\+E\+F\+\_\+\+N\+A\+M\+E@{D\+E\+F\+\_\+\+N\+A\+M\+E}}
+\index{D\+E\+F\+\_\+\+N\+A\+M\+E@{D\+E\+F\+\_\+\+N\+A\+M\+E}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{D\+E\+F\+\_\+\+N\+A\+M\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+E\+F\+\_\+\+N\+A\+M\+E~\char`\"{}disk.\+tfs\char`\"{}   /$\ast$$\ast$$\ast$$<$ default disk name $\ast$/}\label{tfs__analyze_8c_a84e3c4beae1c472a0e42c015ec588c4d}
+
+
+Definition at line 17 of file tfs\+\_\+analyze.\+c.
+
+\hypertarget{tfs__analyze_8c_acee645ded32d622ccb9bcb897382a31e}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!M\+O\+D\+E\+\_\+\+D\+I\+S\+K@{M\+O\+D\+E\+\_\+\+D\+I\+S\+K}}
+\index{M\+O\+D\+E\+\_\+\+D\+I\+S\+K@{M\+O\+D\+E\+\_\+\+D\+I\+S\+K}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{M\+O\+D\+E\+\_\+\+D\+I\+S\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+E\+\_\+\+D\+I\+S\+K~1 /$\ast$$\ast$$\ast$$<$ Mode analyze disk $\ast$/}\label{tfs__analyze_8c_acee645ded32d622ccb9bcb897382a31e}
+
+
+Definition at line 12 of file tfs\+\_\+analyze.\+c.
+
+\hypertarget{tfs__analyze_8c_aae8dcfa4217a418a69330eb70982700d}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!M\+O\+D\+E\+\_\+\+L\+O\+N\+G@{M\+O\+D\+E\+\_\+\+L\+O\+N\+G}}
+\index{M\+O\+D\+E\+\_\+\+L\+O\+N\+G@{M\+O\+D\+E\+\_\+\+L\+O\+N\+G}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{M\+O\+D\+E\+\_\+\+L\+O\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+E\+\_\+\+L\+O\+N\+G~4 /$\ast$$\ast$$\ast$$<$ Mode analyze long $\ast$/}\label{tfs__analyze_8c_aae8dcfa4217a418a69330eb70982700d}
+
+
+Definition at line 14 of file tfs\+\_\+analyze.\+c.
+
+\hypertarget{tfs__analyze_8c_a244f6dc467df65a29d44c638d9f7dd5b}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!M\+O\+D\+E\+\_\+\+P\+A\+R\+T@{M\+O\+D\+E\+\_\+\+P\+A\+R\+T}}
+\index{M\+O\+D\+E\+\_\+\+P\+A\+R\+T@{M\+O\+D\+E\+\_\+\+P\+A\+R\+T}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{M\+O\+D\+E\+\_\+\+P\+A\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+O\+D\+E\+\_\+\+P\+A\+R\+T~2 /$\ast$$\ast$$\ast$$<$ Mode analyze {\bf partition} $\ast$/}\label{tfs__analyze_8c_a244f6dc467df65a29d44c638d9f7dd5b}
+
+
+Definition at line 13 of file tfs\+\_\+analyze.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__analyze_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__analyze_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+Definition at line 103 of file tfs\+\_\+analyze.\+c.
+
+\hypertarget{tfs__analyze_8c_aeccd00c822c1244d95e7d0c42a12846d}{}\index{tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}!tfs\+\_\+analyze@{tfs\+\_\+analyze}}
+\index{tfs\+\_\+analyze@{tfs\+\_\+analyze}!tfs\+\_\+analyze.\+c@{tfs\+\_\+analyze.\+c}}
+\subsubsection[{tfs\+\_\+analyze}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} tfs\+\_\+analyze (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{name, }
+\item[{int}]{mode, }
+\item[{int}]{partition}
+\end{DoxyParamCaption}
+)}\label{tfs__analyze_8c_aeccd00c822c1244d95e7d0c42a12846d}
+
+
+Analyze a disk Print the size of the disk, number of partitions and size of them @param name the name of the disk @param mode the mode (M\+O\+D\+E\+\_\+\+L\+O\+N\+G,M\+O\+D\+E\+\_\+\+P\+A\+R\+T,M\+O\+D\+E\+\_\+\+D\+I\+S\+K) @param partition the index of partition @return error. 
+
+
+
+Definition at line 30 of file tfs\+\_\+analyze.\+c.
+

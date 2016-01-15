@@ -1,0 +1,105 @@
+\hypertarget{utils_8c}{}\section{lib/utils.c File Reference}
+\label{utils_8c}\index{lib/utils.\+c@{lib/utils.\+c}}
+{\ttfamily \#include $<$ctype.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$inttypes.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+Include dependency graph for utils.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{utils_8c_a81e1ebb06d3d3c759391b34459b9bd6f}{S\+T\+R\+B\+A\+D\+C\+H\+A\+R}~(-\/1)
+\item 
+\#define \hyperlink{utils_8c_af8200276498d932bed7e04a64d478fbd}{U\+I\+N\+T32\+T\+O\+O\+B\+I\+G}~(-\/10)
+\item 
+\#define \hyperlink{utils_8c_a7ebc9a785e5ab85457c98595aac81589}{Y\+E\+S}~1
+\item 
+\#define \hyperlink{utils_8c_a996bde01ecac342918f0a2c4e7ce7bd5}{N\+O}~0
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+long long int \hyperlink{utils_8c_ae4a50d4440aa33f0363fcc1777060b7f}{atou} (char $\ast$s)
+\item 
+int \hyperlink{utils_8c_ad3c49f51a367ddc0b8f2b4ed79e38feb}{answer} (char $\ast$prompt)
+\begin{DoxyCompactList}\small\item\em This function waits for an answer from the user. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{utils_8c_a996bde01ecac342918f0a2c4e7ce7bd5}{}\index{utils.\+c@{utils.\+c}!N\+O@{N\+O}}
+\index{N\+O@{N\+O}!utils.\+c@{utils.\+c}}
+\subsubsection[{N\+O}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+O~0}\label{utils_8c_a996bde01ecac342918f0a2c4e7ce7bd5}
+
+
+Definition at line 35 of file utils.\+c.
+
+\hypertarget{utils_8c_a81e1ebb06d3d3c759391b34459b9bd6f}{}\index{utils.\+c@{utils.\+c}!S\+T\+R\+B\+A\+D\+C\+H\+A\+R@{S\+T\+R\+B\+A\+D\+C\+H\+A\+R}}
+\index{S\+T\+R\+B\+A\+D\+C\+H\+A\+R@{S\+T\+R\+B\+A\+D\+C\+H\+A\+R}!utils.\+c@{utils.\+c}}
+\subsubsection[{S\+T\+R\+B\+A\+D\+C\+H\+A\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+T\+R\+B\+A\+D\+C\+H\+A\+R~(-\/1)}\label{utils_8c_a81e1ebb06d3d3c759391b34459b9bd6f}
+
+
+Definition at line 7 of file utils.\+c.
+
+\hypertarget{utils_8c_af8200276498d932bed7e04a64d478fbd}{}\index{utils.\+c@{utils.\+c}!U\+I\+N\+T32\+T\+O\+O\+B\+I\+G@{U\+I\+N\+T32\+T\+O\+O\+B\+I\+G}}
+\index{U\+I\+N\+T32\+T\+O\+O\+B\+I\+G@{U\+I\+N\+T32\+T\+O\+O\+B\+I\+G}!utils.\+c@{utils.\+c}}
+\subsubsection[{U\+I\+N\+T32\+T\+O\+O\+B\+I\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\+I\+N\+T32\+T\+O\+O\+B\+I\+G~(-\/10)}\label{utils_8c_af8200276498d932bed7e04a64d478fbd}
+
+
+Definition at line 8 of file utils.\+c.
+
+\hypertarget{utils_8c_a7ebc9a785e5ab85457c98595aac81589}{}\index{utils.\+c@{utils.\+c}!Y\+E\+S@{Y\+E\+S}}
+\index{Y\+E\+S@{Y\+E\+S}!utils.\+c@{utils.\+c}}
+\subsubsection[{Y\+E\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define Y\+E\+S~1}\label{utils_8c_a7ebc9a785e5ab85457c98595aac81589}
+
+
+Definition at line 34 of file utils.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{utils_8c_ad3c49f51a367ddc0b8f2b4ed79e38feb}{}\index{utils.\+c@{utils.\+c}!answer@{answer}}
+\index{answer@{answer}!utils.\+c@{utils.\+c}}
+\subsubsection[{answer}]{\setlength{\rightskip}{0pt plus 5cm}int answer (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{prompt}
+\end{DoxyParamCaption}
+)}\label{utils_8c_ad3c49f51a367ddc0b8f2b4ed79e38feb}
+
+
+This function waits for an answer from the user. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em prompt} & message for the user \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 0 for \mbox{[}n/\+N\mbox{]} and 1 for \mbox{[}y/\+Y\mbox{]}
+\end{DoxyReturn}
+This function displays a prompt message $<$prompt$>$ and waits for the user\textquotesingle{}s answer and returns it 
+
+Definition at line 45 of file utils.\+c.
+
+\hypertarget{utils_8c_ae4a50d4440aa33f0363fcc1777060b7f}{}\index{utils.\+c@{utils.\+c}!atou@{atou}}
+\index{atou@{atou}!utils.\+c@{utils.\+c}}
+\subsubsection[{atou}]{\setlength{\rightskip}{0pt plus 5cm}long long int atou (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{s}
+\end{DoxyParamCaption}
+)}\label{utils_8c_ae4a50d4440aa33f0363fcc1777060b7f}
+atou cast a string to a long long int destined to to be a uint32\+\_\+t.
+
+
+\begin{DoxyParams}{Parameters}
+{\em the} & string to cast \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a long long int that fit in uint32\+\_\+t or -\/1 if the string contains bad characters -\/10 if the string doesn\textquotesingle{}t fit it uint32\+\_\+t 
+\end{DoxyReturn}
+
+
+Definition at line 19 of file utils.\+c.
+

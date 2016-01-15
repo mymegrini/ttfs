@@ -1,0 +1,762 @@
+.TH "lib/tfsll.h" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/tfsll.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdint\&.h>\fP
+.br
+\fC#include 'error\&.h'\fP
+.br
+\fC#include 'll\&.h'\fP
+.br
+\fC#include <semaphore\&.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBdirent\fP"
+.br
+.RI "\fIDirectory entry\&. \fP"
+.ti -1c
+.RI "struct \fBFile\fP"
+.br
+.ti -1c
+.RI "struct \fBf_stat\fP"
+.br
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBINT_SIZE\fP   4                                /***< Integer size */"
+.br
+.ti -1c
+.RI "#define \fBINTX\fP(i)   (i*\fBINT_SIZE\fP)                      /***< Integer size multiples */"
+.br
+.ti -1c
+.RI "#define \fBTFS_MAGIC_NUMBER\fP   0x31534654               /***< TFS version identifier 'TFS1' */"
+.br
+.ti -1c
+.RI "#define \fBTFS_MAGIC_NUMBER_INDEX\fP   \fBINTX\fP(0)            /***< TFS version identifier index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_BLOCK_SIZE\fP   \fBD_BLOCK_SIZE\fP        /***< TFS \fBblock\fP size*/"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_BLOCK_SIZE_INDEX\fP   \fBINTX\fP(1)       /***< TFS \fBblock\fP size index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_BLOCK_COUNT_INDEX\fP   \fBINTX\fP(2)      /***< TFS bllock count index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_FREE_BLOCK_COUNT_INDEX\fP   \fBINTX\fP(3) /***< TFS free \fBblock\fP count index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_FIRST_FREE_BLOCK_INDEX\fP   \fBINTX\fP(4) /***< TFS first free \fBblock\fP index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_MAX_FILE_COUNT_INDEX\fP   \fBINTX\fP(5)   /***< TFS max file count index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_FREE_FILE_COUNT_INDEX\fP   \fBINTX\fP(6)  /***< TFS free file count index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_FIRST_FREE_FILE_INDEX\fP   \fBINTX\fP(7)  /***< TFS first free file index in volume superblock */"
+.br
+.ti -1c
+.RI "#define \fBINT_PER_BLOCK\fP   (\fBTFS_VOLUME_BLOCK_SIZE\fP/\fBINT_SIZE\fP) /***< Number of integers per \fBblock\fP*/"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_TABLE_INDEX\fP   1                    /***< TFS index of the file table */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECT_BLOCKS_NUMBER\fP   10               /***< TFS direct data blocks number in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_INDIRECT1_CAPACITY\fP   \fBINT_PER_BLOCK\fP      /***< TFS file's maximum number of indirect1 blocks */"
+.br
+.ti -1c
+.RI "#define \fBTFS_INDIRECT2_CAPACITY\fP   (\fBINT_PER_BLOCK\fP*\fBINT_PER_BLOCK\fP) /***< TFS file's maximum number of indirect2 blocks */"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_TABLE_ENTRY_SIZE\fP   \fBINTX\fP(6+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS file table entry size */"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_SIZE_INDEX\fP   \fBINTX\fP(0)               /***< TFS file size index in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_TYPE_INDEX\fP   \fBINTX\fP(1)               /***< TFS file type index in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_REGULAR_TYPE\fP   0                        /***< TFS regular file table entry type */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECTORY_TYPE\fP   1                      /***< TFS directory file table entry type */"
+.br
+.ti -1c
+.RI "#define \fBTFS_PSEUDO_TYPE\fP   2                         /***< TFS pseudo file table entry type */"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_SUBTYPE_INDEX\fP   \fBINTX\fP(2)            /***< TFS file pseudo-type index in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DATE_SUBTYPE\fP   0                        /***< TFS date file table entry subtype */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DISK_SUBTYPE\fP   1                        /***< TFS disk file table entry subtype */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECT_INDEX\fP(i)   \fBINTX\fP(3+(i))           /***< TFS direct data \fBblock\fP <i> file table entry index */"
+.br
+.ti -1c
+.RI "#define \fBTFS_INDIRECT1_INDEX\fP   \fBINTX\fP(3+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS indirect1 \fBblock\fP index in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_INDIRECT2_INDEX\fP   \fBINTX\fP(4+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS indirect2 \fBblock\fP index in file table entry */"
+.br
+.ti -1c
+.RI "#define \fBTFS_NEXT_FREE_FILE_ENTRY_INDEX\fP   \fBINTX\fP(5+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS next free file entry index */"
+.br
+.ti -1c
+.RI "#define \fBTFS_VOLUME_NEXT_FREE_BLOCK_INDEX\fP   (\fBTFS_VOLUME_BLOCK_SIZE\fP-\fBINT_SIZE\fP) /***< TFS volume next free \fBblock\fP index */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECTORY_ENTRIES_PER_BLOCK\fP   (\fBTFS_VOLUME_BLOCK_SIZE\fP/\fBTFS_DIRECTORY_ENTRY_SIZE\fP)/*** Number of directory entries per \fBblock\fP */"
+.br
+.ti -1c
+.RI "#define \fBTFS_NAME_MAX\fP   27                           /** TFS directory entry name maximum length */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECTORY_ENTRY_SIZE\fP   (\fBINTX\fP(1)+\fBTFS_NAME_MAX\fP+1) /** TFS directory entry size */"
+.br
+.ti -1c
+.RI "#define \fBTFS_DIRECTORY_ENTRY_INDEX\fP(i)   ((i)*\fBTFS_DIRECTORY_ENTRY_SIZE\fP) /** TFS directory entry file index */"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_MAX_SIZE\fP"
+.br
+.ti -1c
+.RI "#define \fBTFS_FILE_MAX\fP   400                          /** TFS directory maximum number of open files */"
+.br
+.ti -1c
+.RI "#define \fBTFS_ISREG\fP(mode)   (mode == \fBTFS_REGULAR_TYPE\fP)"
+.br
+.ti -1c
+.RI "#define \fBTFS_ISDIR\fP(mode)   (mode == \fBTFS_DIRECTORY_TYPE\fP)"
+.br
+.ti -1c
+.RI "#define \fBTFS_PATHLEAF\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_NOPFX\fP   104"
+.br
+.ti -1c
+.RI "#define \fBTFS_ERRPATH_NOWORKINGPATH\fP   200"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fB_index\fP * \fB_index\fP"
+.br
+.RI "\fI\fBFile\fP index tree\&. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBerror\fP \fBfreeblock_push\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t b_addr)"
+.br
+.RI "\fIPush the block <b_addr> to the free blocks list\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfreeblock_pop\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t *b_addr)"
+.br
+.RI "\fIRemove the block at b_addr of the free blocks list\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfreefile_push\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode)"
+.br
+.RI "\fIPush the file entry <inode> to the free file entry list\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfreefile_pop\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t *inode)"
+.br
+.RI "\fIRemove the file entry <inode> from the free file entry list\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfileblock_add\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, \fB_index\fP index)"
+.br
+.RI "\fIAdd a data block to a file\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfileblock_rm\fP (\fBdisk_id\fP id, uint32_t vol, uint32_t inode, \fB_index\fP index)"
+.br
+.RI "\fIRemove a data block from a file\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfile_realloc\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, uint32_t size)"
+.br
+.RI "\fIChange size of file <inode> to size <size> \fP"
+.ti -1c
+.RI "\fBerror\fP \fBdirectory_pushent\fP (const \fBdisk_id\fP id, const uint32_t vol_addr, const uint32_t inode, const struct \fBdirent\fP *entry)"
+.br
+.RI "\fIPush the directory entry to the directory\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBdirectory_rment\fP (const \fBdisk_id\fP id, const uint32_t vol_addr, const uint32_t inode, char *name)"
+.br
+.RI "\fIRemove a directory entry\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfile_freeblocks\fP (\fBdisk_id\fP id, uint32_t vol, uint32_t inode)"
+.br
+.RI "\fIFree all data blocks of a file\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfind_addr\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, uint32_t b_file_addr, uint32_t *b_addr)"
+.br
+.RI "\fIFinds a file block's volume address\&. \fP"
+.ti -1c
+.RI "int \fBfile_open\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, int flags, int type, int subtype)"
+.br
+.RI "\fIThis function returns a file descriptor for use in subsequent system calls\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBpath_follow\fP (const char *path, char **entry)"
+.br
+.RI "\fIFollow a path\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBpath_split\fP (char *path, char **last_element)"
+.br
+.RI "\fISplit a path between parent directory path and last element\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfind_inode\fP (const char *path, uint32_t *ino)"
+.br
+.RI "\fIRecover filenumber from a valid path\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBfile_stat\fP (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, \fBf_stat\fP *stat)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBFile\fP * \fB_filedes\fP [\fBTFS_FILE_MAX\fP]"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define INT_PER_BLOCK   (\fBTFS_VOLUME_BLOCK_SIZE\fP/\fBINT_SIZE\fP) /***< Number of integers per \fBblock\fP*/"
+
+.PP
+Definition at line 38 of file tfsll\&.h\&.
+.SS "#define INT_SIZE   4                                /***< Integer size */"
+
+.PP
+Definition at line 24 of file tfsll\&.h\&.
+.SS "#define INTX(i)   (i*\fBINT_SIZE\fP)                      /***< Integer size multiples */"
+
+.PP
+Definition at line 25 of file tfsll\&.h\&.
+.SS "#define TFS_DATE_SUBTYPE   0                        /***< TFS date file table entry subtype */"
+
+.PP
+Definition at line 50 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECT_BLOCKS_NUMBER   10               /***< TFS direct data blocks number in file table entry */"
+
+.PP
+Definition at line 40 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECT_INDEX(i)   \fBINTX\fP(3+(i))           /***< TFS direct data \fBblock\fP <i> file table entry index */"
+
+.PP
+Definition at line 52 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECTORY_ENTRIES_PER_BLOCK   (\fBTFS_VOLUME_BLOCK_SIZE\fP/\fBTFS_DIRECTORY_ENTRY_SIZE\fP)/*** Number of directory entries per \fBblock\fP */"
+
+.PP
+Definition at line 59 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECTORY_ENTRY_INDEX(i)   ((i)*\fBTFS_DIRECTORY_ENTRY_SIZE\fP) /** TFS directory entry file index */"
+
+.PP
+Definition at line 64 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECTORY_ENTRY_SIZE   (\fBINTX\fP(1)+\fBTFS_NAME_MAX\fP+1) /** TFS directory entry size */"
+
+.PP
+Definition at line 63 of file tfsll\&.h\&.
+.SS "#define TFS_DIRECTORY_TYPE   1                      /***< TFS directory file table entry type */"
+
+.PP
+Definition at line 47 of file tfsll\&.h\&.
+.SS "#define TFS_DISK_SUBTYPE   1                        /***< TFS disk file table entry subtype */"
+
+.PP
+Definition at line 51 of file tfsll\&.h\&.
+.SS "#define TFS_ERRPATH_NOPFX   104"
+
+.PP
+Definition at line 278 of file tfsll\&.h\&.
+.SS "#define TFS_ERRPATH_NOWORKINGPATH   200"
+
+.PP
+Definition at line 279 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_MAX   400                          /** TFS directory maximum number of open files */"
+
+.PP
+Definition at line 73 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_MAX_SIZE"
+\fBValue:\fP
+.PP
+.nf
+(TFS_VOLUME_BLOCK_SIZE          \
+               *(TFS_DIRECT_BLOCKS_NUMBER           \
+                 +(TFS_VOLUME_BLOCK_SIZE/INT_SIZE)      \
+                 *(1 + (TFS_VOLUME_BLOCK_SIZE/INT_SIZE))    \
+                 )                      \
+               )
+.fi
+.PP
+Definition at line 66 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_SIZE_INDEX   \fBINTX\fP(0)               /***< TFS file size index in file table entry */"
+
+.PP
+Definition at line 44 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_SUBTYPE_INDEX   \fBINTX\fP(2)            /***< TFS file pseudo-type index in file table entry */"
+
+.PP
+Definition at line 49 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_TABLE_ENTRY_SIZE   \fBINTX\fP(6+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS file table entry size */"
+
+.PP
+Definition at line 43 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_TABLE_INDEX   1                    /***< TFS index of the file table */"
+
+.PP
+Definition at line 39 of file tfsll\&.h\&.
+.SS "#define TFS_FILE_TYPE_INDEX   \fBINTX\fP(1)               /***< TFS file type index in file table entry */"
+
+.PP
+Definition at line 45 of file tfsll\&.h\&.
+.SS "#define TFS_INDIRECT1_CAPACITY   \fBINT_PER_BLOCK\fP      /***< TFS file's maximum number of indirect1 blocks */"
+
+.PP
+Definition at line 41 of file tfsll\&.h\&.
+.SS "#define TFS_INDIRECT1_INDEX   \fBINTX\fP(3+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS indirect1 \fBblock\fP index in file table entry */"
+
+.PP
+Definition at line 53 of file tfsll\&.h\&.
+.SS "#define TFS_INDIRECT2_CAPACITY   (\fBINT_PER_BLOCK\fP*\fBINT_PER_BLOCK\fP) /***< TFS file's maximum number of indirect2 blocks */"
+
+.PP
+Definition at line 42 of file tfsll\&.h\&.
+.SS "#define TFS_INDIRECT2_INDEX   \fBINTX\fP(4+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS indirect2 \fBblock\fP index in file table entry */"
+
+.PP
+Definition at line 54 of file tfsll\&.h\&.
+.SS "#define TFS_ISDIR(mode)   (mode == \fBTFS_DIRECTORY_TYPE\fP)"
+
+.PP
+Definition at line 76 of file tfsll\&.h\&.
+.SS "#define TFS_ISREG(mode)   (mode == \fBTFS_REGULAR_TYPE\fP)"
+
+.PP
+Definition at line 75 of file tfsll\&.h\&.
+.SS "#define TFS_MAGIC_NUMBER   0x31534654               /***< TFS version identifier 'TFS1' */"
+
+.PP
+Definition at line 27 of file tfsll\&.h\&.
+.SS "#define TFS_MAGIC_NUMBER_INDEX   \fBINTX\fP(0)            /***< TFS version identifier index in volume superblock */"
+
+.PP
+Definition at line 28 of file tfsll\&.h\&.
+.SS "#define TFS_NAME_MAX   27                           /** TFS directory entry name maximum length */"
+
+.PP
+Definition at line 62 of file tfsll\&.h\&.
+.SS "#define TFS_NEXT_FREE_FILE_ENTRY_INDEX   \fBINTX\fP(5+\fBTFS_DIRECT_BLOCKS_NUMBER\fP) /***< TFS next free file entry index */"
+
+.PP
+Definition at line 55 of file tfsll\&.h\&.
+.SS "#define TFS_PATHLEAF   1"
+
+.PP
+Definition at line 277 of file tfsll\&.h\&.
+.SS "#define TFS_PSEUDO_TYPE   2                         /***< TFS pseudo file table entry type */"
+
+.PP
+Definition at line 48 of file tfsll\&.h\&.
+.SS "#define TFS_REGULAR_TYPE   0                        /***< TFS regular file table entry type */"
+
+.PP
+Definition at line 46 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_BLOCK_COUNT_INDEX   \fBINTX\fP(2)      /***< TFS bllock count index in volume superblock */"
+
+.PP
+Definition at line 31 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_BLOCK_SIZE   \fBD_BLOCK_SIZE\fP        /***< TFS \fBblock\fP size*/"
+
+.PP
+Definition at line 29 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_BLOCK_SIZE_INDEX   \fBINTX\fP(1)       /***< TFS \fBblock\fP size index in volume superblock */"
+
+.PP
+Definition at line 30 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_FIRST_FREE_BLOCK_INDEX   \fBINTX\fP(4) /***< TFS first free \fBblock\fP index in volume superblock */"
+
+.PP
+Definition at line 33 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_FIRST_FREE_FILE_INDEX   \fBINTX\fP(7)  /***< TFS first free file index in volume superblock */"
+
+.PP
+Definition at line 36 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_FREE_BLOCK_COUNT_INDEX   \fBINTX\fP(3) /***< TFS free \fBblock\fP count index in volume superblock */"
+
+.PP
+Definition at line 32 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_FREE_FILE_COUNT_INDEX   \fBINTX\fP(6)  /***< TFS free file count index in volume superblock */"
+
+.PP
+Definition at line 35 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_MAX_FILE_COUNT_INDEX   \fBINTX\fP(5)   /***< TFS max file count index in volume superblock */"
+
+.PP
+Definition at line 34 of file tfsll\&.h\&.
+.SS "#define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX   (\fBTFS_VOLUME_BLOCK_SIZE\fP-\fBINT_SIZE\fP) /***< TFS volume next free \fBblock\fP index */"
+
+.PP
+Definition at line 57 of file tfsll\&.h\&.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef struct \fB_index\fP* \fB_index\fP"
+
+.PP
+\fBFile\fP index tree\&. A structure which represents a file's data block tree 
+.PP
+Definition at line 97 of file tfsll\&.h\&.
+.SH "Function Documentation"
+.PP 
+.SS "\fBerror\fP directory_pushent (const \fBdisk_id\fP id, const uint32_t vol_addr, const uint32_t inode, const struct \fBdirent\fP * entry)"
+
+.PP
+Push the directory entry to the directory\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdir\fP 
+.br
+\fIent\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_FULL if the volume is full 
+.RE
+.PP
+
+.PP
+Definition at line 838 of file tfsll\&.c\&.
+.SS "\fBerror\fP directory_rment (const \fBdisk_id\fP id, const uint32_t vol_addr, const uint32_t inode, char * name)"
+
+.PP
+Remove a directory entry\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS 
+.RE
+.PP
+
+.PP
+Definition at line 1062 of file tfsll\&.c\&.
+.SS "\fBerror\fP file_freeblocks (\fBdisk_id\fP id, uint32_t vol, uint32_t inode)"
+
+.PP
+Free all data blocks of a file\&. Free all data blocks of the <inode> file
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP file inode 
+.br
+\fIvol\fP partition index 
+.br
+\fIid\fP disk id number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_ERRINODE if the inode is not valid 
+.RE
+.PP
+
+.SS "int file_open (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, int flags, int type, int subtype)"
+
+.PP
+This function returns a file descriptor for use in subsequent system calls\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIvol_addr\fP volume address 
+.br
+\fIinode\fP file number 
+.br
+\fIflags\fP opening mode 
+.br
+\fI\fP 
+.RE
+.PP
+
+.PP
+Definition at line 775 of file tfsll\&.c\&.
+.SS "\fBerror\fP file_realloc (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, uint32_t size)"
+
+.PP
+Change size of file <inode> to size <size> 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIvol\fP partition number 
+.br
+\fIinode\fP file inode number 
+.br
+\fIsize\fP new file size 
+.RE
+.PP
+
+.PP
+Definition at line 667 of file tfsll\&.c\&.
+.SS "\fBerror\fP file_stat (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, \fBf_stat\fP * stat)"
+
+.PP
+Definition at line 1257 of file tfsll\&.c\&.
+.SS "\fBerror\fP fileblock_add (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, \fB_index\fP index)"
+
+.PP
+Add a data block to a file\&. Add the block at b_addr to the file of inode file number
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP file inode 
+.br
+\fIb_addr\fP block index on the volume 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_ERRBLOCK if adress is not valid TFS_ERRINODE if the inode is not valid 
+.RE
+.PP
+
+.PP
+Definition at line 285 of file tfsll\&.c\&.
+.SS "\fBerror\fP fileblock_rm (\fBdisk_id\fP id, uint32_t vol, uint32_t inode, \fB_index\fP index)"
+
+.PP
+Remove a data block from a file\&. Remove the data block <b_adrr> from the file <inode>
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP file inode 
+.br
+\fIb_addr\fP block index in the file 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_ERRBLOCK if adress is not valid, TFS_ERRINODE if the inode is not valid 
+.RE
+.PP
+
+.PP
+Definition at line 375 of file tfsll\&.c\&.
+.SS "\fBerror\fP find_addr (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode, uint32_t b_file_addr, uint32_t * b_addr)"
+
+.PP
+Finds a file block's volume address\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP file inode 
+.br
+\fIvol\fP partition index 
+.br
+\fIid\fP disk id number 
+.br
+\fIb_file_addr\fP block's file number 
+.br
+\fIb_addr\fP block's volume address 
+.RE
+.PP
+
+.PP
+Definition at line 719 of file tfsll\&.c\&.
+.SS "\fBerror\fP find_inode (const char * path, uint32_t * ino)"
+
+.PP
+Recover filenumber from a valid path\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP 
+.br
+\fIino\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+
+.PP
+Definition at line 1173 of file tfsll\&.c\&.
+.SS "\fBerror\fP freeblock_pop (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t * b_addr)"
+
+.PP
+Remove the block at b_addr of the free blocks list\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIvol\fP partition number 
+.br
+\fIb_addr\fP block volume address 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_ERRADDR if address is not valid 
+.RE
+.PP
+
+.PP
+Definition at line 505 of file tfsll\&.c\&.
+.SS "\fBerror\fP freeblock_push (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t b_addr)"
+
+.PP
+Push the block <b_addr> to the free blocks list\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIb_addr\fP block index on the volume 
+.br
+\fIid\fP disk id 
+.br
+\fIvol\fP partition number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_ERRBLOCK if address is not valid 
+.RE
+.PP
+
+.PP
+Definition at line 459 of file tfsll\&.c\&.
+.SS "\fBerror\fP freefile_pop (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t * inode)"
+
+.PP
+Remove the file entry <inode> from the free file entry list\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIid\fP disk id 
+.br
+\fIvol\fP partition number 
+.br
+\fIinode\fP file inode number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+
+.PP
+Definition at line 608 of file tfsll\&.c\&.
+.SS "\fBerror\fP freefile_push (\fBdisk_id\fP id, uint32_t vol_addr, uint32_t inode)"
+
+.PP
+Push the file entry <inode> to the free file entry list\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinode\fP file inode 
+.br
+\fIid\fP disk id 
+.br
+\fIvol\fP partition number 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+
+.PP
+Definition at line 564 of file tfsll\&.c\&.
+.SS "\fBerror\fP path_follow (const char * path, char ** entry)"
+
+.PP
+Follow a path\&. Follow the path path by filling entry with the next entry\&. entry should be the adress of a char *\&.
+.PP
+Usage:
+.PP
+First, call path_follow with the full path, i\&.e\&. prefixed by FILE://, and the adress of an unitialized char*\&. For the first call, the pointer *entry is not modified so you can pass NULL\&. If the path is not prefixed, TFS_ERRPATH_NOPFX is returned\&. Example: char path[] = 'FILE://disk/vol/entry1/entry2' if (path_follow(path, NULL) == TFS_ERRPATH) \&.\&.\&.;
+.PP
+To follow the previous path, you should now call follow_path with a null path and the adress of an unitialized char*\&. If the last call has reached a leaf, then TFS_PATHLEAF is returned and entry stay unchanged\&. If you try calling path_follow(NULL,NULL) you will get a segmentation fault\&. Example: char *entry; while (path_follow(NULL, &entry) != TFS_PATHLEAF) { printf('Entry : %s\\n', entry); } printf('Last entry %s was a leaf\&.\\n');
+.PP
+If the working path has not been initialized by a first call and you follow a path (with something like follow_path(NULL, &entry))$ then error TFS_ERRPATH_NOWORKINGPATH is returned\&.
+.PP
+About memory allocation: An internal static char* is used to work on, it is automatically released after reaching a leaf or after
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP 
+.br
+\fIentry\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error EXIT_SUCCESS, TFS_PATHLEAF, TFS_ERRPATH_NOPFX, TFS_ERRPATH_NOWORKINGPATH 
+.RE
+.PP
+
+.PP
+Definition at line 1120 of file tfsll\&.c\&.
+.SS "\fBerror\fP path_split (char * path, char ** last_element)"
+
+.PP
+Split a path between parent directory path and last element\&. After successfull execution, path is modified to contain the parent directory path, last_element point to the last_element of the path\&. Also test if path is prefixed, you can then just call path_follow with a NULL path to follow the path without testing prefix\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpath\fP 
+.br
+\fIleaf\fP 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error 
+.RE
+.PP
+
+.PP
+Definition at line 1152 of file tfsll\&.c\&.
+.SH "Variable Documentation"
+.PP 
+.SS "\fBFile\fP* _filedes[\fBTFS_FILE_MAX\fP]"
+
+.PP
+Definition at line 120 of file tfsll\&.h\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

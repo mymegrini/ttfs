@@ -1,0 +1,174 @@
+\hypertarget{tfs__create_8c}{}\section{src/tfs\+\_\+create.c File Reference}
+\label{tfs__create_8c}\index{src/tfs\+\_\+create.\+c@{src/tfs\+\_\+create.\+c}}
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+Include dependency graph for tfs\+\_\+create.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__create_8c_ab3a3ecd17e8bbd389478437af475fb09}{F\+\_\+\+O\+W\+R}~1    /$\ast$$\ast$$\ast$$<$ flag for overwrite option $\ast$/
+\item 
+\#define \hyperlink{tfs__create_8c_ab30348e352fc02b3ad044bfe2577ef18}{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{tfs__create_8c_af7c15991e6202d5a041cbac67876f14c}{usage} (char $\ast$argv0, F\+I\+L\+E $\ast$out)
+\begin{DoxyCompactList}\small\item\em This function prints the command prototype. \end{DoxyCompactList}\item 
+void \hyperlink{tfs__create_8c_a81abcefb2851ea8c2af518d0c65556c9}{create\+\_\+disk} (char $\ast$name, int size, char $\ast$argv0)
+\begin{DoxyCompactList}\small\item\em This function creates and initializes a disk. \end{DoxyCompactList}\item 
+int \hyperlink{tfs__create_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em This function parses command line inputs and launches auxiliary functions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__create_8c_ab30348e352fc02b3ad044bfe2577ef18}{}\index{tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}!D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}}
+\index{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N@{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}!tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}}
+\subsubsection[{D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+N\+A\+M\+E\+\_\+\+M\+A\+X\+L\+E\+N~79     /$\ast$$\ast$$\ast$$<$ disk name maximum length $\ast$/}\label{tfs__create_8c_ab30348e352fc02b3ad044bfe2577ef18}
+
+
+Definition at line 16 of file tfs\+\_\+create.\+c.
+
+\hypertarget{tfs__create_8c_ab3a3ecd17e8bbd389478437af475fb09}{}\index{tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}!F\+\_\+\+O\+W\+R@{F\+\_\+\+O\+W\+R}}
+\index{F\+\_\+\+O\+W\+R@{F\+\_\+\+O\+W\+R}!tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}}
+\subsubsection[{F\+\_\+\+O\+W\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+\_\+\+O\+W\+R~1    /$\ast$$\ast$$\ast$$<$ flag for overwrite option $\ast$/}\label{tfs__create_8c_ab3a3ecd17e8bbd389478437af475fb09}
+
+
+Definition at line 15 of file tfs\+\_\+create.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__create_8c_a81abcefb2851ea8c2af518d0c65556c9}{}\index{tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}!create\+\_\+disk@{create\+\_\+disk}}
+\index{create\+\_\+disk@{create\+\_\+disk}!tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}}
+\subsubsection[{create\+\_\+disk}]{\setlength{\rightskip}{0pt plus 5cm}void create\+\_\+disk (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{name, }
+\item[{int}]{size, }
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__create_8c_a81abcefb2851ea8c2af518d0c65556c9}
+
+
+This function creates and initializes a disk. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & containing path for the disk \\
+\hline
+\mbox{\tt in}  & {\em size} & of the disk \\
+\hline
+\mbox{\tt in}  & {\em argv0} & name of the calling command \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function creates a disk $<$name$>$ of size $<$size$>$ and fills in the appropriate values in the description block
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_adfb020b9554c80391c7a39f29b11b0cc}{C\+\_\+\+F\+O\+R\+M\+A\+T} 
+
+\hyperlink{error_8h_aa872caeaea9781725ac1b6428832988c}{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a98320f7130a66e221c7ebec00bde975b}{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R} 
+
+D\+\_\+\+P\+E\+R\+M\+\_\+\+E\+R\+R 
+
+\hyperlink{error_8h_a73ab0e8e087c378b11d78a5ceeb553f7}{D\+\_\+\+W\+R\+I\+T\+E\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S} 
+\end{DoxySeeAlso}
+
+
+Definition at line 60 of file tfs\+\_\+create.\+c.
+
+\hypertarget{tfs__create_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__create_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+This function parses command line inputs and launches auxiliary functions. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em argc} & number of command line inputs \\
+\hline
+\mbox{\tt in}  & {\em argv} & array of command line inputs \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int value storing the error encountered
+\end{DoxyReturn}
+This function parses command line inputs and options then launches the auxiliary function create\+\_\+disk to create the disk with the appropriate parameters
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{tfs__create_8c_a81abcefb2851ea8c2af518d0c65556c9}{create\+\_\+disk} 
+
+\hyperlink{utils_8h_ad3c49f51a367ddc0b8f2b4ed79e38feb}{answer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 109 of file tfs\+\_\+create.\+c.
+
+\hypertarget{tfs__create_8c_af7c15991e6202d5a041cbac67876f14c}{}\index{tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}!usage@{usage}}
+\index{usage@{usage}!tfs\+\_\+create.\+c@{tfs\+\_\+create.\+c}}
+\subsubsection[{usage}]{\setlength{\rightskip}{0pt plus 5cm}void usage (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0, }
+\item[{F\+I\+L\+E $\ast$}]{out}
+\end{DoxyParamCaption}
+)}\label{tfs__create_8c_af7c15991e6202d5a041cbac67876f14c}
+
+
+This function prints the command prototype. 
+
+Print a message about usage of the command.
+
+This command creates and initializes a new disk. It allocates enough memory for $<$size$>$ blocks and stores $<$size$>$ in the first block
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_adfb020b9554c80391c7a39f29b11b0cc}{C\+\_\+\+F\+O\+R\+M\+A\+T} 
+
+\hyperlink{error_8h_aa872caeaea9781725ac1b6428832988c}{D\+\_\+\+O\+P\+E\+N\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a98320f7130a66e221c7ebec00bde975b}{D\+\_\+\+S\+E\+E\+K\+\_\+\+E\+R\+R} 
+
+\hyperlink{error_8h_a687984f47d8cce148d1b914d2b79612a}{E\+X\+I\+T\+\_\+\+S\+U\+C\+C\+E\+S\+S} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em argv0} & command name \\
+\hline
+\mbox{\tt out}  & {\em out} & output stream \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function prints the command prototype to the $<$out$>$ stream
+
+
+\begin{DoxyParams}{Parameters}
+{\em argv0} & name of the command \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 38 of file tfs\+\_\+create.\+c.
+

@@ -1,0 +1,73 @@
+.TH "tfs_ftent" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+tfs_ftent \- \fBFile\fP table entry structure\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "uint32_t \fBsize\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBtype\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBsubtype\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBtfs_direct\fP [\fBTFS_DIRECT_BLOCKS_NUMBER\fP]"
+.br
+.ti -1c
+.RI "uint32_t \fBtfs_indirect1\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBtfs_indirect2\fP"
+.br
+.ti -1c
+.RI "uint32_t \fBnextfreefile\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+\fBFile\fP table entry structure\&. 
+.PP
+Definition at line 78 of file tfsll\&.c\&.
+.SH "Field Documentation"
+.PP 
+.SS "uint32_t nextfreefile"
+
+.PP
+Definition at line 85 of file tfsll\&.c\&.
+.SS "uint32_t size"
+
+.PP
+Definition at line 79 of file tfsll\&.c\&.
+.SS "uint32_t subtype"
+
+.PP
+Definition at line 81 of file tfsll\&.c\&.
+.SS "uint32_t tfs_direct[\fBTFS_DIRECT_BLOCKS_NUMBER\fP]"
+
+.PP
+Definition at line 82 of file tfsll\&.c\&.
+.SS "uint32_t tfs_indirect1"
+
+.PP
+Definition at line 83 of file tfsll\&.c\&.
+.SS "uint32_t tfs_indirect2"
+
+.PP
+Definition at line 84 of file tfsll\&.c\&.
+.SS "uint32_t type"
+
+.PP
+Definition at line 80 of file tfsll\&.c\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

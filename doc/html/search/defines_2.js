@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['d_5fblock_5fsize',['D_BLOCK_SIZE',['../block_8h.html#a96e92341ab86353244d3e0a6414818aa',1,'block.h']]],
+  ['d_5fgetwd_5ffail',['D_GETWD_FAIL',['../error_8h.html#a11fa3ed9b1990639e086a0b08992fb13',1,'error.h']]],
+  ['d_5flock',['D_LOCK',['../error_8h.html#ada9ecd255ba9bdbd5a1efda5e66bb111',1,'error.h']]],
+  ['d_5fname_5fmaxlen',['D_NAME_MAXLEN',['../ll_8h.html#ab30348e352fc02b3ad044bfe2577ef18',1,'D_NAME_MAXLEN():&#160;ll.h'],['../tfs__analyze_8c.html#ab30348e352fc02b3ad044bfe2577ef18',1,'D_NAME_MAXLEN():&#160;tfs_analyze.c'],['../tfs__create_8c.html#ab30348e352fc02b3ad044bfe2577ef18',1,'D_NAME_MAXLEN():&#160;tfs_create.c'],['../tfs__format_8c.html#ab30348e352fc02b3ad044bfe2577ef18',1,'D_NAME_MAXLEN():&#160;tfs_format.c']]],
+  ['d_5fnewdisk',['D_NEWDISK',['../error_8h.html#a47e66bc5d9530af9107c1272584dc522',1,'error.h']]],
+  ['d_5fopen_5ferr',['D_OPEN_ERR',['../error_8h.html#aa872caeaea9781725ac1b6428832988c',1,'error.h']]],
+  ['d_5fpartmax',['D_PARTMAX',['../ll_8h.html#a318f8a09c916fffa98b557818d12ec0a',1,'ll.h']]],
+  ['d_5fperm_5ffail',['D_PERM_FAIL',['../error_8h.html#a80b8d2828871f962635b872da5da17da',1,'error.h']]],
+  ['d_5fread_5ferr',['D_READ_ERR',['../error_8h.html#a89147f8149ded631eeab5b339ea10fa4',1,'error.h']]],
+  ['d_5fseek_5ferr',['D_SEEK_ERR',['../error_8h.html#a98320f7130a66e221c7ebec00bde975b',1,'error.h']]],
+  ['d_5fstop_5ffail',['D_STOP_FAIL',['../error_8h.html#a191571925462b9d659b7d44b037986ca',1,'error.h']]],
+  ['d_5funlock',['D_UNLOCK',['../error_8h.html#add8ae2158685d674513a6d7be2b39032',1,'error.h']]],
+  ['d_5fwrite_5ferr',['D_WRITE_ERR',['../error_8h.html#a73ab0e8e087c378b11d78a5ceeb553f7',1,'error.h']]],
+  ['d_5fwrongid',['D_WRONGID',['../error_8h.html#a62a8edd367d554fa1abe39f568458e58',1,'error.h']]],
+  ['dd_5fmax',['DD_MAX',['../ll_8h.html#a86a42c974cd1b73e5307fefdecdffd63',1,'ll.h']]],
+  ['def_5fext',['DEF_EXT',['../utils_8h.html#a1540853f54619b4c6bc47cce4b96b1da',1,'utils.h']]],
+  ['def_5ffilename',['DEF_FILENAME',['../utils_8h.html#a8a6dbd6ae56a211b6b137dc3290484c1',1,'utils.h']]],
+  ['def_5fname',['DEF_NAME',['../utils_8h.html#a84e3c4beae1c472a0e42c015ec588c4d',1,'DEF_NAME():&#160;utils.h'],['../tfs__analyze_8c.html#a84e3c4beae1c472a0e42c015ec588c4d',1,'DEF_NAME():&#160;tfs_analyze.c']]],
+  ['def_5fpath',['DEF_PATH',['../utils_8h.html#a2ee153941d7532a29eebf71d06181152',1,'utils.h']]],
+  ['dir_5fblockfull',['DIR_BLOCKFULL',['../error_8h.html#ae6b707047471ec3332b5961abddf27e3',1,'error.h']]],
+  ['direct_5fidx',['DIRECT_IDX',['../tfsll_8c.html#a7d27470ddf7941b7f117b9fb0123d6f5',1,'tfsll.c']]],
+  ['directory_5fsizemin',['DIRECTORY_SIZEMIN',['../tfs_8c.html#a592336bdddb94c318a9e36daf57133d2',1,'tfs.c']]],
+  ['dirpath_5fmissing',['DIRPATH_MISSING',['../tfs__mkdir_8c.html#aa28f9e895b392f331624546c76e63ab4',1,'tfs_mkdir.c']]],
+  ['diskexist',['DISKEXIST',['../ll_8h.html#a8019e5cd80f5582018524d3eec054f6f',1,'ll.h']]]
+];

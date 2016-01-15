@@ -1,0 +1,69 @@
+.TH "lib/error.c" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/error.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'error\&.h'\fP
+.br
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBprinterror\fP (char *s, \fBerror\fP err)"
+.br
+.ti -1c
+.RI "void \fBtesterror\fP (char *msg, \fBerror\fP err)"
+.br
+.RI "\fIThis function forces an exit if an error is encountered\&. \fP"
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBerror\fP \fBerrnum\fP = \fBEXIT_SUCCESS\fP"
+.br
+.RI "\fIThis variable can store an error\&. \fP"
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void printerror (char * s, \fBerror\fP err)"
+Prints an errror message on error output using the format <s: error message>
+.PP
+\fBParameters:\fP
+.RS 4
+\fIs[in]\fP sting to be added at beginning of error output 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+void 
+.RE
+.PP
+
+.PP
+Definition at line 84 of file error\&.c\&.
+.SS "void testerror (char * msg, \fBerror\fP err)"
+
+.PP
+This function forces an exit if an error is encountered\&. This function prints an error message and terminates the program if <err> is not EXIT_SUCCESS 
+.PP
+Definition at line 93 of file error\&.c\&.
+.SH "Variable Documentation"
+.PP 
+.SS "\fBerror\fP errnum = \fBEXIT_SUCCESS\fP"
+
+.PP
+This variable can store an error\&. This variable can be used to store an error in functions which do not return <error> 
+.PP
+Definition at line 106 of file error\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

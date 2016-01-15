@@ -1,0 +1,195 @@
+\hypertarget{block_8h}{}\section{lib/block.h File Reference}
+\label{block_8h}\index{lib/block.\+h@{lib/block.\+h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$inttypes.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+Include dependency graph for block.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structblock}{block}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{block_8h_a96e92341ab86353244d3e0a6414818aa}{D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}~1024    /$\ast$$\ast$$\ast$$<$ \hyperlink{structblock}{block} size $\ast$/
+\item 
+\#define \hyperlink{block_8h_a3ac36dd0f02f263e5966ac1d1ecbd1bd}{I\+N\+T\+\_\+\+S\+I\+Z\+E}~4
+\item 
+\#define \hyperlink{block_8h_a82cf767a1c06d95bbcf6f1dc701f38ce}{B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E}~0
+\item 
+\#define \hyperlink{block_8h_a03702ddcdd95923e0434effceb265d5b}{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}~(\hyperlink{tfsll_8h_a3ac36dd0f02f263e5966ac1d1ecbd1bd}{I\+N\+T\+\_\+\+S\+I\+Z\+E}$\ast$1)
+\item 
+\#define \hyperlink{block_8h_afbafda79aeea9a7f157d2fe58bb7ab71}{B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T}~(\hyperlink{block_8h_a03702ddcdd95923e0434effceb265d5b}{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}+\hyperlink{tfsll_8h_a3ac36dd0f02f263e5966ac1d1ecbd1bd}{I\+N\+T\+\_\+\+S\+I\+Z\+E})
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint8\+\_\+t \hyperlink{block_8h_ab8ef12fab634c171394422d0ee8baf94}{byte}
+\item 
+typedef int16\+\_\+t \hyperlink{block_8h_aea8fe1533cb469cc089393048ef8965f}{addr}
+\item 
+typedef struct \hyperlink{structblock}{block} $\ast$ \hyperlink{block_8h_ac22bb4bf2e5e47d6adfc8fae3ca38314}{block}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structblock}{block} \hyperlink{block_8h_a6c413723ed7349d0692c9603ed2eeb52}{new\+\_\+block} (void)
+\begin{DoxyCompactList}\small\item\em Return a pointer to a new empty. An empty block is full of bytes 0. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{block_8h_a27d0c4b4e5b531e5133ea6330716067c}{rintle} (uint32\+\_\+t $\ast$value, \hyperlink{structblock}{block} b, \hyperlink{block_8h_aea8fe1533cb469cc089393048ef8965f}{addr} idx)
+\begin{DoxyCompactList}\small\item\em Reads an integer in little-\/endian from a block. \end{DoxyCompactList}\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{block_8h_a6f48d101fccf2d437c38afc0324207f7}{wintle} (uint32\+\_\+t value, \hyperlink{structblock}{block} b, \hyperlink{block_8h_aea8fe1533cb469cc089393048ef8965f}{addr} idx)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{block_8h_a82cf767a1c06d95bbcf6f1dc701f38ce}{}\index{block.\+h@{block.\+h}!B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E@{B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E}}
+\index{B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E@{B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E}!block.\+h@{block.\+h}}
+\subsubsection[{B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+A\+D\+D\+\_\+\+D\+S\+I\+Z\+E~0}\label{block_8h_a82cf767a1c06d95bbcf6f1dc701f38ce}
+Address of disk size 
+
+Definition at line 11 of file block.\+h.
+
+\hypertarget{block_8h_afbafda79aeea9a7f157d2fe58bb7ab71}{}\index{block.\+h@{block.\+h}!B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T@{B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T}}
+\index{B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T@{B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T}!block.\+h@{block.\+h}}
+\subsubsection[{B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+A\+D\+D\+\_\+\+F\+S\+T\+P\+A\+R\+T~({\bf B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}+{\bf I\+N\+T\+\_\+\+S\+I\+Z\+E})}\label{block_8h_afbafda79aeea9a7f157d2fe58bb7ab71}
+Address of first partition size 
+
+Definition at line 13 of file block.\+h.
+
+\hypertarget{block_8h_a03702ddcdd95923e0434effceb265d5b}{}\index{block.\+h@{block.\+h}!B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T@{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}}
+\index{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T@{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}!block.\+h@{block.\+h}}
+\subsubsection[{B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define B0\+\_\+\+A\+D\+D\+\_\+\+N\+P\+A\+R\+T~({\bf I\+N\+T\+\_\+\+S\+I\+Z\+E}$\ast$1)}\label{block_8h_a03702ddcdd95923e0434effceb265d5b}
+Address of partition number 
+
+Definition at line 12 of file block.\+h.
+
+\hypertarget{block_8h_a96e92341ab86353244d3e0a6414818aa}{}\index{block.\+h@{block.\+h}!D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E@{D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}}
+\index{D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E@{D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}!block.\+h@{block.\+h}}
+\subsubsection[{D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+\_\+\+B\+L\+O\+C\+K\+\_\+\+S\+I\+Z\+E~1024    /$\ast$$\ast$$\ast$$<$ {\bf block} size $\ast$/}\label{block_8h_a96e92341ab86353244d3e0a6414818aa}
+
+
+Definition at line 8 of file block.\+h.
+
+\hypertarget{block_8h_a3ac36dd0f02f263e5966ac1d1ecbd1bd}{}\index{block.\+h@{block.\+h}!I\+N\+T\+\_\+\+S\+I\+Z\+E@{I\+N\+T\+\_\+\+S\+I\+Z\+E}}
+\index{I\+N\+T\+\_\+\+S\+I\+Z\+E@{I\+N\+T\+\_\+\+S\+I\+Z\+E}!block.\+h@{block.\+h}}
+\subsubsection[{I\+N\+T\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+T\+\_\+\+S\+I\+Z\+E~4}\label{block_8h_a3ac36dd0f02f263e5966ac1d1ecbd1bd}
+
+
+Definition at line 9 of file block.\+h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{block_8h_aea8fe1533cb469cc089393048ef8965f}{}\index{block.\+h@{block.\+h}!addr@{addr}}
+\index{addr@{addr}!block.\+h@{block.\+h}}
+\subsubsection[{addr}]{\setlength{\rightskip}{0pt plus 5cm}typedef int16\+\_\+t {\bf addr}}\label{block_8h_aea8fe1533cb469cc089393048ef8965f}
+byte address in a block 
+
+Definition at line 16 of file block.\+h.
+
+\hypertarget{block_8h_ac22bb4bf2e5e47d6adfc8fae3ca38314}{}\index{block.\+h@{block.\+h}!block@{block}}
+\index{block@{block}!block.\+h@{block.\+h}}
+\subsubsection[{block}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf block}$\ast$ {\bf block}}\label{block_8h_ac22bb4bf2e5e47d6adfc8fae3ca38314}
+a block is a pointer to a struct block 
+
+Definition at line 28 of file block.\+h.
+
+\hypertarget{block_8h_ab8ef12fab634c171394422d0ee8baf94}{}\index{block.\+h@{block.\+h}!byte@{byte}}
+\index{byte@{byte}!block.\+h@{block.\+h}}
+\subsubsection[{byte}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint8\+\_\+t {\bf byte}}\label{block_8h_ab8ef12fab634c171394422d0ee8baf94}
+a byte in the disk 
+
+Definition at line 15 of file block.\+h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{block_8h_a6c413723ed7349d0692c9603ed2eeb52}{}\index{block.\+h@{block.\+h}!new\+\_\+block@{new\+\_\+block}}
+\index{new\+\_\+block@{new\+\_\+block}!block.\+h@{block.\+h}}
+\subsubsection[{new\+\_\+block}]{\setlength{\rightskip}{0pt plus 5cm}{\bf block} new\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{block_8h_a6c413723ed7349d0692c9603ed2eeb52}
+
+
+Return a pointer to a new empty. An empty block is full of bytes 0. 
+
+\begin{DoxyReturn}{Returns}
+block a new block
+\end{DoxyReturn}
+Return a pointer to a new empty. An empty block is full of bytes 0.
+
+\begin{DoxyReturn}{Returns}
+block 
+\end{DoxyReturn}
+
+
+Definition at line 8 of file block.\+c.
+
+\hypertarget{block_8h_a27d0c4b4e5b531e5133ea6330716067c}{}\index{block.\+h@{block.\+h}!rintle@{rintle}}
+\index{rintle@{rintle}!block.\+h@{block.\+h}}
+\subsubsection[{rintle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} rintle (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t $\ast$}]{value, }
+\item[{{\bf block}}]{b, }
+\item[{{\bf addr}}]{idx}
+\end{DoxyParamCaption}
+)}\label{block_8h_a27d0c4b4e5b531e5133ea6330716067c}
+
+
+Reads an integer in little-\/endian from a block. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em value} & pointer where read integer is stored \\
+\hline
+\mbox{\tt in}  & {\em b} & the block from which integer is read \\
+\hline
+\mbox{\tt in}  & {\em idx} & index of integer in block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error if index out of bound 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_a7adedda73b55794ab5b0b8d3fbc8defb}{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}
+\end{DoxySeeAlso}
+Reads an integer in little-\/endian from a block at a specified index idx and stores it in value integer pointer 
+
+Definition at line 19 of file block.\+c.
+
+\hypertarget{block_8h_a6f48d101fccf2d437c38afc0324207f7}{}\index{block.\+h@{block.\+h}!wintle@{wintle}}
+\index{wintle@{wintle}!block.\+h@{block.\+h}}
+\subsubsection[{wintle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} wintle (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{value, }
+\item[{{\bf block}}]{b, }
+\item[{{\bf addr}}]{idx}
+\end{DoxyParamCaption}
+)}\label{block_8h_a6f48d101fccf2d437c38afc0324207f7}
+Writes an integer in little-\/endian to a block at a specified index
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em value} & of integer to be written \\
+\hline
+\mbox{\tt out}  & {\em b} & the block to which integer is written \\
+\hline
+\mbox{\tt in}  & {\em idx} & index of integer in block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+error if index out of bound 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{error_8h_a7adedda73b55794ab5b0b8d3fbc8defb}{B\+\_\+\+W\+R\+O\+N\+G\+I\+D\+X}
+\end{DoxySeeAlso}
+Writes an integer in little-\/endian to a block at a specified index idx and stores it in value integer pointer 
+
+Definition at line 34 of file block.\+c.
+

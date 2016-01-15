@@ -1,0 +1,182 @@
+.TH "lib/block.h" 3 "Fri Jan 15 2016" "Version By : V. Fontaine, M.Y. Megrini, N. Scotto Di Perto" "The Tiny Toy File System" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/block.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdint\&.h>\fP
+.br
+\fC#include <inttypes\&.h>\fP
+.br
+\fC#include 'error\&.h'\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBblock\fP"
+.br
+.in -1c
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBD_BLOCK_SIZE\fP   1024    /***< \fBblock\fP size */"
+.br
+.ti -1c
+.RI "#define \fBINT_SIZE\fP   4"
+.br
+.ti -1c
+.RI "#define \fBB0_ADD_DSIZE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBB0_ADD_NPART\fP   (\fBINT_SIZE\fP*1)"
+.br
+.ti -1c
+.RI "#define \fBB0_ADD_FSTPART\fP   (\fBB0_ADD_NPART\fP+\fBINT_SIZE\fP)"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef uint8_t \fBbyte\fP"
+.br
+.ti -1c
+.RI "typedef int16_t \fBaddr\fP"
+.br
+.ti -1c
+.RI "typedef struct \fBblock\fP * \fBblock\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBblock\fP \fBnew_block\fP (void)"
+.br
+.RI "\fIReturn a pointer to a new empty\&. An empty block is full of bytes 0\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBrintle\fP (uint32_t *value, \fBblock\fP b, \fBaddr\fP idx)"
+.br
+.RI "\fIReads an integer in little-endian from a block\&. \fP"
+.ti -1c
+.RI "\fBerror\fP \fBwintle\fP (uint32_t value, \fBblock\fP b, \fBaddr\fP idx)"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define B0_ADD_DSIZE   0"
+Address of disk size 
+.PP
+Definition at line 11 of file block\&.h\&.
+.SS "#define B0_ADD_FSTPART   (\fBB0_ADD_NPART\fP+\fBINT_SIZE\fP)"
+Address of first partition size 
+.PP
+Definition at line 13 of file block\&.h\&.
+.SS "#define B0_ADD_NPART   (\fBINT_SIZE\fP*1)"
+Address of partition number 
+.PP
+Definition at line 12 of file block\&.h\&.
+.SS "#define D_BLOCK_SIZE   1024    /***< \fBblock\fP size */"
+
+.PP
+Definition at line 8 of file block\&.h\&.
+.SS "#define INT_SIZE   4"
+
+.PP
+Definition at line 9 of file block\&.h\&.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef int16_t \fBaddr\fP"
+byte address in a block 
+.PP
+Definition at line 16 of file block\&.h\&.
+.SS "typedef struct \fBblock\fP* \fBblock\fP"
+a block is a pointer to a struct block 
+.PP
+Definition at line 28 of file block\&.h\&.
+.SS "typedef uint8_t \fBbyte\fP"
+a byte in the disk 
+.PP
+Definition at line 15 of file block\&.h\&.
+.SH "Function Documentation"
+.PP 
+.SS "\fBblock\fP new_block (void)"
+
+.PP
+Return a pointer to a new empty\&. An empty block is full of bytes 0\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+block a new block
+.RE
+.PP
+Return a pointer to a new empty\&. An empty block is full of bytes 0\&.
+.PP
+\fBReturns:\fP
+.RS 4
+block 
+.RE
+.PP
+
+.PP
+Definition at line 8 of file block\&.c\&.
+.SS "\fBerror\fP rintle (uint32_t * value, \fBblock\fP b, \fBaddr\fP idx)"
+
+.PP
+Reads an integer in little-endian from a block\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP pointer where read integer is stored 
+.br
+\fIb\fP the block from which integer is read 
+.br
+\fIidx\fP index of integer in block 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error if index out of bound 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBB_WRONGIDX\fP
+.RE
+.PP
+Reads an integer in little-endian from a block at a specified index idx and stores it in value integer pointer 
+.PP
+Definition at line 19 of file block\&.c\&.
+.SS "\fBerror\fP wintle (uint32_t value, \fBblock\fP b, \fBaddr\fP idx)"
+Writes an integer in little-endian to a block at a specified index
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP of integer to be written 
+.br
+\fIb\fP the block to which integer is written 
+.br
+\fIidx\fP index of integer in block 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+error if index out of bound 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBB_WRONGIDX\fP
+.RE
+.PP
+Writes an integer in little-endian to a block at a specified index idx and stores it in value integer pointer 
+.PP
+Definition at line 34 of file block\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for The Tiny Toy File System from the source code\&.

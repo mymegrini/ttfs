@@ -1,0 +1,186 @@
+\hypertarget{tfs__mkdir_8c}{}\section{src/tfs\+\_\+mkdir.c File Reference}
+\label{tfs__mkdir_8c}\index{src/tfs\+\_\+mkdir.\+c@{src/tfs\+\_\+mkdir.\+c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$getopt.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}tfs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}tfsll.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}block.\+h\char`\"{}}\\*
+Include dependency graph for tfs\+\_\+mkdir.\+c\+:
+% FIG 0
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_ab4994df638d9e65593483a02e6dde3d6}{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S}~\textquotesingle{}p\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_a31a7336968a9984df68eddd5b4da5ef0}{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G}~\char`\"{}path\char`\"{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_a5a44059b42cd62194271c932ad05d99a}{O\+P\+T\+\_\+\+N\+A\+M\+E}~\textquotesingle{}n\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_ad711bd6611dd678f5e8125cc081bab6a}{O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G}~\char`\"{}name\char`\"{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_adaef1917469e58d838e08ea9eec83aa5}{O\+P\+T\+\_\+\+H\+E\+L\+P}~\textquotesingle{}h\textquotesingle{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_a1ea8dc79a78c520be81fa16c785bef65}{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}~\char`\"{}help\char`\"{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_a91fea349332c05eb78ce3c17202e1dc9}{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}~\char`\"{}hpn\+:\char`\"{}
+\item 
+\#define \hyperlink{tfs__mkdir_8c_ac8feab8724de9686c9dc8de9a991cd15}{P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T}~-\/1
+\item 
+\#define \hyperlink{tfs__mkdir_8c_aa28f9e895b392f331624546c76e63ab4}{D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G}~-\/2
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{error_8h_a8765e3594431b5759071393ed6de3e45}{error} \hyperlink{tfs__mkdir_8c_abbb91dd0487864455a5c9fb485a8bb09}{recursive\+\_\+mkdir} (char $\ast$fullpath, mode\+\_\+t mode)
+\item 
+void \hyperlink{tfs__mkdir_8c_a4907135737e2fb22dcde4be8474bcab1}{usage} (char $\ast$argv0)
+\item 
+void \hyperlink{tfs__mkdir_8c_ac5b3462ec0c812741cb7010d27232d35}{help} (char $\ast$argv0)
+\item 
+int \hyperlink{tfs__mkdir_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct option \hyperlink{tfs__mkdir_8c_af3fa26ecabe32d66e998a45c701cb116}{options} \mbox{[}4\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{tfs__mkdir_8c_aa28f9e895b392f331624546c76e63ab4}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G@{D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G}}
+\index{D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G@{D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+I\+R\+P\+A\+T\+H\+\_\+\+M\+I\+S\+S\+I\+N\+G~-\/2}\label{tfs__mkdir_8c_aa28f9e895b392f331624546c76e63ab4}
+
+
+Definition at line 47 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_adaef1917469e58d838e08ea9eec83aa5}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}}
+\index{O\+P\+T\+\_\+\+H\+E\+L\+P@{O\+P\+T\+\_\+\+H\+E\+L\+P}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+H\+E\+L\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+H\+E\+L\+P~\textquotesingle{}h\textquotesingle{}}\label{tfs__mkdir_8c_adaef1917469e58d838e08ea9eec83aa5}
+
+
+Definition at line 30 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a1ea8dc79a78c520be81fa16c785bef65}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}}
+\index{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+H\+E\+L\+P\+\_\+\+L\+O\+N\+G~\char`\"{}help\char`\"{}}\label{tfs__mkdir_8c_a1ea8dc79a78c520be81fa16c785bef65}
+
+
+Definition at line 31 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a5a44059b42cd62194271c932ad05d99a}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+N\+A\+M\+E}}
+\index{O\+P\+T\+\_\+\+N\+A\+M\+E@{O\+P\+T\+\_\+\+N\+A\+M\+E}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+N\+A\+M\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+N\+A\+M\+E~\textquotesingle{}n\textquotesingle{}}\label{tfs__mkdir_8c_a5a44059b42cd62194271c932ad05d99a}
+
+
+Definition at line 28 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_ad711bd6611dd678f5e8125cc081bab6a}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G}}
+\index{O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+N\+A\+M\+E\+\_\+\+L\+O\+N\+G~\char`\"{}name\char`\"{}}\label{tfs__mkdir_8c_ad711bd6611dd678f5e8125cc081bab6a}
+
+
+Definition at line 29 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_ab4994df638d9e65593483a02e6dde3d6}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S@{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S}}
+\index{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S@{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S~\textquotesingle{}p\textquotesingle{}}\label{tfs__mkdir_8c_ab4994df638d9e65593483a02e6dde3d6}
+
+
+Definition at line 26 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a31a7336968a9984df68eddd5b4da5ef0}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G}}
+\index{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G@{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+P\+A\+R\+E\+N\+T\+S\+\_\+\+L\+O\+N\+G~\char`\"{}path\char`\"{}}\label{tfs__mkdir_8c_a31a7336968a9984df68eddd5b4da5ef0}
+
+
+Definition at line 27 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a91fea349332c05eb78ce3c17202e1dc9}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G@{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}}
+\index{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G@{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+P\+T\+\_\+\+S\+T\+R\+I\+N\+G~\char`\"{}hpn\+:\char`\"{}}\label{tfs__mkdir_8c_a91fea349332c05eb78ce3c17202e1dc9}
+
+
+Definition at line 33 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_ac8feab8724de9686c9dc8de9a991cd15}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T@{P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T}}
+\index{P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T@{P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+T\+H\+\_\+\+F\+O\+R\+M\+A\+T~-\/1}\label{tfs__mkdir_8c_ac8feab8724de9686c9dc8de9a991cd15}
+
+
+Definition at line 46 of file tfs\+\_\+mkdir.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{tfs__mkdir_8c_ac5b3462ec0c812741cb7010d27232d35}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!help@{help}}
+\index{help@{help}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{help}]{\setlength{\rightskip}{0pt plus 5cm}void help (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__mkdir_8c_ac5b3462ec0c812741cb7010d27232d35}
+
+
+Definition at line 145 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!main@{main}}
+\index{main@{main}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{tfs__mkdir_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+Definition at line 59 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_abbb91dd0487864455a5c9fb485a8bb09}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!recursive\+\_\+mkdir@{recursive\+\_\+mkdir}}
+\index{recursive\+\_\+mkdir@{recursive\+\_\+mkdir}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{recursive\+\_\+mkdir}]{\setlength{\rightskip}{0pt plus 5cm}{\bf error} recursive\+\_\+mkdir (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{fullpath, }
+\item[{mode\+\_\+t}]{mode}
+\end{DoxyParamCaption}
+)}\label{tfs__mkdir_8c_abbb91dd0487864455a5c9fb485a8bb09}
+
+
+Definition at line 113 of file tfs\+\_\+mkdir.\+c.
+
+\hypertarget{tfs__mkdir_8c_a4907135737e2fb22dcde4be8474bcab1}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!usage@{usage}}
+\index{usage@{usage}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{usage}]{\setlength{\rightskip}{0pt plus 5cm}void usage (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{argv0}
+\end{DoxyParamCaption}
+)}\label{tfs__mkdir_8c_a4907135737e2fb22dcde4be8474bcab1}
+
+
+Definition at line 138 of file tfs\+\_\+mkdir.\+c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{tfs__mkdir_8c_af3fa26ecabe32d66e998a45c701cb116}{}\index{tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}!options@{options}}
+\index{options@{options}!tfs\+\_\+mkdir.\+c@{tfs\+\_\+mkdir.\+c}}
+\subsubsection[{options}]{\setlength{\rightskip}{0pt plus 5cm}struct option options\mbox{[}4\mbox{]}}\label{tfs__mkdir_8c_af3fa26ecabe32d66e998a45c701cb116}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+  \{ \hyperlink{tfs__mkdir_8c_a1ea8dc79a78c520be81fa16c785bef65}{OPT\_HELP\_LONG}, no\_argument, 0, \hyperlink{tfs__mkdir_8c_adaef1917469e58d838e08ea9eec83aa5}{OPT\_HELP} \},
+  \{ \hyperlink{tfs__mkdir_8c_ad711bd6611dd678f5e8125cc081bab6a}{OPT\_NAME\_LONG}, required\_argument, 0, \hyperlink{tfs__mkdir_8c_a5a44059b42cd62194271c932ad05d99a}{OPT\_NAME} \},
+  \{ \hyperlink{tfs__mkdir_8c_a31a7336968a9984df68eddd5b4da5ef0}{OPT\_PARENTS\_LONG}, no\_argument, 0, \hyperlink{tfs__mkdir_8c_ab4994df638d9e65593483a02e6dde3d6}{OPT\_PARENTS} \},
+  \{ 0, 0, 0, 0 \}
+\}
+\end{DoxyCode}
+
+
+Definition at line 35 of file tfs\+\_\+mkdir.\+c.
+
