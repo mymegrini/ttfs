@@ -20,7 +20,7 @@ typedef uint32_t ad_b;    /**< address for blocks in the disk */
  */
 typedef struct {
   char name[D_NAME_MAXLEN+1];      /**< name of the disk     */
-  //char hash[HASH_LEN];            /** md5 generated from path */
+  char hash[HASH_LEN];            /** md5 generated from path */
   int fd;          /**< file descriptor */
   uint32_t size;   /**< size of the disk */
   uint32_t npart;   /**< number of partitions */
@@ -102,31 +102,26 @@ error write_physical_block(disk_id id,block b,uint32_t num){
 error start_disk(char *name,disk_id *id){
   int i = 0;
   // md5
-  char fullpath[PATH_MAX+D_NAME_MAXLEN+1];
-  if (getcwd(fullpath, PATH_MAX+D_NAME_MAXLEN)==NULL);
-  strcat(fullpath, name);
-  //char md5print[HASH_LEN];
-  //hashmd5(fullpath, md5print);
+  char hash[HASH_LEN];
+  char* fullpath = realpath(name, NULL);
+  if(!fullpath) return D_OPEN_ERR;
+  hash64(fullpath, hash);
+  free(fullpath);
   // looking for existing id
-  for (int i = 0; i < DD_MAX; ++i)
-    {
-      if (_disk[i] != NULL             &&
-	  !strcmp(name, _disk[i]->name) //&&
-	  //!strncmp(_disk[i]->hash, md5print, HASH_LEN)
-	  )
-	{
-	  *id = i;
-	  return EXIT_SUCCESS;
-	}
+  for (i = 0; i < DD_MAX; ++i){    
+    if (_disk[i] != NULL && !strcmp(_disk[i]->hash, hash)){
+      *id = i;
+      return EXIT_SUCCESS;
     }
+  }
   i = 0;
+
   while((i<DD_MAX)&&(_disk[i]!=NULL))
     ++i;
   if(i == DD_MAX) 
     return OD_FULL;
   
   int fd = open(name, O_RDWR);
-  puts(name);
   if(fd == -1){
     return D_OPEN_ERR;
   }
@@ -134,11 +129,14 @@ error start_disk(char *name,disk_id *id){
     return D_LOCK;
   *id = i;
   disk_ent* dent = (disk_ent*) malloc(sizeof(disk_ent));
-  dent->name[D_NAME_MAXLEN]=0;
   dent->fd = fd;
+  for (int j=0; j<strlen(name); j++){
+    if (name[j] == '/') {name+=j+1; j=0;}
+  }
+  dent->name[D_NAME_MAXLEN]=0;
   strncpy(dent->name, name, D_NAME_MAXLEN);
-  dent->time = time(NULL);
-  
+  strncpy(dent->hash, hash, HASH_LEN);
+  dent->time = time(NULL);  
 
   _disk[i] = dent;
 
@@ -160,7 +158,6 @@ error start_disk(char *name,disk_id *id){
     rintle(dent->part+j, b_read, B0_IDX_PRTABLE+j*INT_SIZE);
   }
   free(b_read);
-
   
   return EXIT_SUCCESS;
 }
@@ -249,7 +246,7 @@ error disk_stat(disk_id id, d_stat* stat){
   } else {
     int n;
     strncpy(stat->name, _disk[id]->name, D_NAME_MAXLEN);
-    //strncpy(stat->hash, _disk[id]->hash, HASH_LEN);
+    strncpy(stat->hash, _disk[id]->hash, HASH_LEN);
     stat->size = _disk[id]->size;
     stat->npart = _disk[id]->npart;
     stat->time = _disk[id]->time;

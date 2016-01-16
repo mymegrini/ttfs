@@ -8,7 +8,7 @@
 
 #define DD_MAX 100        /***< maximum number of open disks */
 #define D_PARTMAX 10      /***< maximum number of partitions in a disk */
-#define D_NAME_MAXLEN 79  /***< disk name maximum length */
+#define D_NAME_MAXLEN 255  /***< disk name maximum length */
 #define INT_SIZE 4      /**< size of an int */
 
 #define DISKEXIST(id) ( id < DD_MAX && _disk[id] != NULL )

@@ -16,7 +16,7 @@
  *         -10 if the string doesn't fit it uint32_t
  */
 long long int
-atou ( char *s ) {
+atou (const char *s ) {
   int size = strlen(s);
   uint32_t val = 0;
   int count = 0;
@@ -42,7 +42,7 @@ atou ( char *s ) {
  * This function displays a prompt message <prompt> and
  * waits for the user's answer and returns it
  */
-int answer(char* prompt){
+int answer(const char* prompt){
   printf("%s", prompt);
   switch(getchar()){
   case 'Y':	
@@ -57,22 +57,19 @@ int answer(char* prompt){
   }
 }
 
-
-/*#define _XOPEN_RESOURCE
-#include <unistd.h>
-#include <string.h>
-#include <crypt.h>
-#include <stdlib.h>
-
-#define _MD5_SALT "$1$TFS"
-
-void hashmd5(char *str, char *hash) {
-    char *md5 = crypt(str, _MD5_SALT);
-    for (int i = 0; i < 33; i++)
-      {
-	char hex[] = {0,0,0};
-	sprintf(hex, "%x", md5[i]);
-	strcat(hash, hex);
-      }
+/**
+ * @brief Generate decimal hash
+ *
+ * Fill hash string variable a hash generated from str 
+ * hash variable bust be of at least HASH_LEN size
+ * @param str 
+ * @param hash 
+ */
+void
+hash64(const char *str, char* hash){
+  uint64_t h = 5381;
+  char c;  
+  while ((c = *str++)) h = ((h << 5) + h) + c; /* hash * 33 + c */  
+  while((h/=10)) *hash++ = (h%10)+48;  
+  *hash = 0;
 }
-*/

@@ -104,7 +104,6 @@ main ( int argc, char *argv[] )
     }
   }
 
-
   if ( nb_part == 0 ) {
     usage( argv[0], stderr );
     return -1;

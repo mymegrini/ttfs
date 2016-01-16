@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <semaphore.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MACROS
@@ -44,7 +45,7 @@
 #define SEM_FBL_S "semb"
 #define SEM_FEL_S "semt"
 #define SEM_FILE_S "semf"
-#define SEM_NAME_LEN NAME_MAX-5
+#define SEM_NAME_LEN NAME_MAX -5
 
 ////////////////////////////////////////////////////////////////////////////////
 // TYPES
@@ -1172,7 +1173,6 @@ path_split (char *path, char **leaf)
 error
 find_inode (const char *path, uint32_t *ino)
 {
-  puts(path);
   char *token;
   char *pathcpy = strdup(path);
   error e;

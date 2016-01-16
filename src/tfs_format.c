@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define D_NAME_MAXLEN 79     /***< disk name maximum length */
 #define F_OWR 1    /***< flag for overwrite option */
 
 /**

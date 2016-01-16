@@ -93,11 +93,13 @@ void ls(char *argv0, char *path)
     exit(execl("ls", argv0, path + PATH_FPFXLEN + 4, NULL));
 
   disk_id id;
+  //disk_id id2;
   if ((e=start_disk("test.tfs", &id)) != EXIT_SUCCESS) {
     printerror("ls", e);
     usage(argv0);
     exit(TFS_ERRPATH);
   }
+  
   if (path_follow(NULL, &token) != EXIT_SUCCESS) {
     fprintf(stderr, "Path %s invalid.\n", path);
     usage(argv0);
