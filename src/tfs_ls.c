@@ -73,39 +73,34 @@ main ( int argc, char *argv[] )
 
 void ls(char *argv0, char *path)
 {
-  char *parent = strdup(path);
+  //char *parent = strdup(path);
   char *token;
-  char *leaf;
   error e;
-  if (path_split(parent, &leaf) != EXIT_SUCCESS) {
-    fprintf(stderr, "Path %s invalid.\n", path);
-    usage(argv0);
-    exit(TFS_ERRPATH);
-  }
+
+  //parsing disk name
   path_follow(path, NULL);
   if (path_follow(NULL, &token) != EXIT_SUCCESS) {
     fprintf(stderr, "Path %s invalid.\n", path);
     usage(argv0);
     exit(TFS_ERRPATH);
-  }
-    
-  if (ISHOST(token))
-    exit(execl("ls", argv0, path + PATH_FPFXLEN + 4, NULL));
-
-  disk_id id;
-  //disk_id id2;
-  if ((e=start_disk("test.tfs", &id)) != EXIT_SUCCESS) {
+  }  
+  if (ISHOST(token)){
+    path+=PATH_FPFXLEN+4;
+    exit(execlp("ls", "ls",(strlen(path)? path : NULL), NULL));
+  }  
+  disk_id id;  
+  if ((e=start_disk(token, &id)) != EXIT_SUCCESS) {
     printerror("ls", e);
     usage(argv0);
     exit(TFS_ERRPATH);
   }
   
-  if (path_follow(NULL, &token) != EXIT_SUCCESS) {
+  //parsing volume
+  if (path_follow(NULL, &token) != EXIT_SUCCESS) {    
     fprintf(stderr, "Path %s invalid.\n", path);
     usage(argv0);
     exit(TFS_ERRPATH);
   }
-
   long long int pid;
   if ((pid = atou(token)) < 0) {
     fprintf(stderr, "Volume %s incorrect.\n", token);
@@ -117,13 +112,12 @@ void ls(char *argv0, char *path)
   uint32_t ino;
   f_stat fstat;
   if (find_inode(path, &ino) != EXIT_SUCCESS || 
-      file_stat(id, vol_addr, ino, &fstat) != EXIT_SUCCESS)
-    {
-      fprintf(stderr, "Can't access to file %s.\n", path);
+      file_stat(id, vol_addr, ino, &fstat) != EXIT_SUCCESS){
+      fprintf(stderr, "Can't access file %s.\n", path);
       exit(-1);
-    }
-  if (TFS_ISREG(fstat.type)) {
-    printf("%s\n", leaf);
+  }
+  if (TFS_ISREG(fstat.type)){
+    printf("%s %d %d %d\n", path, fstat.size, fstat.type, fstat.subtype);
     exit(0);
   }
   else if (TFS_ISDIR(fstat.type))

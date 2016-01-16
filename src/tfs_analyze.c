@@ -17,7 +17,6 @@
    #define DEF_NAME "disk.tfs"   /***< default disk name */
 #endif
 
-#define D_NAME_MAXLEN 79     /***< disk name maximum length */
 
 /**
  * @brief Analyze a disk

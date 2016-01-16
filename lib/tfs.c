@@ -500,17 +500,18 @@ int tfs_open(const char *name, int oflag, ...){
       //get disk id
       if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
 	{free(path);return -1;}
-      strcat(elem, DEF_EXT);
+    puts(elem);
       if ((errnum = start_disk(elem, &id))!=EXIT_SUCCESS)
 	{free(path);return -1;}      
       
       //get volume address
       if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
-	{free(path);return -1;}      
+	{free(path); return -1;}   
       if (atou(elem)<0)
 	{free(path);return -1;}
       if ((errnum = p_index(id, atou(elem), &vol_addr))!=EXIT_SUCCESS)
-	{free(path);return -1;}  
+	{free(path);return -1;} 
+    puts("b"); 
       
       //open file      
       if ((fd = file_open(id, vol_addr, inode, oflag, 0, 0))==-1)

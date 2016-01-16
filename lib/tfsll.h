@@ -22,7 +22,7 @@
 // MACROS
 ////////////////////////////////////////////////////////////////////////////////
 #define INT_SIZE 4                                /***< Integer size */
-#define INTX(i) (i*INT_SIZE)                      /***< Integer size multiples */
+#define INTX(i) ((i)*INT_SIZE)                      /***< Integer size multiples */
 
 #define TFS_MAGIC_NUMBER 0x31534654               /***< TFS version identifier "TFS1" */
 #define TFS_MAGIC_NUMBER_INDEX INTX(0)            /***< TFS version identifier index in volume superblock */
@@ -40,7 +40,8 @@
 #define TFS_DIRECT_BLOCKS_NUMBER 10               /***< TFS direct data blocks number in file table entry */
 #define TFS_INDIRECT1_CAPACITY INT_PER_BLOCK      /***< TFS file's maximum number of indirect1 blocks */
 #define TFS_INDIRECT2_CAPACITY (INT_PER_BLOCK*INT_PER_BLOCK) /***< TFS file's maximum number of indirect2 blocks */
-#define TFS_FILE_TABLE_ENTRY_SIZE INTX(6+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS file table entry size */
+#define TFS_FILE_TABLE_ENTRY_SIZE  (TFS_DIRECT_INDEX(TFS_DIRECT_BLOCKS_NUMBER)+INTX(3))
+/***< TFS file table entry size */
 #define TFS_FILE_SIZE_INDEX INTX(0)               /***< TFS file size index in file table entry */
 #define TFS_FILE_TYPE_INDEX INTX(1)               /***< TFS file type index in file table entry */
 #define TFS_REGULAR_TYPE 0                        /***< TFS regular file table entry type */
@@ -50,9 +51,12 @@
 #define TFS_DATE_SUBTYPE 0                        /***< TFS date file table entry subtype */
 #define TFS_DISK_SUBTYPE 1                        /***< TFS disk file table entry subtype */
 #define TFS_DIRECT_INDEX(i) INTX(3+(i))           /***< TFS direct data block <i> file table entry index */
-#define TFS_INDIRECT1_INDEX INTX(3+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS indirect1 block index in file table entry */
-#define TFS_INDIRECT2_INDEX INTX(4+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS indirect2 block index in file table entry */
-#define TFS_NEXT_FREE_FILE_ENTRY_INDEX INTX(5+TFS_DIRECT_BLOCKS_NUMBER) /***< TFS next free file entry index */
+#define TFS_INDIRECT1_INDEX (TFS_DIRECT_INDEX(TFS_DIRECT_BLOCKS_NUMBER))
+/***< TFS indirect1 block index in file table entry */
+#define TFS_INDIRECT2_INDEX (TFS_DIRECT_INDEX(TFS_DIRECT_BLOCKS_NUMBER)+INTX(1))
+/***< TFS indirect2 block index in file table entry */
+#define TFS_NEXT_FREE_FILE_ENTRY_INDEX (TFS_DIRECT_INDEX(TFS_DIRECT_BLOCKS_NUMBER)+INTX(2))
+/***< TFS next free file entry index */
 
 #define TFS_VOLUME_NEXT_FREE_BLOCK_INDEX (TFS_VOLUME_BLOCK_SIZE-INT_SIZE) /***< TFS volume next free block index */
 

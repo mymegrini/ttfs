@@ -91,8 +91,8 @@ typedef struct {
 // PRIVATE FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-#define NENTBYBLOCK (TFS_VOLUME_BLOCK_SIZE / TFS_FILE_TABLE_ENTRY_SIZE)
-#define INO_FTBLOCK(inode) (1 + ((inode)/NENTBYBLOCK))
+#define NENTBYBLOCK (TFS_VOLUME_BLOCK_SIZE/TFS_FILE_TABLE_ENTRY_SIZE)
+#define INO_FTBLOCK(inode) (TFS_FILE_TABLE_INDEX + ((inode)/NENTBYBLOCK))
 #define INO_BPOS(inode) ((inode) % NENTBYBLOCK)
 
 static error
@@ -1170,60 +1170,35 @@ path_split (char *path, char **leaf)
   *leaf = NULL;
   return TFS_ERRPATH;
 }
+
+
 error
-find_inode (const char *path, uint32_t *ino)
-{
+find_inode (const char *path, uint32_t *ino){
   char *token;
-  char *pathcpy = strdup(path);
   error e;
   int fd;
+  disk_id id;
+  uint32_t vol_addr;
   char dirent[TFS_DIRECTORY_ENTRY_SIZE];
-  //int test;
 
   //path follow init
-  if ((e = path_follow(pathcpy, NULL)) != EXIT_SUCCESS)
-    return e;
+  if ((e = path_follow(path, NULL)) != EXIT_SUCCESS) return e;
 
   // token : disk
-  if ((path_follow(NULL, &token)) != EXIT_SUCCESS) {
-    free(pathcpy);
-    return TFS_ERRPATH_NODISK;
-  }
-  if (ISHOST(token)) {
-    free(pathcpy);
-    return TFS_ERRPATH_HOST;
-  }
-  disk_id id;
-  char* diskname = (char*)malloc((strlen(token)+5)*sizeof(char));
-  strcpy(diskname, token);
-  strcpy(diskname+strlen(token), DEF_EXT);
-  if ((e = start_disk(diskname, &id)) != EXIT_SUCCESS) {
-    free(pathcpy);
-    return e;
-  }
-  //puts(diskname);
-  free(diskname);
+  if ((path_follow(NULL, &token)) != EXIT_SUCCESS) return TFS_ERRPATH_NODISK;  
+  if (ISHOST(token)) return TFS_ERRPATH_HOST;
+  if ((e = start_disk(token, &id)) != EXIT_SUCCESS) return e;
+  
   // token : part index
-  if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) {
-    free(pathcpy);
-    stop_disk(id);
-    return e;
-  }
+  if ((e = path_follow(NULL, &token)) != EXIT_SUCCESS) return e;  
   // conversion to uint32_t
-  long long int partid = atou(token);
+  uint32_t partid = atou(token);
   if (partid < 0) {
-    free(pathcpy);
-    stop_disk(id);
     return TFS_ERRPATH_PARTID;
   }
-  // recover volume adress
-  uint32_t vol_addr;
-  if ((e = p_index(id, partid, &vol_addr)) != EXIT_SUCCESS) {
-    free(pathcpy);
-    stop_disk(id);
-    printf("%d %lld", id, partid);
-    return e;
-  }
+  // recover volume address
+  if ((e = p_index(id, partid, &vol_addr)) != EXIT_SUCCESS) return e;
+
   *ino = 0;
   // exploring file system tree
   while ((e= path_follow(NULL, &token))==EXIT_SUCCESS){
@@ -1232,23 +1207,19 @@ find_inode (const char *path, uint32_t *ino)
     fd = file_open(id, vol_addr, *ino, O_RDONLY, TFS_DIRECTORY_TYPE, 0);
     if (fd == -1) break;
     while(tfs_read(fd, dirent, TFS_DIRECTORY_ENTRY_SIZE)!=-1){
-      //debug
-      //dirent[TFS_DIRECTORY_ENTRY_SIZE-1] = 0;
-      //puts(dirent);
-
       //check for token file entry and store its inode
       if (strncmp(token, dirent+INTX(1), TFS_DIRECTORY_ENTRY_SIZE-INTX(1))==0){
 	rintle(ino, (block)dirent, 0);
-	
+	tfs_close(fd);
 	break;
       }
     }
-    tfs_close(fd);
+    break;
   }
-  free(pathcpy);
-  printerror("find", e);
   if (e==TFS_PATHLEAF) return EXIT_SUCCESS;
-  else return TFS_F_NOTFOUND;  
+
+  printerror("find_inode", e);
+  return TFS_F_NOTFOUND;  
 }
 
 
