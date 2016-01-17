@@ -69,7 +69,9 @@ static char* _errlist[] = {
   "Segmentation fault",
   "Unrecognized subtype",
   "Unrecognized file type",
-  "Invalid seek mode"
+  "Invalid seek mode",
+  "Invalid path",
+  "File is not a directory"
 };
 
 /**

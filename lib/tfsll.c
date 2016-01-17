@@ -778,14 +778,13 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
   tfs_ftent ftent;
   error e;
   int fd = 0;
-  uint32_t finode;
   d_stat dstat;
   int p = 1;
   int vol = 0;
   
   if(flags&O_CREAT){ //create new file entry
     //get free file entry
-    freefile_pop(id, vol_addr, &finode);
+    freefile_pop(id, vol_addr, &inode);
     //fill file entry
     ftent.size = 0;
     ftent.type = type;
@@ -796,16 +795,16 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
     ftent.size = (subtype==TFS_DISK_SUBTYPE ? dstat.part[vol] : 0);
     
     //write file entry
-    write_ftent(id, vol_addr, finode, &ftent);
+    write_ftent(id, vol_addr, inode, &ftent);
   } else {
-    finode = inode;
     //read file entry
-    e = read_ftent(id, vol_addr, finode, &ftent);    
+    e = read_ftent(id, vol_addr, inode, &ftent);    
     if (e != EXIT_SUCCESS) {errnum = e; return -1;}
   }
   
   //find available file descriptor
   while (fd < TFS_FILE_MAX && _filedes[fd] != NULL) fd++;
+  
   if (fd == TFS_FILE_MAX){
     errnum = TFS_MAX_FILE;
     return -1;
@@ -814,14 +813,16 @@ file_open (disk_id id, uint32_t vol_addr, uint32_t inode, int flags,
     //get file semaphore
     char name[SEM_NAME_LEN];
     sem_t* sem;      
-    sem_name(name, SEM_FILE_T, id, vol_addr, finode);
+    sem_name(name, SEM_FILE_T, id, vol_addr, inode);
     sem = sem_open(name, O_CREAT,
 		   S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH, 1);
+    //get file entry
+    read_ftent(id, vol_addr, inode, &ftent);
     //fill structure
     file = (File*)malloc(sizeof(File));
     file->id = id;
     file->vol_addr = vol_addr;
-    file->inode = finode;
+    file->inode = inode;
     file->sem = sem;
     file->offset = 0;
     file->flags = flags;

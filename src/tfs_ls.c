@@ -85,7 +85,7 @@ void ls(char *argv0, char *path)
     exit(TFS_ERRPATH);
   }  
   if (ISHOST(token)){
-    path+=PATH_FPFXLEN+4;
+    path+=PATH_FPFXLEN+strlen("HOST/");
     exit(execlp("ls", "ls",(strlen(path)? path : NULL), NULL));
   }  
   disk_id id;  

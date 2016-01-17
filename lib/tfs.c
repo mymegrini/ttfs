@@ -441,7 +441,7 @@ int tfs_open(const char *name, int oflag, ...){
     disk_id id;
     uint32_t vol_addr;
     int fd;
-    
+
     //find file inode
     errnum = find_inode(path, &inode);
     
@@ -492,17 +492,19 @@ int tfs_open(const char *name, int oflag, ...){
     if (errnum == TFS_F_NOTFOUND) {free(path);return -1;}
     
     //case 3: file exists
-    if (errnum == EXIT_SUCCESS){      
+    if (errnum == EXIT_SUCCESS){
+      
       //obtaining name and parent path
-      if ((errnum = path_split(path, &fname))!=EXIT_SUCCESS)
-	{free(path);return -1;}
+      if ((errnum = path_follow(path, NULL))!=EXIT_SUCCESS)
+	{free(path);return -1;}        
       
       //get disk id
       if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
 	{free(path);return -1;}
-    puts(elem);
+      if (ISHOST(elem)){errnum=TFS_ERRPATH_HOST; return -1;}
+      
       if ((errnum = start_disk(elem, &id))!=EXIT_SUCCESS)
-	{free(path);return -1;}      
+	{free(path);return -1;}
       
       //get volume address
       if ((errnum = path_follow(NULL, &elem))!=EXIT_SUCCESS)
@@ -510,8 +512,7 @@ int tfs_open(const char *name, int oflag, ...){
       if (atou(elem)<0)
 	{free(path);return -1;}
       if ((errnum = p_index(id, atou(elem), &vol_addr))!=EXIT_SUCCESS)
-	{free(path);return -1;} 
-    puts("b"); 
+	{free(path);return -1;}   
       
       //open file      
       if ((fd = file_open(id, vol_addr, inode, oflag, 0, 0))==-1)
@@ -908,23 +909,32 @@ DIR *opendir(const char *filename){
     errnum = TFS_ERROPEN;
     return NULL;
   }
-  DIR *dir = (DIR *) malloc(sizeof(DIR));
-  dir->fd       = fd;
-  dir->b_offset = 0;
-  dir->b_size   = 0;
-  for (int i = 0; i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i)
-    {
-      char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
-      if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
-	return dir;
-      else {
+  f_stat fstat;
+  file_stat(_filedes[fd]->id,_filedes[fd]->vol_addr,_filedes[fd]->inode, &fstat);
+
+  if (fstat.type != TFS_DIRECTORY_TYPE)
+    {errnum = TFS_NOT_DIRECTORY; return NULL;}
+  else {
+    DIR *dir = (DIR *) malloc(sizeof(DIR));
+    dir->fd       = fd;
+    dir->b_offset = 0;
+    dir->b_size   = 0;
+    
+    char entry_buf[TFS_DIRECTORY_ENTRY_SIZE];
+    if (tfs_read(fd, entry_buf, TFS_DIRECTORY_ENTRY_SIZE) == 0)
+    return dir;
+    else {
+      for (int i = 0; i < fstat.size / TFS_DIRECTORY_ENTRY_SIZE
+	     && i < TFS_DIRECTORY_ENTRIES_PER_BLOCK; ++i){
 	// fill buffer
 	rintle(&dir->buf[i].d_ino, (block)entry_buf, 0);
 	strncpy(dir->buf[i].d_name, &entry_buf[INT_SIZE], TFS_NAME_MAX);
 	dir->b_size++;
       }      
     }
-  return dir;
+    return dir;
+    puts("bug");
+  }
 }
 
 /**

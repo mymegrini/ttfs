@@ -99,7 +99,8 @@ void testerror(char* msg, error err);
 #define TFS_WRONGSUBTYPE 55   /**< Unrecognized subtype */
 #define TFS_WRONGTYPE 56      /**< Unrecognized file type */
 #define TFS_INVALIDSEEK 57    /**< Invalid seek mode */
-#define TFS_ERRPATH_NOPATH 58
+#define TFS_ERRPATH_NOPATH 58 /**< Invalid path */
+#define TFS_NOT_DIRECTORY 59  /**< File is not a directory >*/
 
 /**
  * @brief This variable can store an error
